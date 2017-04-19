@@ -79,7 +79,9 @@
                 <td>Rawmaterial </td>
                  <td>:&nbsp;&nbsp;</td>
                 <td>
-                    <input type="text" id="product_descript" name="product_descript" class="textStyle" value="<?php echo $bodycontent['rawmaterial']['product_description'];?>"/>
+				
+                    <input type="text" id="product_descript" name="product_descript" class="textStyle" 
+					value="<?php echo (htmlspecialchars($bodycontent['rawmaterial']['product_description']));?>"/>
                     
                     </td>
             </tr>
