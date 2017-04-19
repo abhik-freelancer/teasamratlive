@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+</head>
+
+<body>
+
+
+        <thead bgcolor="#a6a6a6">
+        <tr><th>LOT/DO</th>
+        <th>Invoice Number</th>
+        <th>Garden/Warehouse/Group</th>
+        <th>Grade/Chest</th>
+        <th>GP No/Date</th>
+        <th>
+            Package<br>
+            Stamp/Net
+        </th>
+        <th>
+            Sample
+        </th>
+        <th>Gross/Brokerage</th>
+        <th>Total Wt.<br>Tax</th>
+        <th>Price<br>Service tax</th>
+        <th>Value<br>Total</th>
+        <th></th>
+        </tr></thead>
+
+        <tbody id="mybody">
+			<tr id="detailtr42" style="border-bottom:1pt solid black;">
+
+                    <td>
+                        <span id="lot42">125</span>
+                        <input name="detailtableid[]" id="detailtableid42" value="42" type="hidden">
+                        <input name="detaillot[]" value="125" type="hidden">
+                        <br>
+                        <span id="do42">125</span>
+                        <input name="detaildo[]" value="125" type="hidden">
+                    </td>
+                    <td>
+                        <span id="invoice42">1253</span>
+                        <input name="detailinvoice[]" value="1253" type="hidden">
+                    </td>
+                    <td>
+                        <span id="garden42">xyztea garden</span>
+                        <input id="detailgardenid42" name="detailgardenid[]" value="28" type="hidden">
+                        <br>
+                        <span id="warehouse42">xzv</span>
+                        <input id="detailwarehouseid42" name="detailwarehouseid[]" value="2" type="hidden">
+                        <br>
+                        <span id="teagroup42"></span>
+                        <input id="detailteagroupid42" name="detailteagroupid[]" value="" type="hidden">
+                    </td>
+                    <td>
+                        <span id="grade42">B+</span>
+                        <input id="detailgradeid42" name="detailgradeid[]" value="2" type="hidden">
+                        <br>
+                        <span id="chest42">110 - 120</span>
+                        <input id="detailchfrom42" name="detailchfrom[]" value="110" type="hidden">
+                        <input id="detailchto42" name="detailchto[]" value="120" type="hidden">
+                    </td>
+                    <td>
+                        <span id="gpnumber42">123</span>
+                        <input name="detailgpno[]" value="123" type="hidden">
+                        <br>
+                        <span id="gpdate42">02-04-2015</span>
+                        <input name="detaildate[]" value="2015-04-02" type="hidden">
+                    </td>
+                    <td>
+                        <span id="package42">10</span>
+                        <input name="detailpackage[]" value="10" type="hidden">
+                        <br>
+                        <span id="stamp42">1</span>
+                        <input name="detailstamp[]" value="1" type="hidden">
+                        <br>
+                        <span id="net42">30</span>
+                        <input name="detailnet[]" value="30" type="hidden">
+                    </td>
+                    <td>
+                        <table>
+                            <tbody><tr>
+                                <td><span id="sample42">110<br>111</span><input name="detailsamplename[]" value="110*111" type="hidden"></td>
+                                <td> =&gt; </td>
+                                <td><span id="samplenet42">10<br>20</span><input name="detailsamplenet[]" value="10*20" type="hidden"></td>
+                            </tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <span id="gross42">30.2</span>
+                        <input name="detailgross[]" value="30.2" type="hidden">
+                        <br>
+                        <span id="brokerage42">110</span>
+                        <input name="detaillistbrokerage[]" value="110" type="hidden">
+                    </td>
+                    <td>
+                        <span id="tweigh42">270.00</span>
+                        <input name="detaillisttweight[]" value="270.00" type="hidden">
+                        <br>
+                        <span id="vat42">VAT =&gt; 2711.00</span>
+                        <input name="rate_type[]" id="ratetype42" class="ratetype" value="V" type="hidden">
+                        <input name="rate_type_id[]" id="ratetypeid42" class="ratetypeid" value="1" type="hidden">
+                        <input name="detailvat[]" id="ratetypevalue42" class="ratetypevalue" value="2711.00" type="hidden">
+                        <input class="fieldvatrate" name="fieldvatrate[]" value="2711.00" type="hidden">
+                        <input class="fieldcstrate" name="fieldcstrate[]" value="" type="hidden">
+                    </td>
+
+
+                    <td>
+                        <span id="price42">100.00</span>
+                        <input name="detailprice[]" value="100.00" type="hidden">
+                        <br>
+                        <span id="stax42">11.00</span>
+                        <input name="detailstax[]" class="detailstax" value="11.00" type="hidden">
+                        <input name="stax_id[]" class="servicetaxid" value="5" type="hidden">
+                    </td>
+                    <td>
+                        <span id="value42">27000.00                            <input name="detailvalue[]" value="27000.00" type="hidden">
+                        </span>
+                        <br>
+                        <span id="total42">29833.00</span>
+                        <input name="detaillisttotal[]" value="29833.00" type="hidden">
+                    </td>
+                    <td>
+                        <img src="http://localhost:8080/tea_samrat/application/assets/images/delete.png" onclick='deleterowdb("detailtr",42)' width="18" height="18">
+                        <img src="http://localhost:8080/tea_samrat/application/assets/images/edit.jpg" onclick='editrow("detailtr",42)' width="20" height="20">
+                    </td>
+                </tr>
+                                <tr id="detailtr43" style="border-bottom:1pt solid black;">
+
+                    <td>
+                        <span id="lot43">110</span>
+                        <input name="detailtableid[]" id="detailtableid43" value="43" type="hidden">
+                        <input name="detaillot[]" value="110" type="hidden">
+                        <br>
+                        <span id="do43">145</span>
+                        <input name="detaildo[]" value="145" type="hidden">
+                    </td>
+                    <td>
+                        <span id="invoice43">123</span>
+                        <input name="detailinvoice[]" value="123" type="hidden">
+                    </td>
+                    <td>
+                        <span id="garden43">xyztea garden</span>
+                        <input id="detailgardenid43" name="detailgardenid[]" value="28" type="hidden">
+                        <br>
+                        <span id="warehouse43">xzv</span>
+                        <input id="detailwarehouseid43" name="detailwarehouseid[]" value="2" type="hidden">
+                        <br>
+                        <span id="teagroup43">a</span>
+                        <input id="detailteagroupid43" name="detailteagroupid[]" value="1" type="hidden">
+                    </td>
+                    <td>
+                        <span id="grade43">B+</span>
+                        <input id="detailgradeid43" name="detailgradeid[]" value="2" type="hidden">
+                        <br>
+                        <span id="chest43">0 - 0</span>
+                        <input id="detailchfrom43" name="detailchfrom[]" value="0" type="hidden">
+                        <input id="detailchto43" name="detailchto[]" value="0" type="hidden">
+                    </td>
+                    <td>
+                        <span id="gpnumber43">0</span>
+                        <input name="detailgpno[]" value="0" type="hidden">
+                        <br>
+                        <span id="gpdate43">01-01-1970</span>
+                        <input name="detaildate[]" value="1970-01-01" type="hidden">
+                    </td>
+                    <td>
+                        <span id="package43">20</span>
+                        <input name="detailpackage[]" value="20" type="hidden">
+                        <br>
+                        <span id="stamp43">2.50</span>
+                        <input name="detailstamp[]" value="2.50" type="hidden">
+                        <br>
+                        <span id="net43">30</span>
+                        <input name="detailnet[]" value="30" type="hidden">
+                    </td>
+                    <td>
+                        <table>
+                            <tbody><tr>
+                                <td><span id="sample43">1<br>2</span><input name="detailsamplename[]" value="1*2" type="hidden"></td>
+                                <td> =&gt; </td>
+                                <td><span id="samplenet43">25<br>30</span><input name="detailsamplenet[]" value="25*30" type="hidden"></td>
+                            </tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <span id="gross43">30.2</span>
+                        <input name="detailgross[]" value="30.2" type="hidden">
+                        <br>
+                        <span id="brokerage43">100</span>
+                        <input name="detaillistbrokerage[]" value="100" type="hidden">
+                    </td>
+                    <td>
+                        <span id="tweigh43">595.00</span>
+                        <input name="detaillisttweight[]" value="595.00" type="hidden">
+                        <br>
+                        <span id="vat43">
+                            
+                            VAT =&gt; 11910.00 
+                        </span>
+                        <input name="rate_type[]" id="ratetype43" class="ratetype" value="V" type="hidden">
+                        <input name="rate_type_id[]" id="ratetypeid43" class="ratetypeid" value="1" type="hidden">
+                        <input name="detailvat[]" id="ratetypevalue43" class="ratetypevalue" value="11910.00" type="hidden">
+                        <input class="fieldvatrate" name="fieldvatrate[]" value="11910.00" type="hidden">
+                        <input class="fieldcstrate" name="fieldcstrate[]" value="" type="hidden">
+                    </td>
+
+
+                    <td>
+                        <span id="price43">200.00</span>
+                        <input name="detailprice[]" value="200.00" type="hidden">
+                        <br>
+                        <span id="stax43">10.00</span>
+                        <input name="detailstax[]" class="detailstax" value="10.00" type="hidden">
+                        <input name="stax_id[]" class="servicetaxid" value="5" type="hidden">
+                    </td>
+                    <td>
+                        <span id="value43">
+                        119000.00
+                        <input name="detailvalue[]" value="119000.00" type="hidden">
+                        </span>
+                        <br>
+                        <span id="total43">131022.50</span>
+                        <input name="detaillisttotal[]" value="131022.50" type="hidden">
+                    </td>
+                    <td>
+                        <img src="http://localhost:8080/tea_samrat/application/assets/images/delete.png" onclick='deleterowdb("detailtr",43)' width="18" height="18">
+                        <img src="http://localhost:8080/tea_samrat/application/assets/images/edit.jpg" onclick='editrow("detailtr",43)' width="20" height="20">
+                    </td>
+                </tr>
+                
+        </tbody>
+
+
+    
+
+
+
+
+
+</body>
+</html>

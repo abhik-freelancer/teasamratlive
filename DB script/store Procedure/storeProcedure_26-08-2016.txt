@@ -1,0 +1,1547 @@
+/*---------START ---------GetVendorUnpaidBill-----*/
+
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `GetVendorUnpaidBill`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `GetVendorUnpaidBill`(
+IN companyId INT(20),
+IN vendorBillMaster INT(20),
+OUT unpaidAmount DECIMAL(10,2)
+)
+BEGIN
+ DECLARE _mbillAmount DECIMAL(10,2) DEFAULT 0;
+ DECLARE _madjustedAmount DECIMAL(10,2) DEFAULT 0;
+ DECLARE _mpaidAmount DECIMAL(10,2) DEFAULT 0;
+SET _mbillAmount:=(SELECT IFNULL(vendorbillmaster.`billAmount`,0) AS bill
+FROM `vendorbillmaster` 
+WHERE  vendorbillmaster.`vendorBillMasterId`=vendorBillMaster AND vendorbillmaster.`companyId`=companyId);
+SET  _madjustedAmount:= (SELECT IFNULL(SUM(`vendoradjustmentdetails`.`adjustedAmount`),0) AS adjustmentAmount
+FROM `vendoradjustmentdetails`
+GROUP BY 
+`vendoradjustmentdetails`.`vendorBillMasterId`
+HAVING 
+`vendoradjustmentdetails`.`vendorBillMasterId`=vendorBillMaster);
+SET _mpaidAmount:= (SELECT IFNULL(SUM(`vendorbillpaymentdetail`.`paidAmount`),0) AS paid FROM 
+`vendorbillpaymentdetail`
+GROUP BY 
+`vendorbillpaymentdetail`.`vendorBillMaster`
+HAVING 
+`vendorbillpaymentdetail`.`vendorBillMaster`=vendorBillMaster);
+ #select _mbillAmount;
+ #SELECT _madjustedAmount;
+ #SELECT _mpaidAmount;
+IF(_madjustedAmount IS NULL)THEN
+	SET _madjustedAmount:=0;
+END IF;
+IF(_mpaidAmount IS NULL)THEN
+	SET _mpaidAmount:=0;
+END IF;
+ 
+ 
+ SET unpaidAmount := _mbillAmount - (_madjustedAmount + _mpaidAmount);
+ #SET unpaidAmount :=50;
+ #SELECT unpaidAmount;
+ 
+ END$$
+
+DELIMITER ;
+
+/*---------END---------GetVendorUnpaidBill-----*/
+
+
+
+
+
+
+/*-----------START -------sp_allgroup_stock-------------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_allgroup_stock`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_allgroup_stock`()
+BEGIN
+SELECT PID.`id` AS purchaseDtl,PBD.`id` AS purchaseBagDtlId,
+`blending_details`.`id`,
+PID.`teagroup_master_id`,PID.`invoice_number`,PID.`lot`,PIM.`sale_number`,garden_master.`garden_name`,grade_master.`grade`,location.`location`,teagroup_master.`group_code`,
+PID.`price`,PID.`cost_of_tea`,PBD.`actual_bags`,PBD.`net`,PBD.`shortkg`,`blending_details`.`number_of_blended_bag`,`blending_details`.`qty_of_bag`,
+(IF(PBD.`actual_bags` IS NULL, 0,PBD.`actual_bags`) -
+ IF(`blending_details`.`number_of_blended_bag` IS NULL,0,`blending_details`.`number_of_blended_bag`)) AS NumberOfStockBag,
+((
+IF(PBD.`actual_bags`IS NULL,0,PBD.`actual_bags`)* IF(PBD.net IS NULL,0,PBD.net))-
+(IF(`blending_details`.`number_of_blended_bag`IS NULL,0,`blending_details`.`number_of_blended_bag`)*
+IF(`blending_details`.`qty_of_bag`IS NULL,0,`blending_details`.`qty_of_bag`))) AS StockBagQty
+FROM `purchase_invoice_detail` PID 
+INNER JOIN 
+`purchase_bag_details` PBD ON PID.`id` =PBD.`purchasedtlid`
+INNER JOIN `purchase_invoice_master` PIM ON PID.`purchase_master_id`=PIM.`id`
+INNER JOIN 
+do_to_transporter DOT ON PID.`id`= DOT.`purchase_inv_dtlid` AND DOT.`in_Stock`='Y'
+LEFT JOIN `blending_details` ON PBD.`id` = `blending_details`.`purchasebag_id`
+INNER JOIN garden_master ON PID.`garden_id` = garden_master.`id`
+INNER JOIN grade_master ON PID.`grade_id` = grade_master.`id`
+INNER JOIN `location` ON DOT.`locationId`=`location`.`id`  
+INNER JOIN `teagroup_master` ON PID.`teagroup_master_id` = `teagroup_master`.`id`;
+END$$
+
+DELIMITER ;
+
+/*-----------END -------sp_allgroup_stock-------------*/
+
+
+
+
+
+/*----------START-----sp_allgroup_sum_stock--------*/
+
+/* Procedure structure for procedure `sp_allgroup_sum_stock` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_allgroup_sum_stock` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_allgroup_sum_stock`()
+BEGIN
+SELECT 
+PID.`teagroup_master_id`,teagroup_master.`group_code`,
+SUM((IF(PBD.`actual_bags` IS NULL, 0,PBD.`actual_bags`) -
+ IF(`blending_details`.`number_of_blended_bag` IS NULL,0,`blending_details`.`number_of_blended_bag`)) )AS NumberOfStockBag,
+SUM((
+IF(PBD.`actual_bags`IS NULL,0,PBD.`actual_bags`)* IF(PBD.net IS NULL,0,PBD.net))-
+(IF(`blending_details`.`number_of_blended_bag`IS NULL,0,`blending_details`.`number_of_blended_bag`)*
+IF(`blending_details`.`qty_of_bag`IS NULL,0,`blending_details`.`qty_of_bag`))) AS StockBagQty
+FROM `purchase_invoice_detail` PID 
+INNER JOIN 
+`purchase_bag_details` PBD ON PID.`id` =PBD.`purchasedtlid`
+INNER JOIN 
+do_to_transporter DOT ON PID.`id`= DOT.`purchase_inv_dtlid` AND DOT.`in_Stock`='Y'
+LEFT JOIN `blending_details` ON PBD.`id` = `blending_details`.`purchasebag_id`
+INNER JOIN garden_master ON PID.`garden_id` = garden_master.`id`
+INNER JOIN grade_master ON PID.`grade_id` = grade_master.`id`
+INNER JOIN `location` ON DOT.`locationId`=`location`.`id`  
+INNER JOIN `teagroup_master` ON PID.`teagroup_master_id` = `teagroup_master`.`id`
+GROUP BY PID.`teagroup_master_id`;
+END */$$
+DELIMITER ;
+
+
+/*----------END ----sp_allgroup_sum_stock-----------*/
+
+
+
+
+
+/*---------- START ----sp_autoVoucherInsertPR-----------*/
+
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_autoVoucherInsertPR`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_autoVoucherInsertPR`()
+BEGIN
+	DECLARE cursor_finish INTEGER DEFAULT 0;
+	DECLARE voucherNumber VARCHAR(100);
+	DECLARE voucherDate DATETIME;
+	DECLARE narration VARCHAR(100);
+	DECLARE transactionType VARCHAR(100);
+	DECLARE companyId INTEGER DEFAULT 0;
+	DECLARE yearId INTEGER DEFAULT 0;
+	DECLARE vendorAccountAmount DECIMAL(10,2);
+	DECLARE vendorAccId INTEGER DEFAULT 0;
+	DECLARE purchaseAccountAmount DECIMAL(10,2);
+	DECLARE VATinputAmount DECIMAL(10,2);
+	DECLARE purchaseMasterId INTEGER DEFAULT 0;
+	#cursor declare
+	DECLARE cursor_purchase CURSOR FOR 
+	SELECT 
+	`purchase_invoice_master`.`purchase_invoice_number`,
+	`purchase_invoice_master`.`purchase_invoice_date`,
+	`purchase_invoice_master`.`company_id`,
+	`purchase_invoice_master`.`year_id` ,`purchase_invoice_master`.`id` AS purchaseMasterId,
+	(IFNULL(`purchase_invoice_master`.`total`,0)) AS totalCreditAmountForVendor,
+	vendor.`account_master_id` AS vendorAccountId,
+	( IFNULL(`purchase_invoice_master`.`tea_value`,0)
+		+IFNULL(`purchase_invoice_master`.`brokerage`,0)
+		+IFNULL(`purchase_invoice_master`.`service_tax`,0)
+		+IFNULL(`purchase_invoice_master`.`stamp`,0)
+		+IFNULL(`purchase_invoice_master`.`other_charges`,0)
+		+IFNULL(`purchase_invoice_master`.`round_off`,0)
+		+IFNULL(`purchase_invoice_master`.`total_cst`,0)
+		) AS totalDebitPurchaseAC,
+		(IFNULL(`purchase_invoice_master`.`total_vat`,0)
+		) AS totalDebitVATinput
+	FROM `purchase_invoice_master` 
+	INNER JOIN vendor ON `purchase_invoice_master`.`vendor_id` = vendor.`id`
+	WHERE `purchase_invoice_master`.`from_where`<>'OP' AND `purchase_invoice_master`.`from_where`<>'STI' AND `purchase_invoice_master`.`company_id`=1;
+	
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER 
+	FOR NOT FOUND SET cursor_finish = 1;
+	
+	OPEN cursor_purchase;
+	get_purchase :LOOP
+	
+	FETCH  cursor_purchase INTO voucherNumber,voucherDate,companyId,yearId,purchaseMasterId,vendorAccountAmount,
+	vendorAccId,purchaseAccountAmount,VATinputAmount;
+	
+	IF cursor_finish = 1 THEN 
+		LEAVE get_purchase;
+	END IF; 	
+	-- insertion section
+	INSERT INTO `voucher_master`(`voucher_number`,`voucher_date`,`narration`,`transaction_type`,`created_by`,`company_id`,`year_id`)
+	VALUES (voucherNumber,voucherDate,'Purchase-Auto','PR',2,companyId,yearId);
+	
+	SET @voucherId := LAST_INSERT_ID();
+	-- update purchase master with voucherId
+	UPDATE purchase_invoice_master 
+	SET purchase_invoice_master.`voucher_master_id` = @voucherId
+	WHERE purchase_invoice_master.`id`= purchaseMasterId;
+	
+	INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+	VALUES(@voucherId,vendorAccId,vendorAccountAmount,'N') ; -- vendor account
+	
+	INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+	VALUES(@voucherId,6,purchaseAccountAmount,'Y') ; -- Purchase Account
+
+	IF VATinputAmount >0 THEN
+		INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+		VALUES(@voucherId,5,VATinputAmount,'Y') ;
+	END IF;
+	
+	SET @voucherId:=0;
+	
+	-- SELECT voucherNumber,voucherDate,companyId,yearId,purchaseMasterId,vendorAccountAmount,vendorAccId,purchaseAccountAmount,VATinputAmount;
+	 END LOOP get_purchase;
+ CLOSE cursor_purchase;
+	
+    END$$
+
+DELIMITER ;
+
+/*---------- END ----sp_autoVoucherInsertPR-----------*/
+
+
+
+
+
+
+/*---------- START ----sp_autoVoucherInsertRAWPUR-----------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_autoVoucherInsertRAWPUR`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_autoVoucherInsertRAWPUR`()
+BEGIN
+	DECLARE cursor_finish INTEGER DEFAULT 0;
+	DECLARE voucherNumber VARCHAR(100);
+	DECLARE voucherDate DATETIME;
+	DECLARE narration VARCHAR(100);
+	DECLARE transactionType VARCHAR(100);
+	DECLARE companyId INTEGER DEFAULT 0;
+	DECLARE yearId INTEGER DEFAULT 0;
+	DECLARE vendorAccountAmount DECIMAL(10,2);
+	DECLARE vendorAccId INTEGER DEFAULT 0;
+	DECLARE purchaseAccountAmount DECIMAL(10,2);
+	DECLARE VATinputAmount DECIMAL(10,2);
+	DECLARE purchaseMasterId INTEGER DEFAULT 0;
+	#cursor declare
+	DECLARE cursor_purchase CURSOR FOR 
+	SELECT 
+	`rawmaterial_purchase_master`.`invoice_no`,
+	`rawmaterial_purchase_master`.`invoice_date`,
+	`rawmaterial_purchase_master`.`companyid`,
+	`rawmaterial_purchase_master`.`yearid` ,`rawmaterial_purchase_master`.`id` AS purchaseMasterId,
+	(IFNULL(`rawmaterial_purchase_master`.`invoice_value`,0)) AS totalCreditAmountForVendor,
+	vendor.`account_master_id` AS vendorAccountId,
+	( IFNULL(`rawmaterial_purchase_master`.`item_amount`,0)
+		+IFNULL(`rawmaterial_purchase_master`.`excise_amount`,0)
+		+IFNULL(`rawmaterial_purchase_master`.`round_off`,0)
+		) AS totalDebitPurchaseAC,
+		(IFNULL(`rawmaterial_purchase_master`.`taxamount`,0)
+		) AS totalDebitVATinput
+	FROM `rawmaterial_purchase_master`
+	INNER JOIN vendor ON `rawmaterial_purchase_master`.`vendor_id` = vendor.`id`;
+	
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER 
+	FOR NOT FOUND SET cursor_finish = 1;
+	
+	OPEN cursor_purchase;
+	get_purchase :LOOP
+	
+	FETCH  cursor_purchase INTO voucherNumber,voucherDate,companyId,yearId,purchaseMasterId,vendorAccountAmount,
+	vendorAccId,purchaseAccountAmount,VATinputAmount;
+	
+	IF cursor_finish = 1 THEN 
+		LEAVE get_purchase;
+	END IF; 	
+	-- insertion section
+	INSERT INTO `voucher_master`(`voucher_number`,`voucher_date`,`narration`,`transaction_type`,`created_by`,`company_id`,`year_id`)
+	VALUES (voucherNumber,voucherDate,'Raw-Purchase-Auto','RP',2,companyId,yearId);
+	
+	SET @voucherId := LAST_INSERT_ID();
+	-- update purchase master with voucherId
+	UPDATE `rawmaterial_purchase_master`
+	SET rawmaterial_purchase_master.`voucher_id` = @voucherId
+	WHERE rawmaterial_purchase_master.`id`= purchaseMasterId;
+	
+	INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+	VALUES(@voucherId,vendorAccId,vendorAccountAmount,'N') ; -- vendor account
+	
+	INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+	VALUES(@voucherId,6,purchaseAccountAmount,'Y') ; -- Purchase Account
+	IF VATinputAmount >0 THEN
+		INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+		VALUES(@voucherId,5,VATinputAmount,'Y') ;
+	END IF;
+	
+	SET @voucherId:=0;
+	
+	-- SELECT voucherNumber,voucherDate,companyId,yearId,purchaseMasterId,vendorAccountAmount,vendorAccId,purchaseAccountAmount,VATinputAmount;
+	 END LOOP get_purchase;
+ CLOSE cursor_purchase;
+	
+    END$$
+
+DELIMITER ;
+/*---------- END ----sp_autoVoucherInsertRAWPUR-----------*/
+
+
+
+
+
+
+/*---------- START ----sp_autoVoucherInsertRS-----------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_autoVoucherInsertRS`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_autoVoucherInsertRS`()
+BEGIN
+	DECLARE cursor_finish INTEGER DEFAULT 0;
+	DECLARE voucherNumber VARCHAR(100);
+	DECLARE voucherDate DATETIME;
+	DECLARE narration VARCHAR(100);
+	DECLARE transactionType VARCHAR(100);
+	DECLARE companyId INTEGER DEFAULT 0;
+	DECLARE yearId INTEGER DEFAULT 0;
+	DECLARE CustomerAccountAmount DECIMAL(10,2);
+	DECLARE CustomerAccId INTEGER DEFAULT 0;
+	DECLARE SalesAccountAmount DECIMAL(10,2);
+	DECLARE VAToutputAmount DECIMAL(10,2);
+	DECLARE rawteasaleMasterId INTEGER DEFAULT 0;
+	#cursor declare
+	DECLARE cursor_sale CURSOR FOR 
+	SELECT 
+	`rawteasale_master`.`invoice_no`,
+	`rawteasale_master`.`sale_date`,
+	`rawteasale_master`.`company_id`,
+	`rawteasale_master`.`year_id`,`rawteasale_master`.`id` AS rawTeasalemasterId,
+	(IFNULL(`rawteasale_master`.`grandtotal`,0)) AS totalDebitAmountForCustomer,
+	`customer`.`account_master_id` AS customerAccountId,
+	((IFNULL(`rawteasale_master`.`totalamount`,0)
+	+IFNULL(`rawteasale_master`.`deliverychgs`,0)
+	+IFNULL(`rawteasale_master`.`roundoff`,0))
+	-IFNULL(`rawteasale_master`.`discountAmount`,0)) AS totalCreditSaleAC,
+	(IFNULL(`rawteasale_master`.`taxamount`,0)
+		) AS totalCreditVAToutput
+	FROM `rawteasale_master` 
+	INNER JOIN `customer` ON `rawteasale_master`.`customer_id` = `customer`.`id`
+	ORDER BY `rawteasale_master`.`invoice_no`;
+	
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER 
+	FOR NOT FOUND SET cursor_finish = 1;
+	
+	OPEN cursor_sale;
+	get_purchase :LOOP
+	
+	FETCH  cursor_sale INTO voucherNumber,voucherDate,companyId,yearId,rawteasaleMasterId,CustomerAccountAmount,
+	CustomerAccId,SalesAccountAmount,VAToutputAmount;
+	
+	IF cursor_finish = 1 THEN 
+		LEAVE get_purchase;
+	END IF; 	
+	-- insertion section
+	INSERT INTO `voucher_master`(`voucher_number`,`voucher_date`,`narration`,`transaction_type`,`created_by`,`company_id`,`year_id`)
+	VALUES (voucherNumber,voucherDate,'RAWSALE-Auto','RS',2,companyId,yearId);
+	
+	SET @voucherId := LAST_INSERT_ID();
+	-- update purchase master with voucherId
+	UPDATE rawteasale_master 
+	SET `rawteasale_master`.`voucher_master_id` = @voucherId
+	WHERE rawteasale_master.`id`= rawteasaleMasterId;
+	
+	INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+	VALUES(@voucherId,CustomerAccId,CustomerAccountAmount,'Y') ; -- vendor account
+	
+	INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+	VALUES(@voucherId,7,SalesAccountAmount,'N') ; -- Sale Account
+	IF VAToutputAmount >0 THEN
+		INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+		VALUES(@voucherId,238,VAToutputAmount,'N') ;
+	END IF;
+	
+	SET @voucherId:=0;
+	
+	-- SELECT voucherNumber,voucherDate,companyId,yearId,purchaseMasterId,vendorAccountAmount,vendorAccId,purchaseAccountAmount,VATinputAmount;
+	 END LOOP get_purchase;
+ CLOSE cursor_sale;
+	
+    END$$
+
+DELIMITER ;
+/*---------- END ----sp_autoVoucherInsertRS-----------*/
+
+
+
+
+
+
+
+/*---------- START ----sp_autoVoucherInsertSL-----------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_autoVoucherInsertSL`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_autoVoucherInsertSL`()
+BEGIN
+	DECLARE cursor_finish INTEGER DEFAULT 0;
+	DECLARE voucherNumber VARCHAR(100);
+	DECLARE voucherDate DATETIME;
+	DECLARE narration VARCHAR(100);
+	DECLARE transactionType VARCHAR(100);
+	DECLARE companyId INTEGER DEFAULT 0;
+	DECLARE yearId INTEGER DEFAULT 0;
+	DECLARE CustomerAccountAmount DECIMAL(10,2);
+	DECLARE CustomerAccId INTEGER DEFAULT 0;
+	DECLARE SalesAccountAmount DECIMAL(10,2);
+	DECLARE VAToutputAmount DECIMAL(10,2);
+	DECLARE salesMasterId INTEGER DEFAULT 0;
+	#cursor declare
+	DECLARE cursor_sale CURSOR FOR 
+	SELECT 
+	`sale_bill_master`.`taxinvoiceno`,
+	`sale_bill_master`.`taxinvoicedate`,
+	`sale_bill_master`.`companyid`,
+	`sale_bill_master`.`yearid`,`sale_bill_master`.`id` AS SaleMasterId,
+	(IFNULL(`sale_bill_master`.`grandtotal`,0)) AS totalDebitAmountForCustomer,
+	`customer`.`account_master_id` AS customerAccountId,
+	((IFNULL(`sale_bill_master`.`totalamount`,0)
+	+IFNULL(`sale_bill_master`.`deliverychgs`,0)
+	+IFNULL(`sale_bill_master`.`roundoff`,0))
+	-IFNULL(`sale_bill_master`.`discountAmount`,0)) AS totalCreditSaleAC,
+	(IFNULL(`sale_bill_master`.`taxamount`,0)
+		) AS totalCreditVAToutput
+	FROM `sale_bill_master` 
+	INNER JOIN `customer` ON `sale_bill_master`.`customerId` = `customer`.`id`
+	ORDER BY `sale_bill_master`.`taxinvoiceno`;
+	
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER 
+	FOR NOT FOUND SET cursor_finish = 1;
+	
+	OPEN cursor_sale;
+	get_purchase :LOOP
+	
+	FETCH  cursor_sale INTO voucherNumber,voucherDate,companyId,yearId,salesMasterId,CustomerAccountAmount,
+	CustomerAccId,SalesAccountAmount,VAToutputAmount;
+	
+	IF cursor_finish = 1 THEN 
+		LEAVE get_purchase;
+	END IF; 	
+	-- insertion section
+	INSERT INTO `voucher_master`(`voucher_number`,`voucher_date`,`narration`,`transaction_type`,`created_by`,`company_id`,`year_id`)
+	VALUES (voucherNumber,voucherDate,'SALE-Auto','SL',2,companyId,yearId);
+	
+	SET @voucherId := LAST_INSERT_ID();
+	-- update purchase master with voucherId
+	UPDATE sale_bill_master 
+	SET `sale_bill_master`.`voucher_master_id` = @voucherId
+	WHERE sale_bill_master.`id`= salesMasterId;
+	
+	INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+	VALUES(@voucherId,CustomerAccId,CustomerAccountAmount,'Y') ; -- vendor account
+	
+	INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+	VALUES(@voucherId,7,SalesAccountAmount,'N') ; -- Sale Account
+	IF VAToutputAmount >0 THEN
+		INSERT INTO `voucher_detail` (`voucher_master_id`,`account_master_id`, `voucher_amount`, `is_debit`)
+		VALUES(@voucherId,238,VAToutputAmount,'N') ;
+	END IF;
+	
+	SET @voucherId:=0;
+	
+	-- SELECT voucherNumber,voucherDate,companyId,yearId,purchaseMasterId,vendorAccountAmount,vendorAccId,purchaseAccountAmount,VATinputAmount;
+	 END LOOP get_purchase;
+ CLOSE cursor_sale;
+	
+    END$$
+
+DELIMITER ;
+/*---------- END ----sp_autoVoucherInsertSL-----------*/
+
+
+
+
+
+
+
+/*----------START ----sp_GetStockWithCostRangeWise----------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_GetStockWithCostRangeWise`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_GetStockWithCostRangeWise`(
+IN fromcost DECIMAL(10,2),
+IN tocost DECIMAL(10,2),
+IN companyId INT 
+)
+BEGIN	
+DECLARE cursor_finish INTEGER DEFAULT 0;
+DECLARE m_numofpurchaseBag DECIMAL(10,2)DEFAULT 0;
+DECLARE m_purchasedKg DECIMAL(10,2)DEFAULT 0;
+DECLARE m_purBagDtlId INTEGER DEFAULT 0;
+DECLARE m_purchaseInvoiceDetailId INTEGER DEFAULT 0;
+DECLARE stockCursor CURSOR FOR 
+SELECT purchase_bag_details.`actual_bags`, 
+(purchase_bag_details.`net` * purchase_bag_details.`actual_bags`) AS PurchasedKg,
+purchase_bag_details.`id` AS PurchaseBagDtlId,purchase_invoice_detail.`id` AS purchaseInvoiceDtlId
+FROM 
+purchase_invoice_detail
+INNER JOIN
+purchase_bag_details
+ON purchase_invoice_detail.`id`= purchase_bag_details.`purchasedtlid`
+INNER JOIN `purchase_invoice_master`
+ON `purchase_invoice_master`.id=purchase_invoice_detail.`purchase_master_id`
+INNER JOIN
+`do_to_transporter`
+ON purchase_invoice_detail.`id` = do_to_transporter.`purchase_inv_dtlid`
+WHERE  do_to_transporter.`in_Stock`='Y' AND (purchase_invoice_detail.`cost_of_tea` BETWEEN fromcost AND tocost) 
+AND purchase_invoice_master.`company_id`= companyId;
+ -- declare NOT FOUND handler
+ DECLARE CONTINUE HANDLER 
+ FOR NOT FOUND SET cursor_finish = 1;
+DROP TEMPORARY TABLE IF EXISTS StockTable;
+ 
+ #temptable creation
+ CREATE TEMPORARY TABLE IF NOT EXISTS  StockTable
+(
+	purchaseBagDtlId INT,
+	purchasedBag NUMERIC(10,2),
+	purchasedKg  NUMERIC(10,2),
+	blendedBag NUMERIC(10,2),
+	blendedKg NUMERIC(10,2),
+	stockOutBag NUMERIC(10,2),
+	stockOutKgs NUMERIC(10,2),
+	saleOutBag NUMERIC(10,2),
+	saleOutKgs NUMERIC(10,2),
+	stockBag  NUMERIC(10,2),
+	stockKg   NUMERIC(10,2),
+	purchaseInvoiceDetailId INT
+	
+);
+ #temptable creation
+ OPEN stockCursor ;
+ get_stock : LOOP
+ 
+ FETCH stockCursor INTO m_numofpurchaseBag,m_purchasedKg,m_purBagDtlId,m_purchaseInvoiceDetailId;
+ 
+ IF cursor_finish = 1 THEN 
+ LEAVE get_stock;
+ END IF; 
+ 
+ 
+/* Blending  bag query*/ 
+#SET @m_numberofBlndBag:=0;
+#SET @m_BlndKg:=0;
+		#Blend bag
+		SET @m_numberofBlndBag:=(SELECT IFNULL(SUM(blending_details.`number_of_blended_bag`),0) AS belendedBag 
+		 FROM blending_details 
+		WHERE blending_details.`purchasebag_id`= m_purBagDtlId
+		GROUP BY blending_details.`purchasebag_id`);
+		#Blend Bag
+		#Blend Kgs
+		SET @m_BlndKg:=(SELECT IFNULL(SUM(blending_details.`qty_of_bag` * blending_details.`number_of_blended_bag`),0) AS blendkg 
+		 FROM blending_details 
+		WHERE blending_details.`purchasebag_id`= m_purBagDtlId
+		GROUP BY blending_details.`purchasebag_id`);
+		#Blend Kg
+IF(@m_numberofBlndBag IS NULL)THEN
+	SET @m_numberofBlndBag:=0;
+END IF;
+IF(@m_BlndKg IS NULL) THEN
+SET @m_BlndKg:=0;
+END IF;
+	#Stock Out bag
+	SET @m_numberofStockOutBag:=(SELECT IFNULL(SUM(stocktransfer_out_detail.`num_of_stockout_bag`),0) AS stockoutBag 
+		 FROM stocktransfer_out_detail 
+		WHERE stocktransfer_out_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY stocktransfer_out_detail.`purchase_bag_id`);
+	#Stock Out bag
+		
+	#Stock Out Kgs
+	SET @m_StockOutKg:=(SELECT IFNULL(SUM(stocktransfer_out_detail.`qty_stockout_kg` * stocktransfer_out_detail.`num_of_stockout_bag`),0) AS stockOutKgs 
+		 FROM stocktransfer_out_detail 
+		WHERE stocktransfer_out_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY stocktransfer_out_detail.`purchase_bag_id`);
+	#Stock Out Kgs
+IF(@m_numberofStockOutBag IS NULL)THEN
+	SET @m_numberofStockOutBag:=0;
+END IF;
+IF(@m_StockOutKg IS NULL) THEN
+SET @m_StockOutKg:=0;
+END IF;
+		#Raw Tea Sale Bag
+		SET @m_numberofSaleOutBag:=(SELECT IFNULL(SUM(rawteasale_detail.`num_of_sale_bag`),0) AS saleBag 
+		 FROM rawteasale_detail 
+		WHERE rawteasale_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY rawteasale_detail.`purchase_bag_id`);
+		#Raw Tea Sale Bag
+		
+		#Raw Tea Sale Kgs
+		SET @m_SaleOutKg:=(SELECT IFNULL(SUM(rawteasale_detail.`qty_of_sale_bag` * rawteasale_detail.`num_of_sale_bag`),0) AS SaleKgs 
+		 FROM rawteasale_detail 
+		WHERE rawteasale_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY rawteasale_detail.`purchase_bag_id`);
+		#Raw Tea Sale Kgs
+		
+IF(@m_numberofSaleOutBag IS NULL)THEN
+	SET @m_numberofSaleOutBag:=0;
+END IF;
+IF(@m_SaleOutKg IS NULL) THEN
+SET @m_SaleOutKg:=0;
+END IF;
+SET @m_StockBag:=(m_numofpurchaseBag - (@m_numberofBlndBag+@m_numberofStockOutBag+@m_numberofSaleOutBag));
+SET @m_StockKg:=(m_purchasedKg - (@m_BlndKg+@m_StockOutKg+@m_SaleOutKg));
+INSERT INTO StockTable
+(
+	purchaseBagDtlId ,
+	purchasedBag ,
+	purchasedKg ,
+	blendedBag ,
+	blendedKg ,
+	stockOutBag,
+	stockOutKgs,
+	saleOutBag,
+	saleOutKgs,
+	stockBag  ,
+	stockKg  ,purchaseInvoiceDetailId 	
+)VALUES(m_purBagDtlId,m_numofpurchaseBag,m_purchasedKg,@m_numberofBlndBag,@m_BlndKg,@m_numberofStockOutBag,@m_StockOutKg,@m_numberofSaleOutBag,@m_SaleOutKg,@m_StockBag,@m_StockKg,m_purchaseInvoiceDetailId);
+ END LOOP get_stock;
+ CLOSE stockCursor;
+#Stock Print Start
+SELECT StockTable.purchaseInvoiceDetailId,
+StockTable.purchaseBagDtlId,
+ StockTable.stockBag AS NumberOfStockBag,StockTable.stockKg AS StockBagQty,
+ StockTable.purchasedBag AS PurchasedBags,StockTable.purchasedKg AS PurchasedKgs,
+ StockTable.blendedBag AS BlendedBags,StockTable.blendedKg AS BlendedKgs,
+ StockTable.stockOutBag AS StockOutBag,StockTable.stockOutKgs AS StockOutKgs,
+ StockTable.saleOutBag AS SaleOutBag,StockTable.saleOutKgs AS SaleOutKgs,
+ `garden_master`.`garden_name`,`purchase_invoice_detail`.`invoice_number`,`purchase_invoice_detail`.`lot`,
+ `teagroup_master`.`group_code`,`purchase_invoice_master`.`sale_number`,`grade_master`.`grade`,
+ `purchase_invoice_master`.`purchase_invoice_date`,`purchase_invoice_master`.`purchase_invoice_number`,
+ `purchase_invoice_detail`.`cost_of_tea`,`location`.`location`,purchase_bag_details.`net` AS netKgs,
+ `purchase_invoice_detail`.`price` AS rate
+ FROM StockTable
+INNER JOIN  `purchase_invoice_detail` ON StockTable.purchaseInvoiceDetailId=`purchase_invoice_detail`.`id`
+INNER JOIN  `purchase_invoice_master` ON `purchase_invoice_detail`.`purchase_master_id` = `purchase_invoice_master`.`id`
+INNER JOIN `garden_master` ON `purchase_invoice_detail`.`garden_id` = `garden_master`.`id`
+INNER JOIN `teagroup_master` ON `purchase_invoice_detail`.`teagroup_master_id` = `teagroup_master`.`id`
+INNER JOIN `grade_master` ON `purchase_invoice_detail`.`grade_id` = `grade_master`.`id`
+INNER JOIN `purchase_bag_details` ON StockTable.purchaseBagDtlId = `purchase_bag_details`.`id`
+INNER JOIN `do_to_transporter` ON StockTable.purchaseInvoiceDetailId= do_to_transporter.`purchase_inv_dtlid`
+INNER JOIN `location` ON `do_to_transporter`.`locationId` = `location`.`id`
+GROUP BY StockTable.purchaseBagDtlId
+ORDER BY `purchase_invoice_detail`.`teagroup_master_id`,StockTable.purchaseInvoiceDetailId;
+#Stock Print END
+ END$$
+
+DELIMITER ;
+
+
+/*----------END ----sp_GetStockWithCostRangeWise----------*/
+
+
+
+
+/*---------START-----sp_GetStockWithGroupAndCost---------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_GetStockWithGroupAndCost`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_GetStockWithGroupAndCost`(
+IN teagroupId INT,
+IN fromcost DECIMAL(10,2),
+IN tocost DECIMAL(10,2),
+IN companyId INT 
+)
+BEGIN	
+DECLARE cursor_finish INTEGER DEFAULT 0;
+DECLARE m_numofpurchaseBag DECIMAL(10,2)DEFAULT 0;
+DECLARE m_purchasedKg DECIMAL(10,2)DEFAULT 0;
+DECLARE m_purBagDtlId INTEGER DEFAULT 0;
+DECLARE m_purchaseInvoiceDetailId INTEGER DEFAULT 0;
+DECLARE stockCursor CURSOR FOR 
+SELECT purchase_bag_details.`actual_bags`, 
+(purchase_bag_details.`net` * purchase_bag_details.`actual_bags`) AS PurchasedKg,
+purchase_bag_details.`id` AS PurchaseBagDtlId,purchase_invoice_detail.`id` AS purchaseInvoiceDtlId
+FROM 
+purchase_invoice_detail
+INNER JOIN
+purchase_bag_details
+ON purchase_invoice_detail.`id`= purchase_bag_details.`purchasedtlid`
+INNER JOIN `purchase_invoice_master`
+ON `purchase_invoice_master`.id=purchase_invoice_detail.`purchase_master_id`
+INNER JOIN
+`do_to_transporter`
+ON purchase_invoice_detail.`id` = do_to_transporter.`purchase_inv_dtlid`
+WHERE purchase_invoice_detail.`teagroup_master_id`= teagroupId
+AND do_to_transporter.`in_Stock`='Y' AND (purchase_invoice_detail.`cost_of_tea` BETWEEN fromcost AND tocost)
+AND purchase_invoice_master.`company_id`= companyId;
+ -- declare NOT FOUND handler
+ DECLARE CONTINUE HANDLER 
+ FOR NOT FOUND SET cursor_finish = 1;
+DROP TEMPORARY TABLE IF EXISTS StockTable;
+ 
+#temptable creation
+ CREATE TEMPORARY TABLE IF NOT EXISTS  StockTable
+(
+	purchaseBagDtlId INT,
+	purchasedBag NUMERIC(10,2),
+	purchasedKg  NUMERIC(10,2),
+	blendedBag NUMERIC(10,2),
+	blendedKg NUMERIC(10,2),
+	stockOutBag NUMERIC(10,2),
+	stockOutKgs NUMERIC(10,2),
+	saleOutBag NUMERIC(10,2),
+	saleOutKgs NUMERIC(10,2),
+	stockBag  NUMERIC(10,2),
+	stockKg   NUMERIC(10,2),
+	purchaseInvoiceDetailId INT
+	
+);
+ #temptable creation
+ OPEN stockCursor ;
+ get_stock : LOOP
+ 
+ FETCH stockCursor INTO m_numofpurchaseBag,m_purchasedKg,m_purBagDtlId,m_purchaseInvoiceDetailId;
+ 
+ IF cursor_finish = 1 THEN 
+ LEAVE get_stock;
+ END IF; 
+ 
+ 
+/* Blending  bag query*/ 
+#SET @m_numberofBlndBag:=0;
+#SET @m_BlndKg:=0;
+		#Blend bag
+		SET @m_numberofBlndBag:=(SELECT IFNULL(SUM(blending_details.`number_of_blended_bag`),0) AS belendedBag 
+		 FROM blending_details 
+		WHERE blending_details.`purchasebag_id`= m_purBagDtlId
+		GROUP BY blending_details.`purchasebag_id`);
+		#Blend Bag
+		#Blend Kgs
+		SET @m_BlndKg:=(SELECT IFNULL(SUM(blending_details.`qty_of_bag` * blending_details.`number_of_blended_bag`),0) AS blendkg 
+		 FROM blending_details 
+		WHERE blending_details.`purchasebag_id`= m_purBagDtlId
+		GROUP BY blending_details.`purchasebag_id`);
+		#Blend Kg
+IF(@m_numberofBlndBag IS NULL)THEN
+	SET @m_numberofBlndBag:=0;
+END IF;
+IF(@m_BlndKg IS NULL) THEN
+SET @m_BlndKg:=0;
+END IF;
+	#Stock Out bag
+	SET @m_numberofStockOutBag:=(SELECT IFNULL(SUM(stocktransfer_out_detail.`num_of_stockout_bag`),0) AS stockoutBag 
+		 FROM stocktransfer_out_detail 
+		WHERE stocktransfer_out_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY stocktransfer_out_detail.`purchase_bag_id`);
+	#Stock Out bag
+		
+	#Stock Out Kgs
+	SET @m_StockOutKg:=(SELECT IFNULL(SUM(stocktransfer_out_detail.`qty_stockout_kg` * stocktransfer_out_detail.`num_of_stockout_bag`),0) AS stockOutKgs 
+		 FROM stocktransfer_out_detail 
+		WHERE stocktransfer_out_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY stocktransfer_out_detail.`purchase_bag_id`);
+	#Stock Out Kgs
+IF(@m_numberofStockOutBag IS NULL)THEN
+	SET @m_numberofStockOutBag:=0;
+END IF;
+IF(@m_StockOutKg IS NULL) THEN
+SET @m_StockOutKg:=0;
+END IF;
+		#Raw Tea Sale Bag
+		SET @m_numberofSaleOutBag:=(SELECT IFNULL(SUM(rawteasale_detail.`num_of_sale_bag`),0) AS saleBag 
+		 FROM rawteasale_detail 
+		WHERE rawteasale_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY rawteasale_detail.`purchase_bag_id`);
+		#Raw Tea Sale Bag
+		
+		#Raw Tea Sale Kgs
+		SET @m_SaleOutKg:=(SELECT IFNULL(SUM(rawteasale_detail.`qty_of_sale_bag` * rawteasale_detail.`num_of_sale_bag`),0) AS SaleKgs 
+		 FROM rawteasale_detail 
+		WHERE rawteasale_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY rawteasale_detail.`purchase_bag_id`);
+		#Raw Tea Sale Kgs
+		
+IF(@m_numberofSaleOutBag IS NULL)THEN
+	SET @m_numberofSaleOutBag:=0;
+END IF;
+IF(@m_SaleOutKg IS NULL) THEN
+SET @m_SaleOutKg:=0;
+END IF;
+SET @m_StockBag:=(m_numofpurchaseBag - (@m_numberofBlndBag+@m_numberofStockOutBag+@m_numberofSaleOutBag));
+SET @m_StockKg:=(m_purchasedKg - (@m_BlndKg+@m_StockOutKg+@m_SaleOutKg));
+INSERT INTO StockTable
+(
+	purchaseBagDtlId ,
+	purchasedBag ,
+	purchasedKg ,
+	blendedBag ,
+	blendedKg ,
+	stockOutBag,
+	stockOutKgs,
+	saleOutBag,
+	saleOutKgs,
+	stockBag  ,
+	stockKg  ,purchaseInvoiceDetailId 	
+)VALUES(m_purBagDtlId,m_numofpurchaseBag,m_purchasedKg,@m_numberofBlndBag,@m_BlndKg,@m_numberofStockOutBag,@m_StockOutKg,@m_numberofSaleOutBag,@m_SaleOutKg,@m_StockBag,@m_StockKg,m_purchaseInvoiceDetailId);
+ END LOOP get_stock;
+ CLOSE stockCursor;
+#Stock Print Start
+SELECT StockTable.purchaseInvoiceDetailId,
+StockTable.purchaseBagDtlId,
+ StockTable.stockBag AS NumberOfStockBag,StockTable.stockKg AS StockBagQty,
+ StockTable.purchasedBag AS PurchasedBags,StockTable.purchasedKg AS PurchasedKgs,
+ StockTable.blendedBag AS BlendedBags,StockTable.blendedKg AS BlendedKgs,
+ StockTable.stockOutBag AS StockOutBag,StockTable.stockOutKgs AS StockOutKgs,
+ StockTable.saleOutBag AS SaleOutBag,StockTable.saleOutKgs AS SaleOutKgs,
+ `garden_master`.`garden_name`,`purchase_invoice_detail`.`invoice_number`,`purchase_invoice_detail`.`lot`,
+ `teagroup_master`.`group_code`,`purchase_invoice_master`.`sale_number`,`grade_master`.`grade`,
+ `purchase_invoice_master`.`purchase_invoice_date`,`purchase_invoice_master`.`purchase_invoice_number`,
+ `purchase_invoice_detail`.`cost_of_tea`,`location`.`location`,purchase_bag_details.`net` AS netKgs,
+ `purchase_invoice_detail`.`price` AS rate
+ FROM StockTable
+INNER JOIN  `purchase_invoice_detail` ON StockTable.purchaseInvoiceDetailId=`purchase_invoice_detail`.`id`
+INNER JOIN  `purchase_invoice_master` ON `purchase_invoice_detail`.`purchase_master_id` = `purchase_invoice_master`.`id`
+INNER JOIN `garden_master` ON `purchase_invoice_detail`.`garden_id` = `garden_master`.`id`
+INNER JOIN `teagroup_master` ON `purchase_invoice_detail`.`teagroup_master_id` = `teagroup_master`.`id`
+INNER JOIN `grade_master` ON `purchase_invoice_detail`.`grade_id` = `grade_master`.`id`
+INNER JOIN `purchase_bag_details` ON StockTable.purchaseBagDtlId = `purchase_bag_details`.`id`
+INNER JOIN `do_to_transporter` ON StockTable.purchaseInvoiceDetailId= do_to_transporter.`purchase_inv_dtlid`
+INNER JOIN `location` ON `do_to_transporter`.`locationId` = `location`.`id`
+GROUP BY StockTable.purchaseBagDtlId
+ORDER BY `purchase_invoice_detail`.`teagroup_master_id`,StockTable.purchaseInvoiceDetailId;
+#Stock Print END
+ END$$
+
+DELIMITER ;
+
+/*---------END-----sp_GetStockWithGroupAndCost---------*/
+
+
+
+
+
+
+
+/*------------START-----sp_GetStockWithGroupWise----------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_GetStockWithGroupWise`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_GetStockWithGroupWise`(
+IN teagroupId INT,
+IN companyId INT 
+)
+BEGIN	
+DECLARE cursor_finish INTEGER DEFAULT 0;
+DECLARE m_numofpurchaseBag DECIMAL(10,2)DEFAULT 0;
+DECLARE m_purchasedKg DECIMAL(10,2)DEFAULT 0;
+DECLARE m_purBagDtlId INTEGER DEFAULT 0;
+DECLARE m_purchaseInvoiceDetailId INTEGER DEFAULT 0;
+DECLARE stockCursor CURSOR FOR 
+SELECT purchase_bag_details.`actual_bags`, 
+(purchase_bag_details.`net` * purchase_bag_details.`actual_bags`) AS PurchasedKg,
+purchase_bag_details.`id` AS PurchaseBagDtlId,purchase_invoice_detail.`id` AS purchaseInvoiceDtlId
+FROM 
+purchase_invoice_detail
+INNER JOIN
+purchase_bag_details
+ON purchase_invoice_detail.`id`= purchase_bag_details.`purchasedtlid`
+INNER JOIN `purchase_invoice_master`
+ON `purchase_invoice_master`.id=purchase_invoice_detail.`purchase_master_id`
+INNER JOIN
+`do_to_transporter`
+ON purchase_invoice_detail.`id` = do_to_transporter.`purchase_inv_dtlid`
+WHERE purchase_invoice_detail.`teagroup_master_id`= teagroupId
+AND do_to_transporter.`in_Stock`='Y'
+AND purchase_invoice_master.`company_id`= companyId;
+ -- declare NOT FOUND handler
+ DECLARE CONTINUE HANDLER 
+ FOR NOT FOUND SET cursor_finish = 1;
+DROP TEMPORARY TABLE IF EXISTS StockTable;
+ 
+#temptable creation
+ CREATE TEMPORARY TABLE IF NOT EXISTS  StockTable
+(
+	purchaseBagDtlId INT,
+	purchasedBag NUMERIC(10,2),
+	purchasedKg  NUMERIC(10,2),
+	blendedBag NUMERIC(10,2),
+	blendedKg NUMERIC(10,2),
+	stockOutBag NUMERIC(10,2),
+	stockOutKgs NUMERIC(10,2),
+	saleOutBag NUMERIC(10,2),
+	saleOutKgs NUMERIC(10,2),
+	stockBag  NUMERIC(10,2),
+	stockKg   NUMERIC(10,2),
+	purchaseInvoiceDetailId INT
+	
+);
+ #temptable creation
+ OPEN stockCursor ;
+ get_stock : LOOP
+ 
+ FETCH stockCursor INTO m_numofpurchaseBag,m_purchasedKg,m_purBagDtlId,m_purchaseInvoiceDetailId;
+ 
+ IF cursor_finish = 1 THEN 
+ LEAVE get_stock;
+ END IF; 
+ 
+ 
+/* Blending  bag query*/ 
+#SET @m_numberofBlndBag:=0;
+#SET @m_BlndKg:=0;
+		#Blend bag
+		SET @m_numberofBlndBag:=(SELECT IFNULL(SUM(blending_details.`number_of_blended_bag`),0) AS belendedBag 
+		 FROM blending_details 
+		WHERE blending_details.`purchasebag_id`= m_purBagDtlId
+		GROUP BY blending_details.`purchasebag_id`);
+		#Blend Bag
+		#Blend Kgs
+		SET @m_BlndKg:=(SELECT IFNULL(SUM(blending_details.`qty_of_bag` * blending_details.`number_of_blended_bag`),0) AS blendkg 
+		 FROM blending_details 
+		WHERE blending_details.`purchasebag_id`= m_purBagDtlId
+		GROUP BY blending_details.`purchasebag_id`);
+		#Blend Kg
+IF(@m_numberofBlndBag IS NULL)THEN
+	SET @m_numberofBlndBag:=0;
+END IF;
+IF(@m_BlndKg IS NULL) THEN
+SET @m_BlndKg:=0;
+END IF;
+	#Stock Out bag
+	SET @m_numberofStockOutBag:=(SELECT IFNULL(SUM(stocktransfer_out_detail.`num_of_stockout_bag`),0) AS stockoutBag 
+		 FROM stocktransfer_out_detail 
+		WHERE stocktransfer_out_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY stocktransfer_out_detail.`purchase_bag_id`);
+	#Stock Out bag
+		
+	#Stock Out Kgs
+	SET @m_StockOutKg:=(SELECT IFNULL(SUM(stocktransfer_out_detail.`qty_stockout_kg` * stocktransfer_out_detail.`num_of_stockout_bag`),0) AS stockOutKgs 
+		 FROM stocktransfer_out_detail 
+		WHERE stocktransfer_out_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY stocktransfer_out_detail.`purchase_bag_id`);
+	#Stock Out Kgs
+IF(@m_numberofStockOutBag IS NULL)THEN
+	SET @m_numberofStockOutBag:=0;
+END IF;
+IF(@m_StockOutKg IS NULL) THEN
+SET @m_StockOutKg:=0;
+END IF;
+		#Raw Tea Sale Bag
+		SET @m_numberofSaleOutBag:=(SELECT IFNULL(SUM(rawteasale_detail.`num_of_sale_bag`),0) AS saleBag 
+		 FROM rawteasale_detail 
+		WHERE rawteasale_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY rawteasale_detail.`purchase_bag_id`);
+		#Raw Tea Sale Bag
+		
+		#Raw Tea Sale Kgs
+		SET @m_SaleOutKg:=(SELECT IFNULL(SUM(rawteasale_detail.`qty_of_sale_bag` * rawteasale_detail.`num_of_sale_bag`),0) AS SaleKgs 
+		 FROM rawteasale_detail 
+		WHERE rawteasale_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY rawteasale_detail.`purchase_bag_id`);
+		#Raw Tea Sale Kgs
+		
+IF(@m_numberofSaleOutBag IS NULL)THEN
+	SET @m_numberofSaleOutBag:=0;
+END IF;
+IF(@m_SaleOutKg IS NULL) THEN
+SET @m_SaleOutKg:=0;
+END IF;
+SET @m_StockBag:=(m_numofpurchaseBag - (@m_numberofBlndBag+@m_numberofStockOutBag+@m_numberofSaleOutBag));
+SET @m_StockKg:=(m_purchasedKg - (@m_BlndKg+@m_StockOutKg+@m_SaleOutKg));
+INSERT INTO StockTable
+(
+	purchaseBagDtlId ,
+	purchasedBag ,
+	purchasedKg ,
+	blendedBag ,
+	blendedKg ,
+	stockOutBag,
+	stockOutKgs,
+	saleOutBag,
+	saleOutKgs,
+	stockBag  ,
+	stockKg  ,purchaseInvoiceDetailId 	
+)VALUES(m_purBagDtlId,m_numofpurchaseBag,m_purchasedKg,@m_numberofBlndBag,@m_BlndKg,@m_numberofStockOutBag,@m_StockOutKg,@m_numberofSaleOutBag,@m_SaleOutKg,@m_StockBag,@m_StockKg,m_purchaseInvoiceDetailId);
+ END LOOP get_stock;
+ CLOSE stockCursor;
+#Stock Print Start
+SELECT StockTable.purchaseInvoiceDetailId,
+StockTable.purchaseBagDtlId,
+ StockTable.stockBag AS NumberOfStockBag,StockTable.stockKg AS StockBagQty,
+ StockTable.purchasedBag AS PurchasedBags,StockTable.purchasedKg AS PurchasedKgs,
+ StockTable.blendedBag AS BlendedBags,StockTable.blendedKg AS BlendedKgs,
+ StockTable.stockOutBag AS StockOutBag,StockTable.stockOutKgs AS StockOutKgs,
+ StockTable.saleOutBag AS SaleOutBag,StockTable.saleOutKgs AS SaleOutKgs,
+ `garden_master`.`garden_name`,`purchase_invoice_detail`.`invoice_number`,`purchase_invoice_detail`.`lot`,
+ `teagroup_master`.`group_code`,`purchase_invoice_master`.`sale_number`,`grade_master`.`grade`,
+ `purchase_invoice_master`.`purchase_invoice_date`,`purchase_invoice_master`.`purchase_invoice_number`,
+ `purchase_invoice_detail`.`cost_of_tea`,`location`.`location`,purchase_bag_details.`net` AS netKgs,
+ `purchase_invoice_detail`.`price` AS rate
+ FROM StockTable
+INNER JOIN  `purchase_invoice_detail` ON StockTable.purchaseInvoiceDetailId=`purchase_invoice_detail`.`id`
+INNER JOIN  `purchase_invoice_master` ON `purchase_invoice_detail`.`purchase_master_id` = `purchase_invoice_master`.`id`
+INNER JOIN `garden_master` ON `purchase_invoice_detail`.`garden_id` = `garden_master`.`id`
+INNER JOIN `teagroup_master` ON `purchase_invoice_detail`.`teagroup_master_id` = `teagroup_master`.`id`
+INNER JOIN `grade_master` ON `purchase_invoice_detail`.`grade_id` = `grade_master`.`id`
+INNER JOIN `purchase_bag_details` ON StockTable.purchaseBagDtlId = `purchase_bag_details`.`id`
+INNER JOIN `do_to_transporter` ON StockTable.purchaseInvoiceDetailId= do_to_transporter.`purchase_inv_dtlid`
+INNER JOIN `location` ON `do_to_transporter`.`locationId` = `location`.`id`
+GROUP BY StockTable.purchaseBagDtlId
+ORDER BY `purchase_invoice_detail`.`teagroup_master_id`,StockTable.purchaseInvoiceDetailId;
+#Stock Print END
+ END$$
+
+DELIMITER ;
+
+
+/*-------------END-----sp_GetStockWithGroupWise----------*/
+
+
+
+
+
+
+
+/*---------START-----sp_GetStockWithoutGroupAndCost------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_GetStockWithoutGroupAndCost`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_GetStockWithoutGroupAndCost`(
+IN companyId INT 
+)
+BEGIN	
+DECLARE cursor_finish INTEGER DEFAULT 0;
+DECLARE m_numofpurchaseBag DECIMAL(10,2)DEFAULT 0;
+DECLARE m_purchasedKg DECIMAL(10,2)DEFAULT 0;
+DECLARE m_purBagDtlId INTEGER DEFAULT 0;
+DECLARE m_purchaseInvoiceDetailId INTEGER DEFAULT 0;
+DECLARE stockCursor CURSOR FOR 
+SELECT purchase_bag_details.`actual_bags`, 
+(purchase_bag_details.`net` * purchase_bag_details.`actual_bags`) AS PurchasedKg,
+purchase_bag_details.`id` AS PurchaseBagDtlId,purchase_invoice_detail.`id` AS purchaseInvoiceDtlId
+FROM 
+purchase_invoice_detail
+INNER JOIN
+purchase_bag_details
+ON purchase_invoice_detail.`id`= purchase_bag_details.`purchasedtlid`
+INNER JOIN `purchase_invoice_master`
+ON `purchase_invoice_master`.id=purchase_invoice_detail.`purchase_master_id`
+INNER JOIN
+`do_to_transporter`
+ON purchase_invoice_detail.`id` = do_to_transporter.`purchase_inv_dtlid`
+WHERE 
+ do_to_transporter.`in_Stock`='Y' AND purchase_invoice_master.`company_id`= companyId;
+ -- declare NOT FOUND handler
+ DECLARE CONTINUE HANDLER 
+ FOR NOT FOUND SET cursor_finish = 1;
+DROP TEMPORARY TABLE IF EXISTS StockTable;
+ 
+ #temptable creation
+ CREATE TEMPORARY TABLE IF NOT EXISTS  StockTable
+(
+	purchaseBagDtlId INT,
+	purchasedBag NUMERIC(10,2),
+	purchasedKg  NUMERIC(10,2),
+	blendedBag NUMERIC(10,2),
+	blendedKg NUMERIC(10,2),
+	stockOutBag NUMERIC(10,2),
+	stockOutKgs NUMERIC(10,2),
+	saleOutBag NUMERIC(10,2),
+	saleOutKgs NUMERIC(10,2),
+	stockBag  NUMERIC(10,2),
+	stockKg   NUMERIC(10,2),
+	purchaseInvoiceDetailId INT
+	
+);
+ #temptable creation
+ OPEN stockCursor ;
+ get_stock : LOOP
+ 
+ FETCH stockCursor INTO m_numofpurchaseBag,m_purchasedKg,m_purBagDtlId,m_purchaseInvoiceDetailId;
+ 
+ IF cursor_finish = 1 THEN 
+ LEAVE get_stock;
+ END IF; 
+ 
+ 
+/* Blending  bag query*/ 
+#SET @m_numberofBlndBag:=0;
+#SET @m_BlndKg:=0;
+		#Blend bag
+		SET @m_numberofBlndBag:=(SELECT IFNULL(SUM(blending_details.`number_of_blended_bag`),0) AS belendedBag 
+		 FROM blending_details 
+		WHERE blending_details.`purchasebag_id`= m_purBagDtlId
+		GROUP BY blending_details.`purchasebag_id`);
+		#Blend Bag
+		#Blend Kgs
+		SET @m_BlndKg:=(SELECT IFNULL(SUM(blending_details.`qty_of_bag` * blending_details.`number_of_blended_bag`),0) AS blendkg 
+		 FROM blending_details 
+		WHERE blending_details.`purchasebag_id`= m_purBagDtlId
+		GROUP BY blending_details.`purchasebag_id`);
+		#Blend Kg
+IF(@m_numberofBlndBag IS NULL)THEN
+	SET @m_numberofBlndBag:=0;
+END IF;
+IF(@m_BlndKg IS NULL) THEN
+SET @m_BlndKg:=0;
+END IF;
+	#Stock Out bag
+	SET @m_numberofStockOutBag:=(SELECT IFNULL(SUM(stocktransfer_out_detail.`num_of_stockout_bag`),0) AS stockoutBag 
+		 FROM stocktransfer_out_detail 
+		WHERE stocktransfer_out_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY stocktransfer_out_detail.`purchase_bag_id`);
+	#Stock Out bag
+		
+	#Stock Out Kgs
+	SET @m_StockOutKg:=(SELECT IFNULL(SUM(stocktransfer_out_detail.`qty_stockout_kg` * stocktransfer_out_detail.`num_of_stockout_bag`),0) AS stockOutKgs 
+		 FROM stocktransfer_out_detail 
+		WHERE stocktransfer_out_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY stocktransfer_out_detail.`purchase_bag_id`);
+	#Stock Out Kgs
+IF(@m_numberofStockOutBag IS NULL)THEN
+	SET @m_numberofStockOutBag:=0;
+END IF;
+IF(@m_StockOutKg IS NULL) THEN
+SET @m_StockOutKg:=0;
+END IF;
+		#Raw Tea Sale Bag
+		SET @m_numberofSaleOutBag:=(SELECT IFNULL(SUM(rawteasale_detail.`num_of_sale_bag`),0) AS saleBag 
+		 FROM rawteasale_detail 
+		WHERE rawteasale_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY rawteasale_detail.`purchase_bag_id`);
+		#Raw Tea Sale Bag
+		
+		#Raw Tea Sale Kgs
+		SET @m_SaleOutKg:=(SELECT IFNULL(SUM(rawteasale_detail.`qty_of_sale_bag` * rawteasale_detail.`num_of_sale_bag`),0) AS SaleKgs 
+		 FROM rawteasale_detail 
+		WHERE rawteasale_detail.`purchase_bag_id`= m_purBagDtlId
+		GROUP BY rawteasale_detail.`purchase_bag_id`);
+		#Raw Tea Sale Kgs
+		
+IF(@m_numberofSaleOutBag IS NULL)THEN
+	SET @m_numberofSaleOutBag:=0;
+END IF;
+IF(@m_SaleOutKg IS NULL) THEN
+SET @m_SaleOutKg:=0;
+END IF;
+SET @m_StockBag:=(m_numofpurchaseBag - (@m_numberofBlndBag+@m_numberofStockOutBag+@m_numberofSaleOutBag));
+SET @m_StockKg:=(m_purchasedKg - (@m_BlndKg+@m_StockOutKg+@m_SaleOutKg));
+INSERT INTO StockTable
+(
+	purchaseBagDtlId ,
+	purchasedBag ,
+	purchasedKg ,
+	blendedBag ,
+	blendedKg ,
+	stockOutBag,
+	stockOutKgs,
+	saleOutBag,
+	saleOutKgs,
+	stockBag  ,
+	stockKg  ,purchaseInvoiceDetailId 	
+)VALUES(m_purBagDtlId,m_numofpurchaseBag,m_purchasedKg,@m_numberofBlndBag,@m_BlndKg,@m_numberofStockOutBag,@m_StockOutKg,@m_numberofSaleOutBag,@m_SaleOutKg,@m_StockBag,@m_StockKg,m_purchaseInvoiceDetailId);
+ END LOOP get_stock;
+ CLOSE stockCursor;
+#Stock Print Start
+SELECT StockTable.purchaseInvoiceDetailId,
+StockTable.purchaseBagDtlId,
+StockTable.stockBag AS NumberOfStockBag,StockTable.stockKg AS StockBagQty,
+ StockTable.purchasedBag AS PurchasedBags,StockTable.purchasedKg AS PurchasedKgs,
+ StockTable.blendedBag AS BlendedBags,StockTable.blendedKg AS BlendedKgs,
+ StockTable.stockOutBag AS StockOutBag,StockTable.stockOutKgs AS StockOutKgs,
+ StockTable.saleOutBag AS SaleOutBag,StockTable.saleOutKgs AS SaleOutKgs,
+ `garden_master`.`garden_name`,`purchase_invoice_detail`.`invoice_number`,`purchase_invoice_detail`.`lot`,
+ `teagroup_master`.`group_code`,`purchase_invoice_master`.`sale_number`,`grade_master`.`grade`,
+ `purchase_invoice_master`.`purchase_invoice_date`,`purchase_invoice_master`.`purchase_invoice_number`,
+ `purchase_invoice_detail`.`cost_of_tea`,`location`.`location`,purchase_bag_details.`net` AS netKgs,
+ `purchase_invoice_detail`.`price` AS rate
+ FROM StockTable
+INNER JOIN  `purchase_invoice_detail` ON StockTable.purchaseInvoiceDetailId=`purchase_invoice_detail`.`id`
+INNER JOIN  `purchase_invoice_master` ON `purchase_invoice_detail`.`purchase_master_id` = `purchase_invoice_master`.`id`
+INNER JOIN `garden_master` ON `purchase_invoice_detail`.`garden_id` = `garden_master`.`id`
+INNER JOIN `teagroup_master` ON `purchase_invoice_detail`.`teagroup_master_id` = `teagroup_master`.`id`
+INNER JOIN `grade_master` ON `purchase_invoice_detail`.`grade_id` = `grade_master`.`id`
+INNER JOIN `purchase_bag_details` ON StockTable.purchaseBagDtlId = `purchase_bag_details`.`id`
+INNER JOIN `do_to_transporter` ON StockTable.purchaseInvoiceDetailId= do_to_transporter.`purchase_inv_dtlid`
+INNER JOIN `location` ON `do_to_transporter`.`locationId` = `location`.`id`
+GROUP BY StockTable.purchaseBagDtlId
+ORDER BY `purchase_invoice_detail`.`teagroup_master_id`,StockTable.purchaseInvoiceDetailId;
+#Stock Print END
+ END$$
+
+DELIMITER ;
+/*---------END-----sp_GetStockWithoutGroupAndCost------*/
+
+
+
+
+
+
+
+/*---------START------sp_groupwise_stock-------*/
+
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_groupwise_stock`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_groupwise_stock`(
+ IN teagroup INT(10)
+)
+BEGIN	
+SELECT PID.`id` AS purchaseDtl,PBD.`id` AS purchaseBagDtlId,
+`blending_details`.`id`,
+PID.`teagroup_master_id`,PID.`invoice_number`,PID.`lot`,PIM.`sale_number`,garden_master.`garden_name`,grade_master.`grade`,location.`location`,teagroup_master.`group_code`,
+PID.`price`,PID.`cost_of_tea`,PBD.`actual_bags`,PBD.`net`,PBD.`shortkg`,`blending_details`.`number_of_blended_bag`,`blending_details`.`qty_of_bag`,
+(IF(PBD.`actual_bags` IS NULL, 0,PBD.`actual_bags`) -
+ IF(`blending_details`.`number_of_blended_bag` IS NULL,0,`blending_details`.`number_of_blended_bag`)) AS NumberOfStockBag,
+((
+IF(PBD.`actual_bags`IS NULL,0,PBD.`actual_bags`)* IF(PBD.net IS NULL,0,PBD.net))-
+(IF(`blending_details`.`number_of_blended_bag`IS NULL,0,`blending_details`.`number_of_blended_bag`)*
+IF(`blending_details`.`qty_of_bag`IS NULL,0,`blending_details`.`qty_of_bag`))) AS StockBagQty
+FROM `purchase_invoice_detail` PID 
+INNER JOIN 
+`purchase_bag_details` PBD ON PID.`id` =PBD.`purchasedtlid`
+INNER JOIN `purchase_invoice_master` PIM ON PID.`purchase_master_id`=PIM.`id`
+INNER JOIN 
+do_to_transporter DOT ON PID.`id`= DOT.`purchase_inv_dtlid` AND DOT.`in_Stock`='Y'
+LEFT JOIN `blending_details` ON PBD.`id` = `blending_details`.`purchasebag_id`
+INNER JOIN garden_master ON PID.`garden_id` = garden_master.`id`
+INNER JOIN grade_master ON PID.`grade_id` = grade_master.`id`
+INNER JOIN `location` ON DOT.`locationId`=`location`.`id`  
+INNER JOIN `teagroup_master` ON PID.`teagroup_master_id` = `teagroup_master`.`id`
+WHERE PID.`teagroup_master_id`=teagroup;
+END$$
+
+DELIMITER ;
+
+/*---------END------sp_groupwise_stock-------*/
+
+
+
+
+
+/*-----START------sp_groupwise_sum_stock---*/
+
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_groupwise_sum_stock`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_groupwise_sum_stock`(IN teagroup INT(10))
+BEGIN
+SELECT 
+PID.`teagroup_master_id`,teagroup_master.`group_code`,
+SUM((IF(PBD.`actual_bags` IS NULL, 0,PBD.`actual_bags`) -
+ IF(`blending_details`.`number_of_blended_bag` IS NULL,0,`blending_details`.`number_of_blended_bag`)) )AS NumberOfStockBag,
+SUM((
+IF(PBD.`actual_bags`IS NULL,0,PBD.`actual_bags`)* IF(PBD.net IS NULL,0,PBD.net))-
+(IF(`blending_details`.`number_of_blended_bag`IS NULL,0,`blending_details`.`number_of_blended_bag`)*
+IF(`blending_details`.`qty_of_bag`IS NULL,0,`blending_details`.`qty_of_bag`))) AS StockBagQty
+FROM `purchase_invoice_detail` PID 
+INNER JOIN 
+`purchase_bag_details` PBD ON PID.`id` =PBD.`purchasedtlid`
+INNER JOIN 
+do_to_transporter DOT ON PID.`id`= DOT.`purchase_inv_dtlid` AND DOT.`in_Stock`='Y'
+LEFT JOIN `blending_details` ON PBD.`id` = `blending_details`.`purchasebag_id`
+INNER JOIN garden_master ON PID.`garden_id` = garden_master.`id`
+INNER JOIN grade_master ON PID.`grade_id` = grade_master.`id`
+INNER JOIN `location` ON DOT.`locationId`=`location`.`id`  
+INNER JOIN `teagroup_master` ON PID.`teagroup_master_id` = `teagroup_master`.`id`
+GROUP BY PID.`teagroup_master_id`
+HAVING 
+PID.`teagroup_master_id`=teagroup;
+END$$
+
+DELIMITER ;
+/*-----END------sp_groupwise_sum_stock---*/
+
+
+
+
+/*----------START------sp_grp_nd_pricewise--------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_grp_nd_pricewise`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_grp_nd_pricewise`(
+	IN teagroup INT(10),
+	IN fromPrice DECIMAL(10,2),
+	IN toPrice DECIMAL(10,2)
+)
+BEGIN
+SELECT PID.`id` AS purchaseDtl,PBD.`id` AS purchaseBagDtlId,
+`blending_details`.`id`,
+PID.`teagroup_master_id`,PID.`invoice_number`,PID.`lot`,PIM.`sale_number`,garden_master.`garden_name`,grade_master.`grade`,location.`location`,teagroup_master.`group_code`,
+PID.`price`,PID.`cost_of_tea`,PBD.`actual_bags`,PBD.`net`,PBD.`shortkg`,`blending_details`.`number_of_blended_bag`,`blending_details`.`qty_of_bag`,
+(IF(PBD.`actual_bags` IS NULL, 0,PBD.`actual_bags`) -
+ IF(`blending_details`.`number_of_blended_bag` IS NULL,0,`blending_details`.`number_of_blended_bag`)) AS NumberOfStockBag,
+((
+IF(PBD.`actual_bags`IS NULL,0,PBD.`actual_bags`)* IF(PBD.net IS NULL,0,PBD.net))-
+(IF(`blending_details`.`number_of_blended_bag`IS NULL,0,`blending_details`.`number_of_blended_bag`)*
+IF(`blending_details`.`qty_of_bag`IS NULL,0,`blending_details`.`qty_of_bag`))) AS StockBagQty
+FROM `purchase_invoice_detail` PID 
+INNER JOIN 
+`purchase_bag_details` PBD ON PID.`id` =PBD.`purchasedtlid`
+INNER JOIN `purchase_invoice_master` PIM ON PID.`purchase_master_id`=PIM.`id`
+INNER JOIN 
+do_to_transporter DOT ON PID.`id`= DOT.`purchase_inv_dtlid` AND DOT.`in_Stock`='Y'
+LEFT JOIN `blending_details` ON PBD.`id` = `blending_details`.`purchasebag_id`
+INNER JOIN garden_master ON PID.`garden_id` = garden_master.`id`
+INNER JOIN grade_master ON PID.`grade_id` = grade_master.`id`
+INNER JOIN `location` ON DOT.`locationId`=`location`.`id`  
+INNER JOIN `teagroup_master` ON PID.`teagroup_master_id` = `teagroup_master`.`id`
+WHERE PID.`teagroup_master_id`=teagroup AND (PID.`price` BETWEEN fromPrice AND toPrice); 
+END$$
+
+DELIMITER ;
+
+/*----------END------sp_grp_nd_pricewise--------*/
+
+
+
+
+
+
+
+/*----------START------sp_pricewise_allgrp------*/
+
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_pricewise_allgrp`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_pricewise_allgrp`(IN fromPrice DECIMAL(10,2),IN toPrice DECIMAL(10,2))
+BEGIN
+SELECT PID.`id` AS purchaseDtl,PBD.`id` AS purchaseBagDtlId,
+`blending_details`.`id`,
+PID.`teagroup_master_id`,PID.`invoice_number`,PID.`lot`,PIM.`sale_number`,garden_master.`garden_name`,grade_master.`grade`,location.`location`,teagroup_master.`group_code`,
+PID.`price`,PID.`cost_of_tea`,PBD.`actual_bags`,PBD.`net`,PBD.`shortkg`,`blending_details`.`number_of_blended_bag`,`blending_details`.`qty_of_bag`,
+(IF(PBD.`actual_bags` IS NULL, 0,PBD.`actual_bags`) -
+ IF(`blending_details`.`number_of_blended_bag` IS NULL,0,`blending_details`.`number_of_blended_bag`)) AS NumberOfStockBag,
+((
+IF(PBD.`actual_bags`IS NULL,0,PBD.`actual_bags`)* IF(PBD.net IS NULL,0,PBD.net))-
+(IF(`blending_details`.`number_of_blended_bag`IS NULL,0,`blending_details`.`number_of_blended_bag`)*
+IF(`blending_details`.`qty_of_bag`IS NULL,0,`blending_details`.`qty_of_bag`))) AS StockBagQty
+FROM `purchase_invoice_detail` PID 
+INNER JOIN 
+`purchase_bag_details` PBD ON PID.`id` =PBD.`purchasedtlid`
+INNER JOIN `purchase_invoice_master` PIM ON PID.`purchase_master_id`=PIM.`id`
+INNER JOIN 
+do_to_transporter DOT ON PID.`id`= DOT.`purchase_inv_dtlid` AND DOT.`in_Stock`='Y'
+LEFT JOIN `blending_details` ON PBD.`id` = `blending_details`.`purchasebag_id`
+INNER JOIN garden_master ON PID.`garden_id` = garden_master.`id`
+INNER JOIN grade_master ON PID.`grade_id` = grade_master.`id`
+INNER JOIN `location` ON DOT.`locationId`=`location`.`id`  
+INNER JOIN `teagroup_master` ON PID.`teagroup_master_id` = `teagroup_master`.`id`
+WHERE (PID.`price` BETWEEN fromPrice AND toPrice); 
+END$$
+
+DELIMITER ;
+
+/*----------END-----sp_pricewise_allgrp------*/
+
+
+
+
+
+
+/*-----------START--------sp_UpdateVendorBillMaster--------*/
+
+
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_UpdateVendorBillMaster`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_UpdateVendorBillMaster`()
+BEGIN
+    DECLARE m_purchaseInvoiceId INTEGER DEFAULT 0;
+    DECLARE m_purchaseInvoiceDate DATETIME;
+    DECLARE m_purchaseBillAmount DECIMAL(10,2) DEFAULT 0;
+    DECLARE m_vendorAccountId INTEGER ;
+    DECLARE m_companyId INTEGER;
+    DECLARE m_yearId INTEGER;
+	#cursor finish variable declare
+	DECLARE cursor_finish INTEGER DEFAULT 0;
+	
+	#cursor declaration 
+	DECLARE CursorpurchaseBill CURSOR FOR
+	SELECT purchase_invoice_master.`id` AS invoiceId,purchase_invoice_master.`purchase_invoice_date`,
+		  purchase_invoice_master.`total`,`account_master`.`id`,
+		  purchase_invoice_master.`year_id`,purchase_invoice_master.`company_id`
+	FROM 
+		  purchase_invoice_master
+	INNER JOIN`vendor` ON `purchase_invoice_master`.`vendor_id` = vendor.`id`
+	INNER JOIN`account_master` ON `vendor`.`account_master_id` = `account_master`.`id` ;
+	#declare cursor handler
+	DECLARE CONTINUE HANDLER 
+	FOR NOT FOUND SET cursor_finish = 1;
+    
+     OPEN CursorpurchaseBill ;
+     get_bill: LOOP	
+     
+     FETCH CursorpurchaseBill INTO m_purchaseInvoiceId,m_purchaseInvoiceDate,m_purchaseBillAmount,m_vendorAccountId
+     ,m_yearId,m_companyId;
+     
+     IF cursor_finish=1 THEN
+      LEAVE get_bill;
+     END IF;
+     #insertion to bill master
+     INSERT INTO `vendorbillmaster`
+            (
+             `billDate`,
+             `billAmount`,
+             `invoiceMasterId`,
+             `purchaseType`,
+             `vendorAccountId`,
+             `companyId`,
+             `yearId`)
+	VALUES (
+        m_purchaseInvoiceDate,
+        m_purchaseBillAmount,
+        m_purchaseInvoiceId,
+        'T',
+        m_vendorAccountId,
+        m_companyId,
+        m_yearId);
+     
+     END LOOP get_bill;
+	CLOSE CursorpurchaseBill; 
+END$$
+
+DELIMITER ;
+
+/*-------END--------sp_UpdateVendorBillMaster--------*/
+
+
+
+
+
+
+
+/*--------START-----sp_UpdateVendorBillMasterByRawPurchase---------*/
+DELIMITER $$
+
+USE `teasamrat`$$
+
+DROP PROCEDURE IF EXISTS `sp_UpdateVendorBillMasterByRawPurchase`$$
+
+CREATE DEFINER=`samrat`@`localhost` PROCEDURE `sp_UpdateVendorBillMasterByRawPurchase`()
+BEGIN
+    DECLARE m_purchaseInvoiceId INTEGER DEFAULT 0;
+    DECLARE m_purchaseInvoiceDate DATETIME;
+    DECLARE m_purchaseBillAmount DECIMAL(10,2) DEFAULT 0;
+    DECLARE m_vendorAccountId INTEGER ;
+    DECLARE m_companyId INTEGER;
+    DECLARE m_yearId INTEGER;
+	#cursor finish variable declare
+	DECLARE cursor_finish INTEGER DEFAULT 0;
+	
+	#cursor declaration 
+	DECLARE CursorpurchaseBill CURSOR FOR
+	
+	SELECT 
+		  rawmaterial_purchase_master.`id` AS invoiceId,rawmaterial_purchase_master.`invoice_date`,
+		  rawmaterial_purchase_master.`invoice_value`,`account_master`.`id`,
+		  `rawmaterial_purchase_master`.`yearid`,`rawmaterial_purchase_master`.`companyid`
+		  
+	FROM 
+		  rawmaterial_purchase_master
+	INNER JOIN`vendor` ON `rawmaterial_purchase_master`.`vendor_id` = vendor.`id`
+	INNER JOIN`account_master` ON `vendor`.`account_master_id` = `account_master`.`id` ;
+	#declare cursor handler
+	DECLARE CONTINUE HANDLER 
+	FOR NOT FOUND SET cursor_finish = 1;
+    
+     OPEN CursorpurchaseBill ;
+     get_bill: LOOP	
+     
+     FETCH CursorpurchaseBill INTO m_purchaseInvoiceId,m_purchaseInvoiceDate,m_purchaseBillAmount,m_vendorAccountId
+     ,m_yearId,m_companyId;
+     
+     IF cursor_finish=1 THEN
+      LEAVE get_bill;
+     END IF;
+     #insertion to bill master
+     INSERT INTO `vendorbillmaster`
+            (
+             `billDate`,
+             `billAmount`,
+             `invoiceMasterId`,
+             `purchaseType`,
+             `vendorAccountId`,
+             `companyId`,
+             `yearId`)
+	VALUES (
+        m_purchaseInvoiceDate,
+        m_purchaseBillAmount,
+        m_purchaseInvoiceId,
+        'O',
+        m_vendorAccountId,
+        m_companyId,
+        m_yearId);
+     
+     END LOOP get_bill;
+	CLOSE CursorpurchaseBill; 
+END$$
+
+DELIMITER ;
+
+/*--------END-----sp_UpdateVendorBillMasterByRawPurchase---------*/
+
+
+

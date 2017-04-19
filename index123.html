@@ -1,0 +1,9 @@
+<?php
+
+ echo $sql = "select * from user";
+ $connection1 = mysql_connect("localhost", "samrat","admin#2015") or die(mysql_error());
+  $connection2 = mysqli_connect("localhost", "samrat","admin#2015","teasamrat") or die(mysql_error());
+ $requete = mysql_query($sql, $connection1) or die(mysql_error());
+ print_r ($requete);
+
+?>

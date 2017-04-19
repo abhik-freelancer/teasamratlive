@@ -1,0 +1,15 @@
+D:\xampp\htdocs\teasamratlive\DB script\Upload_25-08-2016
+
+
+`sp_UpdateVendorBillMaster` 
+-->Update tea purchase into vendor bill master
+
+`sp_UpdateVendorBillMasterByRawPurchase`
+-->Upadate others purchase into vendor bill master
+
+`sp_autoVoucherInsertRAWPUR`
+-->Upadate voucher against raw purchase
+
+`GetVendorUnpaidBill`
+-->get vendor unpaid bill
+

@@ -1,0 +1,1 @@
+ALTER TABLE `tea_samrat`.`product_packet` ADD COLUMN `sale_rate` DECIMAL(10,2) NOT NULL AFTER `packetid`;

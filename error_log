@@ -1,0 +1,12 @@
+[15-Mar-2015 09:06:02 UTC] PHP Fatal error:  Call to a member function delete() on a non-object in /home/softhought/public_html/application/controllers/customermaster.php on line 197
+[15-Mar-2015 09:07:32 UTC] PHP Fatal error:  Call to a member function delete() on a non-object in /home/softhought/public_html/application/controllers/customermaster.php on line 197
+[23-Mar-2015 08:41:23 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/privatesellmastermodel.php on line 251
+[23-Mar-2015 10:12:54 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/purchaseinvoicemastermodel.php on line 347
+[23-Mar-2015 10:12:55 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/purchaseinvoicemastermodel.php on line 347
+[24-Mar-2015 07:15:05 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/salertobuyermodel.php on line 274
+[24-Mar-2015 07:16:02 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/salertobuyermodel.php on line 274
+[24-Mar-2015 07:18:56 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/salertobuyermodel.php on line 274
+[24-Mar-2015 07:19:17 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/salertobuyermodel.php on line 274
+[24-Mar-2015 07:19:55 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/salertobuyermodel.php on line 274
+[24-Mar-2015 07:22:27 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/salertobuyermodel.php on line 362
+[24-Mar-2015 07:22:27 UTC] PHP Fatal error:  Call to a member function num_rows() on a non-object in /home/softhought/public_html/application/models/salertobuyermodel.php on line 362

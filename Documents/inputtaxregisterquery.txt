@@ -1,0 +1,35 @@
+SELECT 
+  `purchase_invoice_master`.`tea_value`  AS teaValue,
+  `purchase_invoice_master`.`brokerage`  AS brokerages,
+  `purchase_invoice_master`.`service_tax`  AS serviceTaxAmt,
+  `purchase_invoice_master`.`total_vat`  AS vatamt,
+  `purchase_invoice_master`.`stamp`  AS totalStamp,
+  `purchase_invoice_master`.`round_off`  AS tRoundOff,
+  `purchase_invoice_master`.`other_charges`  AS totaOthrs,
+`purchase_invoice_detail`.`rate_type_id`,vat.`vat_rate`
+FROM `purchase_invoice_master`
+RIGHT JOIN `purchase_invoice_detail` ON `purchase_invoice_master`.`id`=`purchase_invoice_detail`.`purchase_master_id` 
+INNER JOIN
+vat ON vat.`id`= `purchase_invoice_detail`.`rate_type_id`
+WHERE `purchase_invoice_master`.`from_where` <> 'OP' AND `purchase_invoice_master`.`from_where` <> 'STI'
+GROUP BY `purchase_invoice_detail`.`rate_type_id`
+
+
+
+
+SELECT 
+SUM(DISTINCT `purchase_invoice_master`.`tea_value`) AS teaValue,
+SUM(DISTINCT `purchase_invoice_master`.`brokerage`) AS brokerages,
+SUM(DISTINCT `purchase_invoice_master`.`service_tax`) AS serviceTaxAmt,
+SUM(DISTINCT `purchase_invoice_master`.`total_vat`) AS vatamt,
+SUM(DISTINCT `purchase_invoice_master`.`stamp`) AS totalStamp,
+SUM(DISTINCT `purchase_invoice_master`.`round_off`) AS tRoundOff,
+SUM(DISTINCT `purchase_invoice_master`.`other_charges`) AS totaOthrs,
+`purchase_invoice_detail`.`rate_type_id`,vat.`vat_rate`
+FROM `purchase_invoice_master`
+RIGHT JOIN `purchase_invoice_detail` ON `purchase_invoice_master`.`id`=`purchase_invoice_detail`.`purchase_master_id` 
+INNER JOIN
+vat ON vat.`id`= `purchase_invoice_detail`.`rate_type_id`
+WHERE `purchase_invoice_master`.`from_where` <> 'OP' AND `purchase_invoice_master`.`from_where` <> 'STI' 
+#AND `purchase_invoice_master`.`id` IN (774,773,928)
+GROUP BY `purchase_invoice_detail`.`rate_type_id`
