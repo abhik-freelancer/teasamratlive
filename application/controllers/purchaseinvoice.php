@@ -95,10 +95,11 @@ class purchaseinvoice extends CI_Controller {
                 $auctionareaId = $this->purchaseinvoicemastermodel->getAuctionareaId($purchaseInvoiceId);
                 if($auctionareaId!=0){
                 $result['transCost'] = $this->purchaseinvoicemastermodel->getTransCost($auctionareaId);}
-              /* echo "<pre>";
-                print_r($result['purchaseMaster']);
-                echo "<pre>";
-                       exit;*/
+				/*
+				echo "<pre>";
+                print_r($result['purchaseDetails']);
+                echo "<pre>";*/
+                      // exit;
              
                 
                 $page = 'purchase_invoice/manage_purchase.php';

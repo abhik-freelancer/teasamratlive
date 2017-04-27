@@ -52,7 +52,7 @@ class purchaseinvoicemastermodel extends CI_Model {
      * NB if editable Y then you can edit.
      */
     public function getPurchaseDetails($masterId = '') {
-        $sql ="SELECT 
+       $sql ="SELECT 
                 purchase_invoice_detail.id,
                 purchase_invoice_detail.purchase_master_id,
                 IF((ISNULL(do_to_transporter.is_sent) OR do_to_transporter.is_sent='N'),'Y','N')AS editable, 
@@ -81,8 +81,55 @@ class purchaseinvoicemastermodel extends CI_Model {
                  do_to_transporter ON purchase_invoice_detail.id = do_to_transporter.purchase_inv_dtlid
             INNER JOIN garden_master ON  purchase_invoice_detail.garden_id=garden_master.id
                 WHERE purchase_invoice_detail.purchase_master_id = '".$masterId."'" ;
-                
+				
+		/*		
+		$where = array(
+			"purchase_invoice_detail.purchase_master_id" => $masterId
+		);
+		$this->db->_protect_identifiers=false;
+		$this->db->select("purchase_invoice_detail.id,
+						   purchase_invoice_detail.purchase_master_id,
+						   IF((ISNULL(do_to_transporter.is_sent) OR do_to_transporter.is_sent='N'),'Y','N')AS editable, 
+						   purchase_invoice_detail.lot,
+						   DATE_FORMAT(purchase_invoice_detail.doRealisationDate, '%d-%m-%Y') AS doRealisationDate,
+						   purchase_invoice_detail.do,
+						   purchase_invoice_detail.invoice_number,
+						   purchase_invoice_detail.garden_id,
+						   purchase_invoice_detail.location_id,
+						   purchase_invoice_detail.grade_id,
+						   purchase_invoice_detail.warehouse_id,
+						   purchase_invoice_detail.cost_of_tea,
+						   purchase_invoice_detail.transportation_cost,
+						   purchase_invoice_detail.gp_number,
+						   DATE_FORMAT(purchase_invoice_detail.date, '%d-%m-%Y') AS gpDate,
+						   purchase_invoice_detail.stamp,	
+						   purchase_invoice_detail.gross,
+						   purchase_invoice_detail.brokerage,
+						   purchase_invoice_detail.tb_charges,
+						   purchase_invoice_detail.total_weight,
+						   purchase_invoice_detail.rate_type_value, 
+						   purchase_invoice_detail.price,
+						   purchase_invoice_detail.service_tax,
+						   purchase_invoice_detail.total_value,
+						   purchase_invoice_detail.value_cost,
+						   purchase_invoice_detail.rate_type,
+						   purchase_invoice_detail.rate_type_id,
+						   purchase_invoice_detail.service_tax_id,
+						   purchase_invoice_detail.teagroup_master_id,
+						   garden_master.garden_name
+						  ")
+						->from("purchase_invoice_detail")
+						->join("do_to_transporter","purchase_invoice_detail.id = do_to_transporter.purchase_inv_dtlid","LEFT")
+						->join("garden_master","purchase_invoice_detail.garden_id=garden_master.id","INNER")
+						->where($where);
+            $query = $this->db->get();   */
+			  
         $query = $this->db->query($sql);
+		//echo $this->db->last_query();
+		//echo $norows = $query->num_rows();
+		//echo "<br>";
+		//echo "All Count ".$this->db->count_all_results();
+		
         if ($query->num_rows() > 0) {
             foreach ($query->result() as $rows) {
                 $data[] = array("id" => $rows->id,
@@ -120,7 +167,9 @@ class purchaseinvoicemastermodel extends CI_Model {
                     
                 );
             }
-
+			/*	echo "<pre>";
+			    print_r($data);
+				echo "</pre>"; */
             return $data;
         } else {
             return $data = array();

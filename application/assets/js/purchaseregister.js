@@ -1,6 +1,6 @@
 $(document).ready(function(){
 $( ".legal-menu"+$('#reportmenu').val() ).addClass( " collapse in " );
-$( ".purchaseregister").addClass( " active " );
+//$( ".purchaseregister").addClass( " active " );
 });
 
 $(function() {
@@ -158,6 +158,10 @@ $(function() {
     
     $("#purchase_register_print").click(function(){
         $("#frmpurchaseRegister").submit();
+    });
+	
+	 $("#purchasereg_new_print").click(function(){
+        $("#frmNewpurchaseReg").submit();
     });
     
     

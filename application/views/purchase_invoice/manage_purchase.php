@@ -125,6 +125,12 @@ table.gridtable td {
 </table>
 
 </div>
+
+<?php 
+	/*echo "<pre>";
+	print_r($bodycontent['purchaseDetails']);
+	echo "<pre>";*/
+?>
 <div id="detailDiv" class="accordion">
     <?php 
    
@@ -349,9 +355,10 @@ table.gridtable td {
                 <table width="100%" >
                     <tr>
                         <td align="right" > 
+							
                             <?php if($dataContent['editable']=='Y'){ ?>
                             <input class="styled-button-10" value="update" onclick="updatePurDtl(<?php echo ($dataContent['id']); ?>);" type="button">
-                            <?php }?>
+                            <?php } ?>
                             <input type="hidden" name="PurchaseMasterId" id="PurchaseMasterId_<?php echo ($dataContent['id']);?>" value="<?php echo ($dataContent['purchase_master_id']); ?>"/>
                         </td>
                         <td>&nbsp;</td>
