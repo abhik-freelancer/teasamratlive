@@ -243,24 +243,29 @@
         
         
         
-         $purchInvGrossSale=0;
+          $purchInvGrossSale=0;
           $rwMaterialTgrossSale = 0;
+		  $fpPurchaseGrossSale = 0;
           $VatINTotalGrossSale=0;
           
           $purchaseInvTaxable=0;
           $rwMaterialTeaTaxable=0;
+          $fpPurchaseTaxable=0;
           $VatINTotalTaxableAmt=0;
           
           $purchInvTaxAmt=0;
           $rawmaterialTeaTaxAmt=0;
+          $fpPurchaseTaxAmt=0;
           $VatINtotalTaxAmt=0;
           
            $purchaseInvWithTax =0;
            $rwMaterialTeaWithTaxt = 0;
+           $fpPurchaseWithTaxt = 0;
            $VatINtotalWithtaxAmt = 0;
            
            $purchaseInvOthers = 0;
            $rawmaterialTeaOthers = 0;
+           $fpPurchaseOthers = 0;
            $VatINtotalOthers = 0;
            
            
@@ -273,27 +278,32 @@
                 //Gross sales
             $purchInvGrossSale = $vatinput['purchaseInvoiceInput']['purchseInvGross'];
             $rwMaterialTgrossSale = $vatinput['rawpurchMaterialInput']['rawmaterailGross'];
-            $VatINTotalGrossSale = $purchInvGrossSale+$rwMaterialTgrossSale;
+            $fpPurchaseGrossSale = $vatinput['finishProdPurchInput']['finishPrdPurchGross'];
+            $VatINTotalGrossSale = $purchInvGrossSale+$rwMaterialTgrossSale+$fpPurchaseGrossSale;
          
             //Taxable
             $purchaseInvTaxable =  $vatinput['purchaseInvoiceInput']['purchTaxable'];
             $rwMaterialTeaTaxable = $vatinput['rawpurchMaterialInput']['rawMaterialTaxable'];
-                $VatINTotalTaxableAmt = $purchaseInvTaxable+$rwMaterialTeaTaxable;
+            $fpPurchaseTaxable = $vatinput['finishProdPurchInput']['finishPrdPurchTaxable'];
+                $VatINTotalTaxableAmt = $purchaseInvTaxable+$rwMaterialTeaTaxable+$fpPurchaseTaxable;
             
             //Tax
             $purchInvTaxAmt = $vatinput['purchaseInvoiceInput']['purTaxamount'];
             $rawmaterialTeaTaxAmt = $vatinput['rawpurchMaterialInput']['rawMaterialTaxamount'];
-                $VatINtotalTaxAmt = $purchInvTaxAmt+$rawmaterialTeaTaxAmt;
+            $fpPurchaseTaxAmt = $vatinput['finishProdPurchInput']['finishPrdPurchTaxamount'];
+                $VatINtotalTaxAmt = $purchInvTaxAmt+$rawmaterialTeaTaxAmt+$fpPurchaseTaxAmt;
             
             //With Tax
             $purchaseInvWithTax = $vatinput['purchaseInvoiceInput']['purchaseWithTax'];
             $rwMaterialTeaWithTaxt = $vatinput['rawpurchMaterialInput']['purchaseWithTax'];
-                $VatINtotalWithtaxAmt = $purchaseInvWithTax+$rwMaterialTeaWithTaxt;
+            $fpPurchaseWithTaxt = $vatinput['finishProdPurchInput']['purchaseWithTax'];
+				$VatINtotalWithtaxAmt = $purchaseInvWithTax+$rwMaterialTeaWithTaxt+$fpPurchaseWithTaxt;
              
              // Others
             $purchaseInvOthers = $vatinput['purchaseInvoiceInput']['purchaseOthers'];
             $rawmaterialTeaOthers = $vatinput['rawpurchMaterialInput']['purchaseOthers'];
-                $VatINtotalOthers = $purchaseInvOthers+$rawmaterialTeaOthers;
+            $fpPurchaseOthers = $vatinput['finishProdPurchInput']['purchaseOthers'];
+                $VatINtotalOthers = $purchaseInvOthers+$rawmaterialTeaOthers+$fpPurchaseOthers;
         
         ?>
         

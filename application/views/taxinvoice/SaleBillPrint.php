@@ -215,7 +215,7 @@
 </table>
 <table width="100%" class="demo">
   <tr>
-      <td width="30%"><b>W.B.V.A.T - 19470546064  C.S.T -19470546258</b></td>
+      <td width="30%"><b>W.B.V.A.T - <?php echo($headerview['CompanyVatNumber']); ?>  C.S.T -<?php echo($headerview['CompanyCstNumber']); ?></b></td>
     <td width="70%"><div align="right">For <?php echo($headerview['Company']); ?></div></td>
   </tr>
   <tr>

@@ -62,7 +62,7 @@ class invoicestatusmodel extends CI_Model {
                 FROM `purchase_invoice_detail`
                 INNER JOIN purchase_invoice_master ON purchase_invoice_master.id = purchase_invoice_detail.purchase_master_id
                 WHERE `purchase_invoice_detail`.`garden_id`=".$gardenId." 
-                AND `purchase_invoice_detail`.`invoice_number`=".$invoice."
+                AND `purchase_invoice_detail`.`invoice_number`='".$invoice."'
                 AND purchase_invoice_master.year_id=".$yearId. " AND purchase_invoice_master.company_id =".$companyId;
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
@@ -106,8 +106,8 @@ class invoicestatusmodel extends CI_Model {
       INNER JOIN purchase_invoice_master 
         ON purchase_invoice_master.id = purchase_invoice_detail.purchase_master_id 
     WHERE `purchase_invoice_detail`.`garden_id` = ".$garden."
-      AND `purchase_invoice_detail`.`invoice_number` =".$invoice." 
-      AND `purchase_invoice_detail`.`lot` = ".$lot."
+      AND `purchase_invoice_detail`.`invoice_number` ='".$invoice."' 
+      AND `purchase_invoice_detail`.`lot` = '".$lot."'
     AND purchase_invoice_master.year_id =".$yearId."  AND purchase_invoice_master.company_id = ".$companyId ;
 
         $query = $this->db->query($sql);
@@ -467,14 +467,14 @@ class invoicestatusmodel extends CI_Model {
        $companyId = $session['company'];
        $yearId = $session['yearid'];
        $purchaseInvoiceId=0;
-       $sql = "SELECT purchase_invoice_detail.id FROM 
+        $sql = "SELECT purchase_invoice_detail.id FROM 
                purchase_invoice_detail 
                INNER JOIN purchase_invoice_master 
                ON purchase_invoice_master.id = purchase_invoice_detail.purchase_master_id 
                WHERE
                `purchase_invoice_detail`.`garden_id` = ".$gardenId."
-                AND `purchase_invoice_detail`.`invoice_number` = ".$invoiceNum." 
-                AND `purchase_invoice_detail`.`lot` = ".$lot." AND purchase_invoice_detail.grade_id = ".$grade."
+                AND `purchase_invoice_detail`.`invoice_number` = '".$invoiceNum."' 
+                AND `purchase_invoice_detail`.`lot` = '".$lot."' AND purchase_invoice_detail.grade_id = ".$grade."
                 AND purchase_invoice_master.year_id = ".$yearId."
                 AND purchase_invoice_master.company_id = ".$companyId;
        $query = $this->db->query($sql);

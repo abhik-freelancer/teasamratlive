@@ -149,7 +149,8 @@ class saletaxregistermodel extends CI_Model {
                    "taxratetypeId"=>$rows->rateTypeId,
                     "vatrate"=>$rows->vat_rate,
                     "purchaseInvoiceInput"=>$this->getPurchaseinvTaxData($rows->rateTypeId,$frmdt,$todate,$compnyId),
-                    "rawpurchMaterialInput"=>$this->getRawPurchasematerialData($rows->rateTypeId,$frmdt,$todate,$compnyId)
+                    "rawpurchMaterialInput"=>$this->getRawPurchasematerialData($rows->rateTypeId,$frmdt,$todate,$compnyId),
+					"finishProdPurchInput" =>$this->getFinishProductPurchaseData($rows->rateTypeId,$frmdt,$todate,$compnyId),
                 );
             }
            
@@ -164,6 +165,109 @@ class saletaxregistermodel extends CI_Model {
    } 
    
    
+    public function getPurchaseinvTaxData($vatId,$fromDt,$todate,$compnyId)
+	{
+		$session = sessiondata_method();
+		$sql = "SELECT 
+				SUM(purchase_invoice_detail.`value_cost`) AS totalteaValue,
+				SUM(purchase_invoice_detail.`brokerage`) AS totalBrokerage,
+				SUM(purchase_invoice_detail.`service_tax`) AS totalServiceTax,
+				SUM(purchase_invoice_detail.`rate_type_value`) AS totalVatAmt,
+				SUM(purchase_invoice_detail.`stamp`) AS totalStamp,
+				SUM(purchase_invoice_detail.`tb_charges`) AS totalTbCharges
+			FROM purchase_invoice_detail
+				INNER JOIN purchase_invoice_master
+				ON purchase_invoice_master.`id` = purchase_invoice_detail.`purchase_master_id`
+				WHERE purchase_invoice_master.year_id = ".$session['yearid']." 
+				  AND `purchase_invoice_master`.`from_where` <> 'OP' 
+				  AND `purchase_invoice_master`.`from_where` <> 'STI' 
+				  AND `purchase_invoice_master`.`purchase_invoice_date` BETWEEN '".$fromDt."' AND '".$todate."' 
+				  AND purchase_invoice_master.`company_id` =".$compnyId." 
+				  AND purchase_invoice_detail.`rate_type_id`=".$vatId;
+		
+		$query =$this->db->query($sql);
+        if($query->num_rows()> 0){
+            foreach ($query->result() as $rows){
+                $data=array(
+                   
+                   "purchTaxable"=>($rows->totalteaValue + $rows->totalBrokerage + $rows->totalStamp),
+                   "purTaxamount"=>$rows->totalVatAmt,
+				   "totalRoundOff" => $this->getTotalRoundOff($vatId,$fromDt,$todate,$compnyId,$session['yearid']),
+				   "totalOtherCharges" => $this->getTotalOtherCharges($vatId,$fromDt,$todate,$compnyId,$session['yearid']),
+				   
+				   "purchseInvGross"=>($rows->totalteaValue + $rows->totalBrokerage + $rows->totalStamp + $rows->totalVatAmt + $rows->totalServiceTax + $rows->totalTbCharges + $this->getTotalRoundOff($vatId,$fromDt,$todate,$compnyId,$session['yearid']) + $this->getTotalOtherCharges($vatId,$fromDt,$todate,$compnyId,$session['yearid'])),
+				   
+                   "purchaseWithTax"=>($rows->totalteaValue + $rows->totalBrokerage + $rows->totalStamp + $rows->totalVatAmt),
+                   "purchaseOthers"=>($rows->totalServiceTax + $this->getTotalRoundOff($vatId,$fromDt,$todate,$compnyId,$session['yearid'])+ $this->getTotalOtherCharges($vatId,$fromDt,$todate,$compnyId,$session['yearid']) +$rows->totalTbCharges)
+                );
+            }
+           
+          return $data;
+        }
+        else{
+            return $data=array();
+        }
+	}
+	
+	public function getTotalRoundOff($vatId,$fromDt,$todate,$compnyId,$yrId)
+	{
+		$totalRoundOff = 0;
+		$sql = "SELECT 
+					DISTINCT(purchase_invoice_master.`id`),
+					purchase_invoice_master.`round_off`
+					FROM purchase_invoice_master
+					INNER JOIN purchase_invoice_detail
+					ON purchase_invoice_detail.`purchase_master_id` = purchase_invoice_master.`id`
+				WHERE 
+					purchase_invoice_master.`year_id` = ".$yrId."
+					AND purchase_invoice_master.`company_id`=".$compnyId."
+					AND purchase_invoice_master.`from_where` NOT IN ('OP','STI')
+					AND `purchase_invoice_master`.`purchase_invoice_date` BETWEEN '".$fromDt."' AND '".$todate."' 
+					AND purchase_invoice_detail.`rate_type_id`=".$vatId;
+					$query =$this->db->query($sql);
+        if($query->num_rows()> 0)
+		{
+            foreach ($query->result() as $rows)
+			{
+				
+                $totalRoundOff = $totalRoundOff+$rows->round_off;
+			}
+		}
+       
+	   return $totalRoundOff;
+	}
+	public function getTotalOtherCharges($vatId,$fromDt,$todate,$compnyId,$yrId)
+	{
+		$totalOtherCharges = 0;
+		$sql = "SELECT 
+					DISTINCT(purchase_invoice_master.`id`),
+					purchase_invoice_master.`other_charges`
+					FROM purchase_invoice_master
+					INNER JOIN purchase_invoice_detail
+					ON purchase_invoice_detail.`purchase_master_id` = purchase_invoice_master.`id`
+				WHERE 
+					purchase_invoice_master.`year_id` = ".$yrId."
+					AND purchase_invoice_master.`company_id`=".$compnyId."
+					AND purchase_invoice_master.`from_where` NOT IN ('OP','STI')
+					AND `purchase_invoice_master`.`purchase_invoice_date` BETWEEN '".$fromDt."' AND '".$todate."' 
+					AND purchase_invoice_detail.`rate_type_id`=".$vatId;
+					$query =$this->db->query($sql);
+        if($query->num_rows()> 0)
+		{
+            foreach ($query->result() as $rows)
+			{
+				
+                $totalOtherCharges = $totalOtherCharges+$rows->other_charges;
+			}
+		}
+       
+	   return $totalOtherCharges;
+		
+	}
+   
+   
+   
+   /*
    public function getPurchaseinvTaxData($vatId,$fromDt,$todate,$compnyId){
        $session = sessiondata_method();
        $sql ="SELECT 
@@ -208,6 +312,10 @@ class saletaxregistermodel extends CI_Model {
             return $data=array();
         }
    }
+   */
+   
+   
+  
    
    public function getRawPurchasematerialData($vatId,$fromDt,$todate,$compnyId){
        $session = sessiondata_method();
@@ -230,6 +338,42 @@ class saletaxregistermodel extends CI_Model {
                    "rawMaterialTaxable"=>($rows->rawGrossPurch + $rows->totalExciseAmt),
                    "rawMaterialTaxamount"=>$rows->totaltaxAmt,
                    "purchaseWithTax"=>($rows->rawGrossPurch + $rows->totalExciseAmt + $rows->totaltaxAmt),
+                   "purchaseOthers"=>($rows->totalRoundOff)
+                );
+            }
+           
+          return $data;
+        }
+        else{
+            return $data=array();
+        }
+   }
+   
+   public function getFinishProductPurchaseData($vatId,$fromDt,$todate,$compnyId)
+   {
+	   $session = sessiondata_method();
+	   $sql = "SELECT 
+				COALESCE(SUM(purchase_finishproductmaster.`taxAmount`),0) AS totalTaxAmt,
+				COALESCE(SUM(purchase_finishproductmaster.`discountAmount`),0) AS totalDiscAmt,
+				COALESCE(SUM(purchase_finishproductmaster.`deliverycharges`),0) AS totalDelivryCharg,
+				COALESCE(SUM(purchase_finishproductmaster.`totalamount`),0) AS totalAmount,
+				COALESCE(SUM(purchase_finishproductmaster.`roundoff`),0) AS totalRoundOff,
+				COALESCE(SUM(purchase_finishproductmaster.`grandtotal`),0) AS grandTotal
+				FROM `purchase_finishproductmaster`
+				WHERE
+				purchase_finishproductmaster.`purchasebilldate` BETWEEN '".$fromDt."' AND '".$todate."'
+				AND purchase_finishproductmaster.`taxtRateTypeId`=".$vatId."
+				AND purchase_finishproductmaster.`companyid`=".$compnyId."
+				AND purchase_finishproductmaster.`yearid`=".$session['yearid'];
+				 
+		  $query =$this->db->query($sql);
+        if($query->num_rows()> 0){
+            foreach ($query->result() as $rows){
+                $data=array(
+                   "finishPrdPurchGross"=>$rows->grandTotal,
+                   "finishPrdPurchTaxable"=>($rows->totalAmount - $rows->totalDiscAmt),
+                   "finishPrdPurchTaxamount"=>$rows->totalTaxAmt,
+                   "purchaseWithTax"=>($rows->totalAmount + $rows->totalTaxAmt),
                    "purchaseOthers"=>($rows->totalRoundOff)
                 );
             }

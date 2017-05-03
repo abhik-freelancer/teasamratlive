@@ -109,7 +109,7 @@ class taxinvoicemodel extends CI_Model {
                     sale_bill_master.companyid,sale_bill_master.creationdate,sale_bill_master.userid,
                     customer.customer_name,customer.`address`,customer.`cst_number`,
                     customer.`tin_number`,customer.`pin_number`,customer.`telephone`,
-                    `company`.`company_name`,`company`.`location`,
+                    `company`.`company_name`,`company`.`location`,company.vat_number,company.cst_number AS compnyCST,
                     vat.vat_rate
                 FROM `sale_bill_master`
                 INNER JOIN
@@ -190,6 +190,8 @@ class taxinvoicemodel extends CI_Model {
                     "GrandTotal"=>$rows->grandtotal,
                     "Company"=>$rows->company_name, 
                     "CompanyLocation"=>$rows->location, 
+					"CompanyVatNumber" => $rows->vat_number,
+					"CompanyCstNumber" => $rows->compnyCST,
                     "TinNumber"=>$rows->tin_number,
                     "PinNumber"=>$rows->pin_number,
                     "telephone"=>$rows->telephone

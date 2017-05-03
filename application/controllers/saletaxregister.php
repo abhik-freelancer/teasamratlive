@@ -61,6 +61,11 @@ class saletaxregister extends CI_Controller {
 		
         $result['salestaxregister']= $this->saletaxregistermodel->getSaleTaxregisterData($frmDate,$toDate,$companyId);
         $result['inputtaxregister'] = $this->saletaxregistermodel->getInputTaxregisterData($frmDate,$toDate,$companyId);
+		/*
+		echo "<pre>";
+			print_r($result['inputtaxregister']);
+		echo "</pre>";
+		*/
          
         $result['company']=  $this->companymodel->getCompanyNameById($companyId);
         $result['companylocation']=  $this->companymodel->getCompanyAddressById($companyId);

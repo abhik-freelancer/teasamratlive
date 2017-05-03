@@ -388,10 +388,12 @@ class finishedproductmodel extends CI_Model {
         
     }
     
-    public function getFinishProductStock($companyId,$yearId){
+    public function getFinishProductStock($fDt,$tDt,$companyId,$yearId){
         $data=array();
         
-        $call_procedure ="CALL sp_finishProductStockCal('$companyId', '$yearId')";
+     //   $call_procedure ="CALL sp_finishProductStockCal('".$fDt."','".$tDt."','$companyId', '$yearId')";
+        $call_procedure ="CALL sp_finishProductStockCal('".$fDt."','".$tDt."',".$companyId.", ".$yearId.")";
+		//echo $call_procedure;
         $query = $this->db->query($call_procedure);
         
         if ($query->num_rows() > 0) {
