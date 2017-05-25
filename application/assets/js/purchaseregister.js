@@ -22,22 +22,24 @@ $(function() {
     var maxDate = '31-03-' + session_end_date;
 
     var currentDate = new Date();
-
+		
 
     $('.datepicker').datepicker({
         dateFormat: 'dd-mm-yy',
-       // minDate: mindate,
-       // maxDate: maxDate
+        minDate: mindate,
+        maxDate: maxDate
     });
     
     $("#vendor").customselect();
     $("#saleno").customselect();
+    $("#group").customselect();
     
+	
     
 
-    /*$("#startdate").val(mindate);
-    $("#enddate").val(maxDate);
-
+   // $("#startdate").val(mindate);
+  //  $("#enddate").val(maxDate);
+/*
     $("#saledate").change(function() {
 
         var saledate = $("#saledate").val().split("-");
@@ -64,6 +66,7 @@ $(function() {
         var startdate = $('#startdate').val();
        
         var enddate = $('#enddate').val();
+      //  var group= $('#group option:selected').val();
         var saleno= $('#saleno option:selected').val();
         var purchasetype= $('#purchasetype option:selected').val();
         var purchasearea = $('#auctionArea option:selected').val();
@@ -85,7 +88,7 @@ $(function() {
             type: "POST",
             url: basepath + "purchaseregister/getlistpurchaseregister",
             data: {vendor: vendor, startdate: startdate, enddate: enddate,
-             saleno: saleno, purchasetype:purchasetype,purchasearea:purchasearea},
+             saleno: saleno,purchasetype:purchasetype,purchasearea:purchasearea},
             dataType: 'html',
             success: function(data) {
                 $('#details').html(data);

@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Purchase Register</title>
+        <title>Purchase Register - Group Wise</title>
         <style>
             .demo {
 		border:1px solid #C0C0C0;
@@ -30,7 +30,7 @@
     <body>
         
         <table width="100%">
-            <tr><td align="center"><b>Purchase Register</b></td></tr>
+            <tr><td align="center"><b>Purchase Register - Group Wise</b></td></tr>
         </table>
         
         <div style="padding:2px 0 5px 0;"></div>
@@ -43,7 +43,7 @@
                             <?php echo($companylocation) ?>
                         </span>
                     </td>
-                    <td align="right">
+                    <td align=right>
                          <span style="font-family:Verdana, Geneva, sans-serif; font-size:12px; font-weight:bold;">
                              Print Date : &nbsp;<?php echo($printDate); ?>
                          </span>
@@ -52,25 +52,14 @@
         </table>
         
         <div style="padding:4px"></div>
-		<span style="font-family:Verdana, Geneva, sans-serif; font-size:12px; font-weight:bold;">
-		<?php echo $for_period; ?>
-		</span><br>
-		<span style="font-family:Verdana, Geneva, sans-serif; font-size:12px; font-weight:bold;">
-		<?php if($vendor){echo "Vendor : ".$vendor;}?>
-		</span>
-		
-        <div style="padding:4px"></div>
-        
-		
+         <span style="font-family:Verdana, Geneva, sans-serif; font-size:12px; font-weight:bold;"><?php echo "Group : ".$group; ?></span>
         <table width="100%" class="demo">
         <tr >
             <th>Invoice No</th>
             <th>Invoice Dt</th>
             <th>Vendor</th>
              <th>Sale</th>
-            <!-- <th>Sale Dt</th>-->
-             <th>Total<br>(Bgs.)</th>
-             <th>Total<br>(Kgs.)</th>
+            
             <th>Tea Value</th>
             <th>Brokerage</th>
             <th>TB charge</th>
@@ -97,8 +86,8 @@
             
             if ($search_purchase_register) {
                 foreach ($search_purchase_register as $row) {
-					$totalAmt = $totalAmt+$row['total']; 
-					
+				
+				/*	$totalAmt = $totalAmt+$row['total']; 
 					$totalBag = $totalBag+$row['bagDtl']['actualBag'];
 					$totalWeight = $totalWeight+$row['bagDtl']['totalkgs'];
 					$totalTeaVal = $totalTeaVal+$row['purchaseDtl']['teaValue'];;
@@ -107,31 +96,27 @@
 					$totalServiceTax = $totalServiceTax+$row['purchaseDtl']['serviceTaxAmt'];
 					$totalStamp = $totalStamp+$row['purchaseDtl']['totalStamp'];
 					$totalVatAmt = $totalVatAmt+$row['purchaseDtl']['totalTaxAmt'];
-					
+				*/
+				
                     ?>
                     <tr>
-                        <td> <?php  echo $row['purchase_invoice_number'];?></td>
-                        <td><?php echo date("d-m-Y",strtotime($row['purchase_invoice_date']));?></td>
-                        <td> <?php echo $row['vendor_name'];?></td>
-                        <td> <?php  echo $row['sale_number'];?></td>
-                        <td align="right"><?php echo $row['bagDtl']['actualBag'];?></td>
-                        <td align="right"><?php echo $row['bagDtl']['totalkgs'];?></td>
-                        <td align="right"><?php echo $row['purchaseDtl']['teaValue'];?></td>
-                        <td align="right"><?php echo $row['purchaseDtl']['totalBrokerage'];?></td>
-                        <td align="right"><?php if($row['purchaseDtl']['totalTBCharges']==0){echo number_format(0,2);}else{ echo $row['purchaseDtl']['totalTBCharges'];} ?></td>
-                        <td align="right"><?php echo $row['purchaseDtl']['serviceTaxAmt'];?></td>
+                        <td> <?php  echo $row->purchase_invoice_number; ?></td>
+                        <td><?php echo date("d-m-Y",strtotime($row->purchase_invoice_date));?></td>
+                        <td> <?php echo $row->vendor_name;?></td>
+                        <td> <?php  echo $row->sale_number;?></td>
+                        <td align="right"><?php echo $row->tea_value;?></td>
+                        <td align="right"><?php echo $row->brokerage;?></td>
+                        <td align="right"><?php echo number_format($row->totalTbCharges,2);?></td>
+                        <td align="right"><?php echo $row->service_tax;?></td>
                         <td>
-						<?php
-						if($row['purchaseDtl']['rate_type']=="V"){echo "VAT";}
-						if($row['purchaseDtl']['rate_type']=="C"){echo "CST";}
-						?>:<br>
-						<?php echo $row['purchaseDtl']['totalTaxAmt'];?> 
+							<?php if($row->total_cst>0){echo "CST : ".$row->total_cst;}
+								  if($row->total_vat>0){echo "VAT : ".$row->total_vat;} ?>
 						</td>
-                        <td align="right"><?php echo $row['purchaseDtl']['totalStamp'];?></td>
-                        <td align="right"><?php echo $row['total'];?></td>
+                        <td align="right"><?php echo $row->stamp;?></td>
+                        <td align="right"><?php echo $row->total;?></td>
                     </tr>
                     <?php 
-                        $grandTotal = $grandTotal + $row['total']; 
+                        $grandTotal = $grandTotal + $row->total; 
                         $lncount = $lncount+1;
                         if($lncount>15){
                     ?>
@@ -145,7 +130,7 @@
                     <div class="break"></div>
                     <?php $lncount=1; ?>
                     <table width="100%">
-                        <tr><td align="center"><b>Purchase Register</b></td></tr>
+                        <tr><td align="center"><b>Purchase Register - Group Wise</b></td></tr>
                     </table>
 
                     <div style="padding:2px 0 5px 0;"></div>
@@ -170,8 +155,6 @@
              <th>Invoice Dt</th>
              <th>Vendor</th>
              <th>Sale</th>
-             <th>Total<br>(Bgs.)</th>
-             <th>Total<br>(Kgs.)</th>
              <th>Tea Value</th>
              <th>Brokerage</th>
              <th>TB charge</th>
@@ -194,7 +177,7 @@
                     <td colspan="13" align="center">No data found....!!!</td>
                 </tr>
             <?php } ?>
-
+			<!--
                  <tr>
                      <td colspan="4" align="left"><b>Grand Total</b></td>
 					
@@ -207,7 +190,7 @@
 					 <td align="right"><b><?php echo number_format($totalVatAmt,2); ?></b></td>
                      <td align="right"><b><?php echo number_format($totalStamp,2); ?></b></td>
 					 <td align="right"><b><?php echo number_format($grandTotal,2); ?></b></td>
-                 </tr>
+                 </tr> -->
         </table>
                 
     </body>

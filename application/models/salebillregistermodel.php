@@ -229,6 +229,37 @@ class salebillregistermodel extends CI_Model {
         }
     }
     
+	
+	public function getSaleBillRegisterData($fdate,$tdate,$cusid,$compnyId,$yid)
+	{
+		$data = array();
+		$sql = "CALL sp_SaleBillRegister('".$fdate."','".$tdate."',".$cusid.",".$compnyId.",".$yid.")";
+		//echo $sql;
+		$query = $this->db->query($sql);
+		
+		if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data[] = array(
+                    "salebillID" => $rows->salebillID,
+                    "saleType" => $rows->saleType,
+                    "customerName" =>$rows->customerName,
+                    "saleBillNo" =>$rows->saleBillNo,
+                    "saleBillDate" =>$rows->saleBillDate,
+                    "totalQty" =>$rows->totalQty,
+                    "taxType"=>$rows->taxType,
+                    "taxAmount"=>$rows->taxAmount,
+                    "discountAmount"=>$rows->discountAmount,
+                    "totalAmount"=>$rows->totalAmount,
+                    "grandTotalAmt"=>$rows->grandTotalAmt
+                );
+            }
+		}
+		//print_r($data);
+		return $data;
+			
+          
+		
+	}
     
 
       

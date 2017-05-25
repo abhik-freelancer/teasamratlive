@@ -29,10 +29,9 @@
 		
             if(count($stock) > 0)  : 
                     foreach ($stock as $content) : ?>
-        
+				<?php if($content['NetKg']>0 AND $content['NetBags']>0){?>
                 <tr id="row">
-                  
-                    <td>
+					<td>
                         <?php echo("<font style='font-family:Verdana, Geneva, sans-serif ; font-size:14px; font-weight:bold'>Group -> </font>".$content['Group']); ?> 
                     </td>
                     <td width="10%"><?php echo $content['Location']; ?> </td> 
@@ -51,7 +50,8 @@
                     <td align="right"><?php echo number_format($content['NetBags'],2); ?> </td>
                     <td align="right"><?php echo number_format($content['costOfTea'],2); ?> </td>
                     <td align="right"><?php echo number_format($content['amount'],2); ?> </td>
-                  </tr>
+                </tr>
+				<?php }else {echo "";}?>
                 
         <?php endforeach; 
 		  endif; 

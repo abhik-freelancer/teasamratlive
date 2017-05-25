@@ -31,6 +31,7 @@
           
          $session = sessiondata_method();
          $company = $session['company'];
+		 $yearId = $session['yearid'];
          
         if ($this->session->userdata('logged_in')) {
        $startdate = date('Y-m-d',  strtotime($this->input->post('startdate')));
@@ -44,9 +45,19 @@
             'customerId'=>$customer,
 			'product'=>$product
         );
+		
+		$fdate = date('Y-m-d',strtotime($startdate));
+		$tdate = date('Y-m-d',strtotime($enddate));
+		$cid = $customer;
         
-        $data['get_salebill_register'] = $this->salebillregistermodel->getSaleBillRegisterList($value,$company);
- 
+      //  $data['get_salebill_register'] = $this->salebillregistermodel->getSaleBillRegisterList($value,$company);
+	  $data['get_salebill_register'] = $this->salebillregistermodel->getSaleBillRegisterData($fdate,$tdate,$cid,$company,$yearId);
+	  $this->db->freeDBResource($this->db->conn_id); 
+	/*
+	echo "<pre>";
+		print_r($data['get_salebill_register']);
+		echo "</pre>";
+	exit;*/
         $page = 'salebill_register/list_view';
         $view = $this->load->view($page, $data , TRUE );
         echo($view);
@@ -72,15 +83,17 @@
             'customerId'=>$customerId,
 			'product'=>$product
         );
-        
-        $result['resultSalebill'] = $this->salebillregistermodel->getSaleBillRegisterList($value,$companyId);
-        $result['company']=  $this->companymodel->getCompanyNameById($companyId);
-        $result['companylocation']=  $this->companymodel->getCompanyAddressById($companyId);
+		
+		$fdate = date('Y-m-d',strtotime($startDate));
+		$tdate = date('Y-m-d',strtotime($endDate));
+		$cid = $customerId;
+        $result['company'] = $this->companymodel->getCompanyNameById($companyId);
+        $result['companylocation']= $this->companymodel->getCompanyAddressById($companyId);
         $result['printDate'] = date('d-m-Y');
-        
-        
-        
-        $this->load->library('pdf');
+		$result['resultSalebill'] = $this->salebillregistermodel->getSaleBillRegisterData($fdate,$tdate,$cid,$companyId,$yearId);
+		$this->db->freeDBResource($this->db->conn_id); 
+	
+		$this->load->library('pdf');
         $pdf = $this->pdf->load();
         ini_set('memory_limit', '256M'); 
         
@@ -94,13 +107,7 @@
         
     }
     
-    
-    
-    
-    
-    
-    
-    
+ 
     
     public function getsaleBillRegisterPrint(){
         

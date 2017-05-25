@@ -22,22 +22,31 @@
     <?php
     if ($search_purchase_register) {
         foreach ($search_purchase_register as $row) {
-           
+		   /*
+		   echo "<pre>";
+           print_r($row);
+		   echo "</pre>";*/
             ?>
             <tr>
-                <td><?php echo $row->purchase_invoice_number;?></td>
-                <td><?php echo date("d-m-Y",strtotime($row->purchase_invoice_date));?></td>
-                <td><?php echo $row->vendor_name;?></td>
-                <td align="right"><?php echo $row->sale_number;?></td>
-                <td align="right"><?php echo $row->totalbags;?></td>
-                <td align="right"><?php echo $row->totalkgs;?></td>
-                <td align="right"><?php echo $row->tea_value;?></td>
-                <td align="right"><?php echo $row->brokerage;?></td>
-                <td align="right"><?php  if($row->totalTbCharges==0){echo number_format(0,2);}else{ echo $row->totalTbCharges;}?></td>
-                <td align="right"><?php echo $row->service_tax;?></td>
-                <td><?php echo $row->tax_type;?>:<?php echo $row->tax;?> </td>
-                <td align="right"><?php echo $row->stamp;?></td>
-                <td align="right"><?php echo $row->total;?></td>
+                <td><?php echo $row['purchase_invoice_number'];?></td>
+                <td><?php echo date("d-m-Y",strtotime($row['purchase_invoice_date']));?></td>
+                <td><?php echo $row['vendor_name'];?></td>
+                <td align="right"><?php echo $row['sale_number'];?></td>
+                <td align="right"><?php echo $row['bagDtl']['actualBag'];?></td>
+                <td align="right"><?php echo $row['bagDtl']['totalkgs'];?></td>
+                <td align="right"><?php echo $row['purchaseDtl']['teaValue'];?></td>
+                <td align="right"><?php echo $row['purchaseDtl']['totalBrokerage'];?></td>
+                <td align="right"><?php  if($row['purchaseDtl']['totalTBCharges']==0){echo number_format(0,2);}else{ echo $row['purchaseDtl']['totalTBCharges'];}?></td>
+                <td align="right"><?php echo $row['purchaseDtl']['serviceTaxAmt'];?></td>
+                <td>
+					<?php
+					if($row['purchaseDtl']['rate_type']=="V"){echo "VAT";}
+					if($row['purchaseDtl']['rate_type']=="C"){echo "CST";}
+					?>:<br>
+					<?php echo $row['purchaseDtl']['totalTaxAmt'];?> 
+				</td>
+                <td align="right"><?php echo $row['purchaseDtl']['totalStamp'];?></td>
+                <td align="right"><?php echo $row['total'];?></td>
             </tr>
             <?php
         }

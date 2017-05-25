@@ -5,12 +5,12 @@
     <th>Customer Name</th>
     <th>Salebill No</th>
     <th>Salebill Dt</th>
-    <th>Due Dt</th>
-    <th>Salebill Detail</th>
-    <th>Tax Amount</th>
-    <th>Discount Amount</th>
-    <th>Total Amount</th>
-    <th>Grand Total</th>
+   <!-- <th>Due Dt</th> -->
+    <th align="right">Quantity</th>
+    <th align="right">Tax Amount</th>
+    <th align="right">Discount Amount</th>
+    <th align="right">Total Amount</th>
+    <th align="right">Grand Total</th>
  
    
    
@@ -24,12 +24,13 @@
             ?>
             <tr>
                 
-                <td><input type="hidden" name="salebillMastrId" value="<?php echo "salebillmasterId--".$row['saleBlMastId'];?>" />
-                    <?php echo $row['customer_name'];?></td>
-                <td><?php echo $row['salebillno'];?></td>
-                <td><?php echo $row['SaleBlDt'];?></td>
-                <td><?php echo $row['DueDt'];?></td>
+                <td><input type="hidden" name="salebillMastrId" value="<?php echo "salebillmasterId--".$row['salebillID']."--".$row['saleType'];?>" />
+                    <?php echo $row['customerName'];?></td>
+                <td><?php echo $row['saleBillNo'];?></td>
+                <td><?php echo date('d-m-Y',strtotime($row['saleBillDate']));?></td>
+               <!-- <td><?php echo $row['DueDt'];?></td>-->
                 <td>
+				<!--
                     <table width="100%" align="left">
                         <tr>
                             <th>product</th>
@@ -48,20 +49,21 @@
                               <td><?php echo $detail['quantity'];?></td>
                         </tr>
                     <?php } ?>
-                    </table>
+                    </table> -->
+					<?php echo $row['totalQty'];?>
                 </td>
-                <td><?php $taxType = $row['taxrateType'];
+                <td><?php $taxType = $row['taxType'];
                     if($taxType=='V'){
-                        echo "VAT : ". $row['taxamount'];
+                        echo "VAT : ". $row['taxAmount'];
                     }
                     if($taxType=='C'){
-                         echo "CST : ". $row['taxamount'];
+                         echo "CST : ". $row['taxAmount'];
                     }
                    
                 ?></td>
-                <td><?php echo $row['discountAmount'];?></td>
-                <td><?php echo $row['totalamount'];?></td>
-                <td><?php echo $row['grandtotal'];?></td>
+                <td align="right"><?php echo $row['discountAmount'];?></td>
+                <td align="right"><?php echo $row['totalAmount'];?></td>
+                <td align="right"><?php echo $row['grandTotalAmt'];?></td>
             </tr>
             <?php
         }
@@ -76,7 +78,7 @@
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
-            <td>&nbsp;</td>
+          
           
             
             

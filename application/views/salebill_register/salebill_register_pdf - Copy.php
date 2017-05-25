@@ -12,22 +12,19 @@
                 padding:4px;
                 background:#F0F0F0;
                 font-family:Verdana, Geneva, sans-serif;
-                font-size:10pt !important;
+                font-size:22px;
                 font-weight:bold;
             }
             .demo td {
                 border:1px solid #C0C0C0;
-                padding:4px;
+                padding:6px;
                 font-family:Verdana, Geneva, sans-serif;
-                font-size:10pt !important;		
+                font-size:21px;		
 
             }
             .break{
                 page-break-after: always;
             }
-			.th_formt{
-				font-size:10px;
-			}
         </style>
     </head>
     <body>
@@ -41,13 +38,13 @@
         <table width="100%" class="">
             <tr>
                 <td align="left">
-                    <span style="font-family:Verdana, Geneva, sans-serif; font-size:10pt; font-weight:bold;">
+                    <span style="font-family:Verdana, Geneva, sans-serif; font-size:12px; font-weight:bold;">
                         <?php echo($company); ?> <br/>
                         <?php echo($companylocation) ?>
                     </span>
                 </td>
-                <td align="right">
-                    <span style="font-family:Verdana, Geneva, sans-serif; font-size:10pt; font-weight:bold;">
+                <td align=right>
+                    <span style="font-family:Verdana, Geneva, sans-serif; font-size:12px; font-weight:bold;">
                         Print Date : &nbsp;<?php echo($printDate); ?>
                     </span>
                 </td>
@@ -60,14 +57,15 @@
 
             <tr>
 
-                <th style="font-size:12px;">Customer Name</th>
-                <th style="font-size:12px;">Salebill No</th>
-                <th style="font-size:12px;">Salebill Dt</th>
-                <th style="font-size:12px;">Quantity</th>
-                <th style="font-size:12px;">Tax Amount</th>
-                <th style="font-size:12px;">Discount Amount</th>
-                <th style="font-size:12px;">Total Amount</th>
-                <th style="font-size:12px;">Grand Total</th>
+                <th>Customer Name</th>
+                <th>Salebill No</th>
+                <th>Salebill Dt</th>
+                <th>Due Dt</th>
+                <th>Salebill Detail</th>
+                <th>Tax Amount</th>
+                <th>Discount Amount</th>
+                <th>Total Amount</th>
+                <th>Grand Total</th>
 
 
 
@@ -75,44 +73,55 @@
 
 
             <?php
-			$grandTotalAmt = 0;
-			$totalAmountSum = 0;
-			$totalDiscountSum = 0;
-			$totalTaxSum = 0;
-			$totalQtySum = 0;
             if ($resultSalebill) {
                 $lnCount = 1;
-                $grandTotalAmt = 0;
-				
+                
                 foreach ($resultSalebill as $row) {
-					
-					$totalQtySum = $totalQtySum+$row['totalQty'];
-					$totalTaxSum = $totalTaxSum+$row['taxAmount'];
-					$totalDiscountSum = $totalDiscountSum+$row['discountAmount'];
-					$totalAmountSum = $totalAmountSum+$row['totalAmount'];
-					$grandTotalAmt = $grandTotalAmt+$row['grandTotalAmt'];
                     ?>
                     <tr>
-						<td style="font-size:11px;"><input type="hidden" name="salebillMastrId" value="<?php echo "salebillmasterId--" . $row['salebillID']."--".$row['saleType'];; ?>" /><?php echo $row['customerName']; ?></td>
-                        <td style="font-size:11px;"><?php echo $row['saleBillNo']; ?></td>
-                        <td style="font-size:11px;"><?php echo date('d-m-Y',strtotime($row['saleBillDate'])); ?></td>
-                        <td style="font-size:11px;" align="right"><?php echo $row['totalQty']; ?></td>
-                        <td style="font-size:11px;" align="right"><?php
-                                $taxType = $row['taxType'];
+
+                        <td><input type="hidden" name="salebillMastrId" value="<?php echo "salebillmasterId--" . $row['saleBlMastId']; ?>" />
+                            <?php echo $row['customer_name']; ?></td>
+                        <td><?php echo $row['salebillno']; ?></td>
+                        <td><?php echo $row['SaleBlDt']; ?></td>
+                        <td><?php echo $row['DueDt']; ?></td>
+                        <td >
+                            <table width="100%" align="left" style="border:0px;">
+                                <tr>
+                                    <th>product</th>
+                                    <th>PackingBox</th>
+                                    <th>Net</th>
+                                    <th>Rate</th>
+                                    <th>Amount</th>
+                                </tr>
+
+                                <?php foreach ($row['salebilldetail'] as $detail) { ?>
+                                    <tr>
+                                        <td><?php echo $detail['finalProduct']; ?></td>
+                                        <td><?php echo $detail['packingbox']; ?></td>
+                                        <td><?php echo $detail['packingnet']; ?></td>
+                                        <td><?php echo $detail['rate']; ?></td>
+                                        <td><?php echo $detail['quantity']; ?></td>
+                                    </tr>
+                                    
+                                  <?php } ?>
+                            </table>
+                        </td>
+                        <td><?php
+                                $taxType = $row['taxrateType'];
                                 if ($taxType == 'V') {
-                                    echo "VAT : <br>" . $row['taxAmount'];
+                                    echo "VAT : " . $row['taxamount'];
                                 }
                                 if ($taxType == 'C') {
-                                    echo "CST : <br>" . $row['taxAmount'];
+                                    echo "CST : " . $row['taxamount'];
                                 }
-                                ?>
-						</td>
-                        <td style="font-size:11px;" align="right"><?php echo $row['discountAmount']; ?></td>
-                        <td style="font-size:11px;" align="right"><?php echo $row['totalAmount']; ?></td>
-                        <td style="font-size:11px;" align="right"><?php echo $row['grandTotalAmt']; ?></td>
+                                ?></td>
+                        <td><?php echo $row['discountAmount']; ?></td>
+                        <td><?php echo $row['totalamount']; ?></td>
+                        <td><?php echo $row['grandtotal']; ?></td>
                     </tr>
                     <?php $lnCount = $lnCount+1;?>
-                    <?php if($lnCount>20){?>
+                    <?php if($lnCount>1){?>
                     </table>
                         
                         <div class="break"></div>
@@ -146,14 +155,15 @@
 
                                         <tr>
 
-                                            <th style="font-size:12px;">Customer Name</th>
-                                            <th style="font-size:12px;">Salebill No</th>
-                                            <th style="font-size:12px;">Salebill Dt</th>
-                                            <th style="font-size:12px;">Quantity</th>
-                                            <th style="font-size:12px;">Tax Amount</th>
-                                            <th style="font-size:12px;">Discount Amount</th>
-                                            <th style="font-size:12px;">Total Amount</th>
-                                            <th style="font-size:12px;">Grand Total</th>
+                                            <th>Customer Name</th>
+                                            <th>Salebill No</th>
+                                            <th>Salebill Dt</th>
+                                            <th>Due Dt</th>
+                                            <th>Salebill Detail</th>
+                                            <th>Tax Amount</th>
+                                            <th>Discount Amount</th>
+                                            <th>Total Amount</th>
+                                            <th>Grand Total</th>
 
 
 
@@ -171,6 +181,7 @@
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
+                    <td>&nbsp;</td>
                     <td>No data found....!!!</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
@@ -181,17 +192,8 @@
 
                 </tr>
             <?php } ?>
-			<tr>
-				<td colspan="3" style="font-size:12px;font-weight:bold;">Grand Total </td>
-				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalQtySum ,2); ?></td>
-				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalTaxSum,2); ?></td>
-				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalDiscountSum,2); ?></td>
-				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalAmountSum,2); ?></td>
-				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($grandTotalAmt,2); ?></td>
-			</tr>
+
         </table>
-		
-		
 
 
     </body>

@@ -23,9 +23,11 @@ class companymodel extends CI_Model {
         }
     }
 
-    public function getCompanyNameById($id = '') {
-        $sql = "SELECT company_name FROM company WHERE id='" . $id . "'";
+    public function getCompanyNameById($id) {
+        $sql = "SELECT company_name FROM company WHERE id=".$id;
         $query = $this->db->query($sql);
+		$row = $query->row();
+        return $row->company_name;
         if ($query->num_rows() > 0) {
             $row = $query->row();
             return $row->company_name;
@@ -115,6 +117,9 @@ class companymodel extends CI_Model {
             return '';
         }
 	}
+	
+	
+	
 }
 
 ?>

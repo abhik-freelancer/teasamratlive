@@ -415,6 +415,75 @@ class customeradvancemodel extends CI_Model {
         }
         
     }
+	
+	public function DeleteCustomerAdvance($cusAdvanceID)
+	{
+		$voucherID = $this->getVoucherMasterIDFromCustomerAdvance($cusAdvanceID);
+		
+		try 
+		{
+			$num = 0;
+			$this->db->trans_begin();
+			   
+			// delete customerreceiptmaster
+			$this->db->where('advanceId', $cusAdvanceID);
+			$this->db->delete('customeradvance'); 
+			   
+			// delete voucher_detail
+			$this->db->where('voucher_master_id', $voucherID);
+			$this->db->delete('voucher_detail'); 	
+			
+			// delete voucher_master
+			$this->db->where('id', $voucherID);
+			$this->db->delete('voucher_master'); 	
+			
+			$msg = $this->db->_error_message();
+			
+			$num = $this->db->_error_number();
+		 
+			if ($this->db->trans_status() === FALSE) 
+			{
+				$this->db->trans_rollback();
+				if($num==1451)
+				{
+					return $num;
+				}
+				else
+				{
+					return 0;
+				}
+				//return false;
+			}
+			else
+			{
+				$this->db->trans_commit();
+				return 1;
+			}
+        }
+		catch (Exception $e) 
+		{
+			 echo ($e->getMessage());
+        }
+		
+		
+	}
+	
+	// use for delete purpose
+	//
+	private function getVoucherMasterIDFromCustomerAdvance($cusAdvanceID)
+	{
+		$voucherID =0;
+		$sql = "SELECT customeradvance.`voucherid` FROM customeradvance WHERE customeradvance.`advanceId`=".$cusAdvanceID;
+		$query = $this->db->query($sql);
+		if($query->num_rows()>0)
+		{
+			$row = $query->row();
+			$voucherID = $row->voucherid;
+		}
+		return $voucherID;
+		 
+	}
+	
     
 
 }

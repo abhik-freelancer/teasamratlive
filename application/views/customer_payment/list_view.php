@@ -32,22 +32,30 @@
             <th>Amount</th>
             <th>Debit</th>
             <th>Customer</th>
-            <th>Action</th>
+            <th style="text-align:right;">Action</th>
     </thead>
     <tbody>
        <?php 
         if($bodycontent)  : 
-                foreach ($bodycontent as $content) : ?>
+		$x = 1;
+                foreach ($bodycontent as $content) : 
+				
+				?>
         <tr>
             <td><?php echo($content['voucher_number']);?></td>
             <td><?php echo($content['dateofpayment']);?></td>
             <td><?php echo($content['totalpaidamount']);?></td>
             <td><?php echo($content['debit_account']);?></td>
-            <td><?php echo($content['customer_name']);?></td>
-            <td> 
+            <td><?php echo ($content['customer_name']);?></td>
+            <td style="text-align:right;"> 
                 <a href="<?php echo base_url(); ?>customerpayment/addCustomerPayment/id/<?php echo($content['customerpaymentid']); ?>" class="showtooltip" title="Edit">
                   <img src="<?php echo base_url(); ?>application/assets/images/edit_ab.png" id="editTaxInvoice" title="" alt=""/>
                  </a>
+				 
+				<a href="javascript:;" class="showtooltip" title="Delete" >
+                  <img src="<?php echo base_url(); ?>application/assets/images/delete.png" id="deleteCustomerRecpt" title="" alt="" width="20" height="20" onclick="delCustomerReceipt(<?php echo ($content['customerpaymentid']); ?>,'<?php echo $content['voucher_number']; ?>')" />
+                </a>
+				 
                 <!-- 30-03-2017 temporary stop this 
 				<img src="<?php echo base_url(); ?>application/assets/images/view_small.png" id="<?php echo($content['customerpaymentid']); ?>" class="paymentDetails" title="view adjust" alt="" style="cursor: pointer;"/>
 				-->
@@ -55,7 +63,9 @@
             </td>
 
         </tr>
-      <?php endforeach; 
+      <?php 
+	  $x++;
+	  endforeach; 
      else: ?>
          <tr> 
              <td>&nbsp;</td>
@@ -75,4 +85,24 @@
      </table>
     
  </div>
+ 
+ 
+ 
+<div id="dialog-confirm-cutomer-receipt" title="Delete" style="display: none;">
+  <p style="padding:8px;">
+  Voucher : <span id="voucher_no-info"></span> will be permanently deleted.<br>Do you Want to continue...</p>
+</div>
+
+
+<div id="dialog-confirm-delete" title="Delete" style="display: none;">
+  <p style="padding:8px;">
+	Voucher : <span id="voucher_no-afterdlt"></span> deleted successfully.
+  </p>
+</div>
+
+
+
+
+
+
  

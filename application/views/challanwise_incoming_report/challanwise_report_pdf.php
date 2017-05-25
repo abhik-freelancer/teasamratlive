@@ -107,8 +107,8 @@
                 <th>Invoice</th>
                 <th>Do.Number</th>
                 <th>Bags</th>
-                <th>No.of Bags</th>
-                <th>Net(Kgs.)</th>
+                <th align="right" width="12%">No.of Bags</th>
+                <th align="right">Net(Kgs.)</th>
             </tr>
 
 
@@ -120,6 +120,9 @@
             $totalrowAmt = 0;
             $totalrowQty = 0;
             $totalrowbag = 0;
+			
+			$totalNetKgs = 0;
+			$totalBags = 0;
 
             if ($challanwisereport_pdf) {
                 $sl = 0;
@@ -128,9 +131,13 @@
                 <?php
                 foreach ($challanwisereport_pdf as $content) {
                     $sl = $sl + 1;
-                    /* $totalrowAmt = $totalrowAmt+$content->amount;
+					
+					$totalBags = $totalBags+$content->actual_bags;
+					$totalNetKgs = $totalNetKgs+$content->net;
+					
+                     $totalrowAmt = $totalrowAmt+$content->amount;
                       $totalrowQty = $totalrowQty + $content->total_weight;
-                      $totalrowbag = $totalrowbag + $content->totalBags; */
+                      $totalrowbag = $totalrowbag + $content->totalBags; 
                     ?>
                     <tr>
                         <td>   
@@ -157,23 +164,34 @@
                         <td >
                             <?php echo($content->bagtype); ?>
                         </td>
-                        <td >
+                        <td align="right">
                             <?php echo($content->actual_bags); ?>
                         </td>
 
-                        <td>
+                        <td align="right">
                             <?php echo($content->net); ?>
                         </td>
-
-
-
-                    </tr>
+					</tr>
+			<?php }} ?>
+					
+					<tr>
+						<td colspan="7">Grand Total </td>
+						<td align="right"><?php echo $totalBags;?></td>
+						<td align="right"><?php echo $totalNetKgs;?></td>
+					</tr>
+					
+					
+					
+					<!--
                     <?php $lnCont = $lnCont + 1;
                     if ($lnCont > 30) { ?>
 
                     </table>
                     <div class="break"></div>
-            <?php $lnCont = 1; ?>
+					
+					
+					
+				<?php $lnCont = 1; ?>
 
                     <table width="100%">
                         <tr>
@@ -202,7 +220,7 @@
 
                     </table>
 
-                    <table width="100%" class="demo" >
+        <table width="100%" class="demo" >
                         <tr>
                             <th>Sl.</th>
                             <th>Garden</th>
@@ -219,15 +237,15 @@
                     <?php } ?>
 
                     <?php
-                    //$grandTotalAmount = $grandTotalAmount + ($content->amount);
-                    //$grandQty = $grandQty + $content->total_weight;
-                    //$grandTotalBag = $grandTotalBag + $content->totalBags;
+                 /*   $grandTotalAmount = $grandTotalAmount + ($content->amount);
+                    $grandQty = $grandQty + $content->total_weight;
+                    $grandTotalBag = $grandTotalBag + $content->totalBags;
                 }
                 ?>
 
 
                 <?php
-            }
+            } */
             ?>
           <!--<tr>
               <td><b>Grand <br>Total</b></td>
@@ -239,6 +257,8 @@
           </tr>-->
 
         </table>
-
+		
+		
+		
     </body>
 </html>

@@ -85,11 +85,14 @@
 	</tr>
 	<?php 
 	$totalRoundOff = 0;
+	$totalAmount = 0;
 		if($purchaseRegister):
 		$totalRoundOff = 0;
+		$totalAmount = 0;
 		$i=1;
 		foreach($purchaseRegister as $purchase_reg):
 		$totalRoundOff = $totalRoundOff+$purchase_reg['roundOff'];
+		$totalAmount = $totalAmount+$purchase_reg['totalAmount'];
 	?>	
 	<tr>
 		<td><?php echo $i++;?></td>
@@ -104,6 +107,10 @@
 		endforeach;
 		endif;
 	?>
+	<tr>
+		<td colspan="4">Total</td>
+		<td align="right" style="font-weight:bold;"><?php echo $totalAmount; ?></td>
+	</tr>
 </table>
 
 <div align="right" style="margin-top:20px;">

@@ -10,20 +10,24 @@
 
  <table id="example" class="display" cellspacing="0" width="100%">
      <thead>
-     <th>Rawmaterial</th>
-     <th>Uom</th>
-     <th>Stock(In)</th>
-     <th>Stock(Out)</th>
-     <th>Stock</th>
+     <th align="left" style="text-align: left;">Rawmaterial</th>
+     <th align="left" style="text-align: left;">Uom</th>
+	 <th align="right" style="text-align: right;">Opening Stock</th>
+	 <th align="right" style="text-align: right;">Purchase</th>
+     <th align="right" style="text-align: right;">Stock(In)</th>
+     <th align="right" style="text-align: right;">Stock(Out)</th>
+     <th align="right" style="text-align: right;">Stock</th>
      </thead>
      <tbody>
          <?php foreach ($bodycontent['rawmaterialStock'] as $row){?>
          <tr>
              <td width=""><?php echo $row['rawmaterial']; ?></td>
              <td width=""><?php echo $row['unit'];?></td>
-             <td width=""><?php echo $row['StockIn'];?></td>
-             <td width=""><?php echo $row['StockOut'];?></td>
-             <td> <?php echo $row['CuurentStock'];?> </td>
+             <td width="" align="right"><?php echo $row['opStock'];?></td>
+             <td width="" align="right"><?php echo $row['purchaseStock'];?></td>
+             <td width="" align="right"><?php echo $row['StockIn'];?></td>
+             <td width="" align="right"><?php echo $row['StockOut'];?></td>
+             <td align="right"> <?php echo $row['CuurentStock'];?> </td>
          </tr>
          <?php } ?>
          

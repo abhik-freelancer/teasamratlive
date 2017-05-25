@@ -215,6 +215,51 @@ class customeradvance extends CI_Controller{
                   //echo "serial No is".$srl;
           return $srl;
 	}
+	
+	
+	public function delCustomerAdvance()
+	{
+		$session = sessiondata_method();
+		if ($this->session->userdata('logged_in')) 
+		{
+			  $customerAdvanceID = $this->input->post('cusadvid');
+			  
+			  $result = $this->customeradvancemodel->DeleteCustomerAdvance($customerAdvanceID);
+			
+			//echo "Result  is  ".$result;
+			
+			if($result==1451)
+			{
+				echo "FK";
+			}
+			if($result==1)
+			{
+				echo "OK";
+			}
+			if($result==0)
+			{
+				echo "ERROR";
+			}
+				
+			 
+			  /*
+			  if($result)
+			  {
+				  echo 1;
+			  }
+			  else
+			  {
+				  echo 0;
+			  }
+			  */
+			 
+
+        }
+		else
+		{
+            redirect('login', 'refresh');
+        }
+	}
     
     
 }

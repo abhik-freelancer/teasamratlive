@@ -145,7 +145,7 @@
                         <?php } ?>
 
 
-
+						<?php if($content['NetKg']>0 AND $content['NetBags']>0){ ?>
                         <tr id="row<?php echo ($content['PbagDtlId']); ?>">
                             <td align="left"><?php if ($group != $content['Group']) echo($content['Group']); ?> </td>
                             <td align="left"><?php echo $content['Location']; ?> </td> 
@@ -159,6 +159,7 @@
                             <td align="right" width="10%"><?php echo number_format($content['costOfTea'], 2); ?> </td>
                             <td align="right" width="10%"><?php echo number_format($content['amount'], 2); ?> </td>
                         </tr>
+						<?php }else{echo "";}?>
 
                         <?php
                         $lnCont = $lnCont + 1;

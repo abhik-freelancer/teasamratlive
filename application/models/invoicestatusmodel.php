@@ -265,11 +265,12 @@ class invoicestatusmodel extends CI_Model {
         $companyId = $session['company'];
         $yearId = $session['yearid'];
         
-         $sql = " SELECT 
+        $sql = " SELECT 
              SUM(`blending_details`.`number_of_blended_bag`) AS blendedbag
              FROM `blending_details`
              INNER JOIN blending_master ON blending_master.id = blending_details.blending_master_id
-             WHERE blending_master.companyid =".$companyId." AND blending_master.yearid =".$yearId."
+             WHERE blending_master.companyid =".$companyId." 
+			 /*AND blending_master.yearid =".$yearId."*/
              GROUP BY `blending_details`.`purchasebag_id`
              HAVING `blending_details`.`purchasebag_id`=".$bagdtlid;   
           
@@ -307,7 +308,8 @@ class invoicestatusmodel extends CI_Model {
             FROM `stocktransfer_out_detail`
             INNER JOIN
             stocktransfer_out_master ON stocktransfer_out_master.id = stocktransfer_out_detail.stocktransfer_out_master_id
-            WHERE stocktransfer_out_master.company_id=".$companyId." AND stocktransfer_out_master.year_id = ".$yearId."
+            WHERE stocktransfer_out_master.company_id=".$companyId." 
+			/*AND stocktransfer_out_master.year_id = ".$yearId."*/
             GROUP BY `stocktransfer_out_detail`.`purchase_bag_id`
             HAVING `stocktransfer_out_detail`.`purchase_bag_id`=".$bagdtlid;
              
@@ -341,8 +343,9 @@ class invoicestatusmodel extends CI_Model {
             SUM(`rawteasale_detail`.`num_of_sale_bag`) AS salebag
             FROM `rawteasale_detail`
             INNER JOIN rawteasale_master ON rawteasale_master.id = rawteasale_detail.rawteasale_master_id
-            WHERE rawteasale_master.company_id =".$companyId." AND rawteasale_master.year_id =".$yearId.
-            " GROUP BY `rawteasale_detail`.`purchase_bag_id`
+            WHERE rawteasale_master.company_id =".$companyId." 
+			/*AND rawteasale_master.year_id =".$yearId.
+            "*/ GROUP BY `rawteasale_detail`.`purchase_bag_id`
             HAVING `rawteasale_detail`.`purchase_bag_id`=".$bagDtldid;
              
              

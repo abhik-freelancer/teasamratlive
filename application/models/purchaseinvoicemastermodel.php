@@ -1573,7 +1573,7 @@ public function getVoucherDtldataFromPMast($pMasterId){
      *Date:11/01/2016
      */
     
-     function getsaleNumberlist($session) {
+     function getsaleNumberlist() {
         $sql = "SELECT distinct sale_number FROM `purchase_invoice_master`";
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {

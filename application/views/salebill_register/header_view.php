@@ -88,6 +88,7 @@
                        <td>&nbsp;</td>
                        <td>&nbsp;</td>
                    </tr>
+				   <!--
 				   <tr>
                        <td>Product</td>
                        <td><select id="product" name="product" class="selectedStyle">
@@ -97,7 +98,7 @@
 									<?php echo $content["finalproduct"]; ?></option>
                                 <?php endforeach; ?>
                           </select></td>
-                   </tr>
+                   </tr> -->
                    </table>
                    <br/>
                  <span class="buttondiv"><div class="save" id="salebill_register" align="center" style="cursor:pointer;">Show SaleBill Register</div></span>

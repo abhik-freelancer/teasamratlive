@@ -22,7 +22,7 @@
             <th>Advance Date</th>
             <th>Advance Amount</th>
             <th>Customer</th>
-            <th>Action</th>
+            <th style="text-align:right;">Action</th>
     </thead>
     <tbody>
        <?php 
@@ -33,13 +33,19 @@
             <td><?php echo($content['advanceDate']);?></td>
             <td><?php echo($content['advanceAmount']);?></td>
             <td><?php echo($content['account_name']);?></td>
-            <td>
+            <td style="text-align:right;">
                  <?php if($content['editable']!=0) {?>
                 <a href="<?php echo base_url(); ?>customeradvance/addEdit/id/<?php echo($content['advanceId']); ?>" class="showtooltip" title="Edit">
                 
                     <img src="<?php echo base_url(); ?>application/assets/images/edit_ab.png" id="editCustomerAdvance" title="" alt=""/>
                 
                 </a>
+				
+				
+				<a href="javascript:;" class="showtooltip" title="Delete" >
+                  <img src="<?php echo base_url(); ?>application/assets/images/delete.png" id="deleteCustomer" title="" alt="" width="20" height="20" onclick="delCustomerAdvance(<?php echo ($content['advanceId']); ?>,'<?php echo $content['voucher_number']; ?>')" />
+                </a>
+				
                 <?php } ?>
                 
              
@@ -66,3 +72,28 @@
      </table>
     
  </div>
+ 
+ 
+ 
+ 
+  
+<div id="dialog-confirm-cusadv" title="Delete" style="display: none;">
+  <p style="padding:8px; font-size:13px;">
+  Voucher : <span id="voucher_no-info" style="font-weight:700;color:red;"></span> will be permanently deleted.<br>Do you Want to continue...</p>
+</div>
+
+
+<div id="dialog-confirm-delete" title="Delete" style="display: none;">
+  <p style="padding:8px;font-size:13px;">
+	Voucher : <span id="voucher_no-afterdlt" style="font-weight:700;color:red;"></span> deleted successfully.
+  </p>
+</div>
+
+
+<div id="dialog-used-vouchr" title="Delete" style="display: none;">
+  <p style="padding:8px;font-size:13px;">
+	This Voucher is used.
+  </p>
+</div>
+
+

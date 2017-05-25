@@ -47,7 +47,7 @@
     <table cellspacing="" cellpadding="0" class="tablespace" >
         <tr>
             <td scope="row" >Start Date <span style="color:red;">*</span></td>
-            <td><input type="text" class="" id="startdate" name="startdate" value="<?php echo date('d-m-Y',strtotime($header['startDt']));?>" readonly /></td>
+            <td><input type="text" class="datepicker" id="startdate" name="startdate" value="<?php echo date('d-m-Y',strtotime($header['startDt']));?>" /></td>
             <td scope="row" >End Date <span style="color:red;">*</span> </td>
             <td><input type="text" class="datepicker" id="enddate" name="enddate" value="<?php echo date("d-m-Y");?>"/></td>
         </tr>

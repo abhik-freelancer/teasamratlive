@@ -495,6 +495,69 @@ class customerpaymentmodel extends CI_Model {
         }
         
     }
+	
+	
+	public function DeleteCustomerReceipt($customerRecptID)
+	{
+		$voucherID = $this->getVoucherMasterIDFromCustomerReceipt($customerRecptID);
+		
+		try 
+		{
+			$this->db->trans_begin();
+			   
+			// delete customerreceiptdetail
+			$this->db->where('customerrecptmstid', $customerRecptID);
+			$this->db->delete('customerreceiptdetail'); 
+			
+			// delete customerreceiptmaster
+			$this->db->where('customerpaymentid', $customerRecptID);
+			$this->db->delete('customerreceiptmaster'); 
+			   
+			// delete voucher_detail
+			$this->db->where('voucher_master_id', $voucherID);
+			$this->db->delete('voucher_detail'); 	
+			
+			// delete voucher_master
+			$this->db->where('id', $voucherID);
+			$this->db->delete('voucher_master'); 	
+		
+		 
+			if ($this->db->trans_status() === FALSE) 
+			{
+				$this->db->trans_rollback();
+				return false;
+			}
+			else
+			{
+				$this->db->trans_commit();
+				return true;
+			}
+        }
+		catch (Exception $e) 
+		{
+            echo ($e->getMessage());
+        }
+		
+		
+		
+	}
+	
+	// use for delete purpose
+	//
+	private function getVoucherMasterIDFromCustomerReceipt($customerRecptID)
+	{
+		$voucherID =0;
+		$sql = "SELECT  customerreceiptmaster.`voucherid`  FROM `customerreceiptmaster` WHERE `customerreceiptmaster`.`customerpaymentid`=".$customerRecptID;
+		$query = $this->db->query($sql);
+		if($query->num_rows()>0)
+		{
+			$row = $query->row();
+			$voucherID = $row->voucherid;
+		}
+		return $voucherID;
+		 
+	}
+	
     
     
 }

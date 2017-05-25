@@ -217,6 +217,31 @@ class customerpayment extends CI_Controller {
               redirect('login', 'refresh');
         }
     }
+	
+	public function deleteCutomerReceipt()
+	{
+		$session = sessiondata_method();
+		if ($this->session->userdata('logged_in')) 
+		{
+			  $paymentId = $this->input->post('customerPaymentId');
+			  $result = $this->customerpaymentmodel->DeleteCustomerReceipt($paymentId);
+			 
+			  if($result)
+			  {
+				  echo 1;
+			  }
+			  else
+			  {
+				  echo 0;
+			  }
+        }
+		else
+		{
+            redirect('login', 'refresh');
+        }
+	}
+	
+	
 }
 
 ?>

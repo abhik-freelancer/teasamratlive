@@ -6,6 +6,7 @@ class rawmaterialstock extends CI_Controller {
    public function __construct() {
         parent::__construct();
         $this->load->model('rawmaterialstockmodel', '', TRUE);
+		$this->load->model('generalledgermodel', '', TRUE);
          
  }
 
@@ -17,7 +18,16 @@ class rawmaterialstock extends CI_Controller {
             $year=$session['yearid'];
             $company=$session['company'];
              
-            $result['rawmaterialStock'] =$this->rawmaterialstockmodel->getRawmaterialStockList($company,$year);
+			$fiscalStartDt = $this->generalledgermodel->getFiscalStartDt($year);
+			$toDate = date('Y-m-d');
+			
+           // $result['rawmaterialStock'] =$this->rawmaterialstockmodel->getRawmaterialStockList($company,$year);
+            $result['rawmaterialStock'] =$this->rawmaterialstockmodel->getRawmaterialStockList($fiscalStartDt,$toDate,$company,$year);
+			/*
+			echo "<pre>";
+			print_r($result['rawmaterialStock']);
+		    echo "</pre>";
+		   */
             $this->db->freeDBResource($this->db->conn_id);
             $headercontent='';
             $page = 'rawmaterialstock/list';
