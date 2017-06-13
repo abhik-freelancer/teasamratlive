@@ -74,7 +74,10 @@ $(function(){
 			   var groupname =  $("#groupname option:selected" ).val();
 			   var balance = $("#balance").val();
 			   var id =  $("#id").val();
+			   var str_accblnceid = "#accblnceid"+selectedVal;
 			   var accblnceid = $("#accblnceid"+selectedVal).val();
+
+
 			   if ($('#special').is(":checked"))
 				{
 				  var special = $("#special" ).val();

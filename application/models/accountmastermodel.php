@@ -15,25 +15,17 @@ class accountmastermodel extends CI_Model{
 			     account_master.is_special,
 			     account_opening_master.id AS aomid,
 			     account_opening_master.opening_balance,
-                              group_master.group_name');
+                 group_master.group_name');
 	   $this -> db -> from('account_master');
-           $this->db->join('account_opening_master', 'account_opening_master.account_master_id = account_master.id AND account_opening_master.financialyear_id='. $session_data['yearid'],'LEFT');
+       $this->db->join('account_opening_master', 'account_opening_master.account_master_id = account_master.id AND account_opening_master.financialyear_id='. $session_data['yearid'],'LEFT');
 	   $this->db->join('group_master', 'account_master.group_master_id = group_master.id','LEFT');
-           $this->db->where('account_master.company_id', $session_data['company']);
-           
-           $this->db->order_by('account_master.account_name', "asc");
+       $this->db->where('account_master.company_id', $session_data['company']);
+       $this->db->order_by('account_master.account_name', "asc");
 
-         //  exit;
-          // $this->db->where('company_id',$session_data['company']);
-          //  echo  $this->db->last_query();
-	  // $this->db->where('company_id',$session_data['company']);
-	  // $this->db->where('financialyear_id',$session_data['yearid']);
-	
+       
 	   $query = $this -> db -> get();
-	
 	   if($query -> num_rows() > 0)
 	   {
-		
 		 foreach($query->result() as $rows){
 			$data[] = $rows;
 		 }
@@ -70,19 +62,42 @@ class accountmastermodel extends CI_Model{
 		return  $insertdetail;
 	}
 	
-	function modify($value)
+	public function modify($value)
 	{
 		
 		if (isset($value['id'])) {
+
+			
+		$session = sessiondata_method();
     	$this->db->trans_begin();
+		$companyId = $session['company'];
+		$yearId = $session['yearid'];
+
 		
-		$datamaster = array('account_name' =>$value['account_name'],'group_master_id' =>$value['group_master_id'],'is_special' =>$value['is_special']);
+		$datamaster = array(
+			'account_name' =>$value['account_name'],
+			'group_master_id' =>$value['group_master_id'],
+			'is_special' =>$value['is_special']);
+
 		$this->db->where('id',$value['id']);
       	$this->db->update('account_master',$datamaster); 
-		
-		$datadetail = array('opening_balance' =>$value['opening_balance']);
+
+		$delarray=array("company_id"=>$companyId,"financialyear_id"=>$yearId,"account_master_id"=>$value['id']);
+		$this->db->where($delarray);
+		$this->db->delete("account_opening_master");
+
+		$datadetail = array(
+							'account_master_id' =>$value['id'],
+							'opening_balance' =>$value['opening_balance'],
+							'company_id' =>$companyId,
+							'financialyear_id' =>$yearId);
+		$this->db->insert('account_opening_master', $datadetail);
+
+     	/*$datadetail = array('opening_balance' =>$value['opening_balance']);
 		$this->db->where('id', $value['accblnceid']);
-		$this->db->update('account_opening_master', $datadetail); 
+		$this->db->update('account_opening_master', $datadetail); */
+
+
 		
 		if ($this->db->trans_status() === FALSE)
 		{
