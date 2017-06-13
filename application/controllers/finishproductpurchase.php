@@ -57,7 +57,8 @@ class finishproductpurchase extends CI_Controller {
                 $headercontent['mode'] = "Edit";
                 $headercontent['salebillno'] = $salebillno;
                 $result['taxInvoiceMaster'] = $this->finishproductpurchasemodel->getFinishProdMasterData($salebillno);
-                $result['taxInvoiceDetail'] = $this->finishproductpurchasemodel->getFinishProdDetailData($salebillno);
+				
+				$result['taxInvoiceDetail'] = $this->finishproductpurchasemodel->getFinishProdDetailData($salebillno);
                 $page = 'finishproductpurchase/taxinvoice_add';
             } else {
                 $headercontent['mode'] = "Add";

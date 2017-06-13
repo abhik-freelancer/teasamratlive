@@ -357,6 +357,7 @@ table.gridtable td {
                         <td align="right" > 
 							
 							
+							 
                             <?php if($dataContent['editable']=='Y'){ ?>
                             <input class="styled-button-10" value="update" onclick="updatePurDtl(<?php echo ($dataContent['id']); ?>);" type="button">
                             <?php } ?>

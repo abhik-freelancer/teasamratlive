@@ -910,13 +910,16 @@ public function RawTeaSalematerData($masterId){
                 customer.`pin_number`,
                 customer.`telephone`,
                 `company`.`company_name`,
-                `company`.`location` 
+                `company`.`location`,
+                vat.`vat_rate` 
               FROM
                 `rawteasale_master` 
                 INNER JOIN `customer` 
                   ON `rawteasale_master`.`customer_id` = `customer`.`id` 
                 INNER JOIN `company` 
                   ON rawteasale_master.company_id = `company`.`id` 
+                LEFT JOIN vat
+                ON vat.`id`=rawteasale_master.`taxrateTypeId`
               WHERE `rawteasale_master`.`id`=".$masterId;
        
         
@@ -947,7 +950,8 @@ public function RawTeaSalematerData($masterId){
                     "VatNumber"=>$rows->vat_number,
                     "TinNumber"=>$rows->tin_number,
                     "PinNumber"=>$rows->pin_number,
-                    "telephone"=>$rows->telephone
+                    "telephone"=>$rows->telephone,
+					"vat_rate"=>$rows->vat_rate
                 );
             }
 

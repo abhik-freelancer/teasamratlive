@@ -301,7 +301,7 @@
         
     <tr>
       <td><?php echo(($headerview['TaxRateType']=="V"?"VAT":"CST")); ?></td>
-      <td>&nbsp;</td>
+      <td>@<?php echo($headerview['vat']);?> %</td>
       <td><div align="right"><?php echo($headerview['TaxAmount']); ?></div></td>
     </tr>
     <tr>

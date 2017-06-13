@@ -86,11 +86,15 @@ table.gridtable td {
    <tr><td colspan="5">&nbsp;</td></tr>
   <tr>
       <td><label>Date</label>&nbsp;</td>
-    <td><input type="text" name="saleBillDate" id="saleBillDate" class="datepicker" value="<?php 
-    if($bodycontent['taxInvoiceMaster']['salebilldate']){ echo($bodycontent['taxInvoiceMaster']['salebilldate']);}else{echo date('d-m-Y');}
-  
-    
-    ?>"  style="width:300px;"/></td>
+    <td>
+	<?php if($bodycontent['taxInvoiceMaster']['purchasebilldate']){?>
+	<input type="text" name="saleBillDate" id="saleBillDate" class="datepicker" value="<?php echo($bodycontent['taxInvoiceMaster']['purchasebilldate']); ?>"  style="width:300px;"/>
+	<?php }else{ ?>
+	<input type="text" name="saleBillDate" id="saleBillDate" class="datepicker" value="<?php 
+    echo date('d-m-Y'); ?>"  style="width:300px;"/>
+	
+	<?php } ?>
+	</td>
   </tr>
   
   
