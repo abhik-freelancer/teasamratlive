@@ -84,7 +84,7 @@
                     <!--<td colspan="2">Closing stock summery for the period of &nbsp; (<?php echo($dateRange); ?>)</td>-->
                     <td colspan="2">
                         <span style="font-family:Verdana, Geneva, sans-serif; font-size:12px; font-weight:500;">
-                            Closing stock summery as on &nbsp;<?php echo($printDate); ?>
+                            Closing stock summery as on &nbsp;<?php echo($upto); ?>
                         </span>
                     </td>
                 </tr>

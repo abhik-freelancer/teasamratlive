@@ -16,6 +16,7 @@ class Stocksummery extends CI_Controller {
         $this->companyId = $session['company'];
         $this->yearId = $session['yearid'];
       
+        //print_r($session);
          if ($this->session->userdata('logged_in')) {
              $result['teagrouplist'] =  $this->teagroupmastermodel->teagrouplist();
           } else {
@@ -38,25 +39,23 @@ class Stocksummery extends CI_Controller {
         
     }
     
-    
+    /**
+     * Screen Print
+     */
     
    public function getStock(){
        $session = sessiondata_method(); 
        $companyId = $session['company'];
+       $yearId = $session['yearid'];
       
        $groupId = $this->input->post('groupId');
        $fromPrice = $this->input->post('fromPrice');
        $toPrice = $this->input->post('toPrice');
+       $toDate = date('Y-m-d',  strtotime($this->input->post('toDate')));
        
-       $result['stock'] = $this->stocksummerymodel->getStock($groupId,$fromPrice,$toPrice,$companyId);
+       $result['stock'] = $this->stocksummerymodel->getStock($groupId,$fromPrice,$toPrice,$companyId,$toDate,$yearId);
        $this->load->view('stocksummery/list_view',$result);
-     //  $this->load->view('stocksummery/list_view',$result);
-       
-       
-             /*   $data['stock']=$this->stocksummerymodel->getStock($groupId,$fromPrice,$toPrice);
-               $page = 'stocksummery/list_view';
-               $view = $this->load->view($page, $data, TRUE);
-               echo($view);*/
+    
    }
    
   /*  public function getStockPrint(){
@@ -102,49 +101,42 @@ class Stocksummery extends CI_Controller {
    
    /* ---print Sale Bill HTML----*/
    
-   
+   /**
+    * Printing stock in pdf format
+    * 
+    */
    
     public function getStockpdf(){
         
-         $session = sessiondata_method();
+        $session = sessiondata_method();
         if ($this->session->userdata('logged_in')) {
         $companyId = $session['company'];
         $yearId = $session['yearid'];
-		$groupReport="";
+	$groupReport="";
        
        $groupId = $this->input->post('group_code');
        $fromPrice = $this->input->post('fromPrice');
        $toPrice = $this->input->post('toPrice');
+       $toDate = date('Y-m-d',  strtotime($this->input->post('toDate')));
+       
        
        $result['company']=  $this->companymodel->getCompanyNameById($companyId);
        $result['companylocation']=  $this->companymodel->getCompanyAddressById($companyId);
        $result['printDate']=date('d-m-Y');
-       $result['stock']=$this->stocksummerymodel->getStock($groupId,$fromPrice,$toPrice,$companyId);
-         
-      
- 
+       $result['upto']=$this->input->post('toDate');
+       $result['stock']=$this->stocksummerymodel->getStock($groupId,$fromPrice,$toPrice,$companyId,$toDate,$yearId);
        
-       
-       
-        
-        /* echo '<pre>';
-        print_r($result['stock']);
-       echo '<pre>';
-       exit;*/
-       
-       
-       
-          $this->load->library('pdf');
-          $pdf = $this->pdf->load();
-          ini_set('memory_limit', '256M'); 
+        $this->load->library('pdf');
+        $pdf = $this->pdf->load();
+        ini_set('memory_limit', '256M'); 
              
-          $page = 'stocksummery/pdf_list_view';
-          $html = $this->load->view($page, $result, true);
+        $page = 'stocksummery/pdf_list_view';
+        $html = $this->load->view($page, $result, true);
                 // render the view into HTML
-          $pdf->WriteHTML($html); 
-          $output = 'stockPdf' . date('Y_m_d_H_i_s') . '_.pdf'; 
-          $pdf->Output("$output", 'I');
-            exit();
+        $pdf->WriteHTML($html); 
+        $output = 'stockPdf' . date('Y_m_d_H_i_s') . '_.pdf'; 
+        $pdf->Output("$output", 'I');
+        exit();
             
        }
         else {

@@ -9,8 +9,8 @@
           <tr>
               <td>Group:</td>
               <td> 
-                  <select id="group_code" name="group_code"  style="width: 205px; margin: 10px;select:focus {width:300px;}">
-                        <option value="0"> All</option>
+                  <select id="group_code" name="group_code"  class="form-control">
+                        <option value="0">All Groups</option>
                         <?php if($bodycontent["teagrouplist"]){
                               foreach ($bodycontent["teagrouplist"] as $row){
                         ?>
@@ -22,6 +22,21 @@
                    </select>
               </td>
           </tr>
+           <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+          </tr>
+          <!-- to date  added by Abhik 16/06/2017-->
+          <tr>
+              <td>As on</td>              
+              <td><input type="text" class="form-control" value="" style="width: 150px; " name="toDate" id="toDate" readonly=""/> </td>
+
+          </tr>
+          <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+          </tr>
+          
           <tr>
               <td>Price Range</td>
               <td>

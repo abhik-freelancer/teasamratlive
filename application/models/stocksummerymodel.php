@@ -1,35 +1,49 @@
 <?php
 
 class stocksummerymodel extends CI_Model {
+    
+    private function getFiscalStartDate($yearId){
+        $sql="SELECT financialyear.start_date FROM financialyear WHERE financialyear.id =".$yearId;
+        $fiscalStartDate="";
+        $query=$this->db->query($sql);
+        if($query->num_rows()>0){
+            $rows= $query->row();
+            $fiscalStartDate = $rows->start_date;
+        }
+        return $fiscalStartDate;
+    }
 
-    public function getStock($groupId,$frmPrice,$toPrice,$companyId) {
+    public function getStock($groupId,$frmPrice,$toPrice,$companyId,$toDate,$yearId) {
         $data = array();
         $whereClause = '';
+        $fiscalStartDate = $this->getFiscalStartDate($yearId);
          
         if ($groupId == 0) {
             
-            $call_procedure = "CALL sp_GetStockWithoutGroupAndCost(" . $companyId . ")";
+            $call_procedure = "CALL sp_GetStockWithoutGroupAndCost(" . $companyId . ",'".$fiscalStartDate."','".$toDate."')";
+            
           
         }
         if($groupId!=0 && $frmPrice=="" && $toPrice==""){
           
-            $call_procedure = "CALL sp_GetStockWithGroupWise(".$groupId.",".$companyId.")";
+            $call_procedure = "CALL sp_GetStockWithGroupWise(".$groupId.",".$companyId.",'".$fiscalStartDate."','".$toDate."')";
         }
         if($groupId==0 && $frmPrice!="" && $toPrice!=""){
          
-            $call_procedure = "CALL sp_GetStockWithCostRangeWise(".$frmPrice.",".$toPrice.",".$companyId.")";
+            $call_procedure = "CALL sp_GetStockWithCostRangeWise(".$frmPrice.",".$toPrice.",".$companyId.",'".$fiscalStartDate."','".$toDate."')";
           
         }
         if($groupId!=0 && $frmPrice!="" && $toPrice!=""){
        
             
-            $call_procedure = "CALL sp_GetStockWithGroupAndCost(".$groupId.",".$frmPrice.",".$toPrice.",".$companyId.")";
+            $call_procedure = "CALL sp_GetStockWithGroupAndCost(".$groupId.",".$frmPrice.",".$toPrice.",".$companyId.",'".$fiscalStartDate."','".$toDate."')";
         }
         
         /*else {
             $call_procedure = "CALL sp_groupwise_stock(" . $groupId . ")";
         }*/
-
+        //echo($call_procedure);
+               // exit();
         $query = $this->db->query($call_procedure);
         
         if ($query->num_rows() > 0) {
