@@ -14,7 +14,7 @@ class unreleaseddomodel extends CI_Model {
             //$whereClause = " WHERE ((`purchase_invoice_detail`.`doRealisationDate` IS NULL) OR (`purchase_invoice_detail`.`do` IS NULL OR `purchase_invoice_detail`.`do` ='')) AND purchase_invoice_master.`company_id`=".$cmpy;//." AND purchase_invoice_master.year_id=".$yearid;
         
         $whereClause = " WHERE (purchase_invoice_detail.doRealisationDate IS NULL OR purchase_invoice_detail.doRealisationDate='')"
-                       ."  AND (purchase_invoice_detail.do IS NULL OR purchase_invoice_detail.do='')";
+                       ."  AND (purchase_invoice_detail.do IS NULL OR purchase_invoice_detail.do='') AND purchase_invoice_master.`company_id`=".$cmpy;
     
         } else {
             $whereClause = " WHERE purchase_invoice_master.`company_id`=".$cmpy ;//." AND purchase_invoice_master.year_id=".$yearid;
