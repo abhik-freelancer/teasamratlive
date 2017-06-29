@@ -23,7 +23,7 @@ class taxinvoicemodel extends CI_Model {
                 `customer` ON `sale_bill_master`.`customerId` = `customer`.`id`
                 where 
                 sale_bill_master.companyid=".$cid." and sale_bill_master.yearid=".$yid.
-                 " ORDER BY sale_bill_master.salebillno,sale_bill_master.salebilldate desc";
+                 " AND sale_bill_master.IsGST ='N' ORDER BY sale_bill_master.salebillno,sale_bill_master.salebilldate desc";
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
             foreach ($query->result() as $rows) {

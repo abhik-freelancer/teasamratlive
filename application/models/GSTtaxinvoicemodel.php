@@ -1,6 +1,6 @@
 <?php
 
-class GSTtaxinvoicemodel extends CI_Model {
+class gsttaxinvoicemodel extends CI_Model {
 
     /**
      * 
@@ -468,26 +468,14 @@ class GSTtaxinvoicemodel extends CI_Model {
      */
     
     public function getSaleBillMasterData($saleBillId){
-      /* $sql="SELECT
-                     id,
-                        salebillno,
-                        DATE_FORMAT(salebilldate, '%d-%m-%Y') AS salebilldate,
-                        voucher_master_id,
-                        customerId,
-                        taxinvoiceno,
-                        DATE_FORMAT(taxinvoicedate,'%d-%m-%Y') AS taxinvoicedate,
-                         DATE_FORMAT(duedate,'%d-%m-%Y') AS duedate,
-                         vehichleno,
-                        taxrateType,
-                        taxrateTypeId ,  taxamount ,
-                        discountRate , discountAmount ,deliverychgs,
-                        totalpacket , totalquantity ,  totalamount , roundoff , 
-                        grandtotal ,  yearid , companyid , creationdate ,userid 
-            FROM  sale_bill_master WHERE id='".$saleBillId."'";*/
-$sql= "SELECT
-            id,  srl_no,  salebillno,  salebilldate,
-            customerId,  taxinvoiceno,  taxinvoicedate,
-            voucher_master_id,  vehichleno,  duedate,
+     
+ $sql= "SELECT
+            id,  srl_no,  salebillno,GST_placeofsupply, 
+            DATE_FORMAT(salebilldate,'%d-%m-%Y') as salebilldate,
+            customerId,  taxinvoiceno,  
+            DATE_FORMAT(taxinvoicedate,'%d-%m-%Y') AS taxinvoicedate,
+            voucher_master_id,  vehichleno,  
+            DATE_FORMAT(duedate,'%d-%m-%Y') AS duedate,
             taxrateType,  taxrateTypeId,  taxamount,
             discountRate,  discountAmount,  deliverychgs,
             totalpacket,  totalquantity,  totalamount,
@@ -515,17 +503,21 @@ $sql= "SELECT
                     "taxinvoicedate"=>$rows->taxinvoicedate,
                     "duedate"=>$rows->duedate,
                     "vehichleno"=>$rows->vehichleno,
-                    "taxrateType"=>$rows->taxrateType,
-                    "taxrateTypeId"=>$rows->taxrateTypeId,
-                    "taxamount"=>$rows->taxamount,
-                    "discountRate"=>$rows->discountRate,
-                    "discountAmount"=>$rows->discountAmount,
-                    "deliveryChgs"=>$rows->deliverychgs,
+                    "GST_placeofsupply" =>$rows->GST_placeofsupply,
                     "totalpacket"=>$rows->totalpacket,
                     "totalquantity"=>$rows->totalquantity,
                     "totalamount"=>$rows->totalamount,
                     "roundoff"=>$rows->roundoff,
-                    "grandtotal"=>$rows->grandtotal
+                    "grandtotal"=>$rows->grandtotal,
+                    "GST_Discountamount"=>$rows->GST_Discountamount,
+                    "GST_Taxableamount"=>$rows->GST_Taxableamount,
+                    "GST_Totalgstincluded"=>$rows->GST_Totalgstincluded,
+                    "GST_Freightamount"=>$rows->GST_Freightamount,
+                    "GST_Insuranceamount"=>$rows->GST_Insuranceamount,
+                    "GST_PFamount"=>$rows->GST_PFamount,
+                    "totalCGST"=>$rows->totalCGST,
+                    "totalSGST"=>$rows->totalSGST,
+                    "totalIGST"=>$rows->totalIGST
                     
                 );
             }
@@ -543,14 +535,22 @@ $sql= "SELECT
         $sql="SELECT
                 id,
                 salebillmasterid,
+                HSN,
                 productpacketid,
                 packingbox,
                 packingnet,
                 quantity,
                 rate,
-                amount
-                FROM `sale_bill_details`
-            WHERE salebillmasterid = '".$sBillid."'";
+                amount,
+                discount,
+                taxableamount,
+                cgstrateid,
+                cgstamount,
+                sgstrateid,
+                sgstamount,
+                igstrateid,
+                igstamount
+            FROM sale_bill_details WHERE sale_bill_details.salebillmasterid =".$sBillid;
         
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
@@ -558,12 +558,21 @@ $sql= "SELECT
                 $data[] = array(
                     "saleBillDetailId" => $rows->id,
                     "salebillmasterid" => $rows->salebillmasterid,
+                    "HSN"=>$rows->HSN,
                     "productpacketid" => $rows->productpacketid,
                     "packingbox"=>$rows->packingbox,
                     "packingnet"=>$rows->packingnet,
                     "quantity"=>$rows->quantity,
                     "rate"=>$rows->rate,
-                    "amount"=>$rows->amount
+                    "amount"=>$rows->amount,
+                    "discount"=>$rows->discount,
+                    "taxableamount"=>$rows->taxableamount,
+                    "cgstrateid"=>$rows->cgstrateid,
+                    "cgstamount"=>$rows->cgstamount,
+                    "sgstrateid"=>$rows->sgstrateid,
+                    "sgstamount"=>$rows->sgstamount,
+                    "igstrateid"=>$rows->igstrateid,
+                    "igstamount"=>$rows->igstamount
                     
                 );
             }
@@ -697,6 +706,7 @@ $sql= "SELECT
             $saleBillMaster['salebillno'] = $salebillno;
             $saleBillMaster['salebilldate'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
             $saleBillMaster['voucher_master_id'] = $vMastId;
+            $saleBillMaster["GST_placeofsupply"]=$searcharray["placeofsupply"];
             $saleBillMaster['customerId'] = $searcharray['customer'];
             $saleBillMaster['taxinvoiceno'] =  $salebillno;
             $saleBillMaster['taxinvoicedate'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
@@ -983,6 +993,7 @@ function getCustomerAccId($cus_id,$compny){
         $numberOfDtl = count($dtlArr['txtDetailPacket']);
         for ($i = 0; $i < $numberOfDtl; $i++) {
             $saleBillDetails['salebillmasterid'] = $newSaleId;
+            $saleBillDetails['HSN']=$dtlArr['txtHSNNumber'][$i];
             $saleBillDetails['productpacketid'] = $dtlArr['finalproduct'][$i];
             $saleBillDetails['packingbox'] = $dtlArr['txtDetailPacket'][$i];
             $saleBillDetails['packingnet'] = ($dtlArr['txtDetailNet'][$i] == "" ? 0 : $dtlArr['txtDetailNet'][$i]);
@@ -992,7 +1003,7 @@ function getCustomerAccId($cus_id,$compny){
 
         //discount
             $saleBillDetails['discount'] = ($dtlArr['txtDiscount'][$i] == "" ? 0 : $dtlArr['txtDiscount'][$i]);
-            $saleBillDetails['taxableamount'] = ($dtlArr['taxableamount'][$i] == "" ? 0 : $dtlArr['taxableamount'][$i]);
+            $saleBillDetails['taxableamount'] = ($dtlArr['txtTaxableAmt'][$i] == "" ? 0 : $dtlArr['txtTaxableAmt'][$i]);
             
             $saleBillDetails['cgstrateid'] = ($dtlArr['cgst'][$i] == 0 ? NULL : $dtlArr['cgst'][$i]);
             $saleBillDetails['cgstamount'] = ($dtlArr['cgstAmt'][$i] == "" ? NULL : $dtlArr['cgstAmt'][$i]);
@@ -1080,33 +1091,47 @@ function getCustomerAccId($cus_id,$compny){
         $saleBillMaster = array();
         
          $saleBillMaster['id'] = $taxinvoiceId;
-          //$saleBillMaster['salebillno'] = $searcharray['txtSaleBillNo'];
-          $saleBillMaster['taxinvoiceno'] = $searcharray['txtSaleBillNo'];
-          $saleBillMaster['salebilldate'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
-       //  $saleBillMaster['voucher_master_id'] = $searcharray['hdvoucherMastid'];
+         $saleBillMaster['taxinvoiceno'] = $searcharray['txtSaleBillNo'];
+         $saleBillMaster['salebilldate'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
+         $saleBillMaster["GST_placeofsupply"]=$searcharray["placeofsupply"];
          $saleBillMaster['customerId'] = $searcharray['customer'];
          $saleBillMaster['taxinvoicedate'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
          $saleBillMaster['duedate'] = date("Y-m-d", strtotime($searcharray['txtDueDate']));
          $saleBillMaster['vehichleno'] = $searcharray['vehichleno'];
-         $saleBillMaster['taxrateType'] = $searcharray['rateType'];
-            if ($searcharray['rateType'] == 'V') {
-                $saleBillMaster['taxrateTypeId'] = $searcharray['vat'];
-            } else {
-                $saleBillMaster['taxrateTypeId'] = $searcharray['cst'];
-            }
-        $saleBillMaster['taxamount'] = $searcharray['txtTaxAmount'];
-        $saleBillMaster['discountRate'] = $searcharray['txtDiscountPercentage'];
-        $saleBillMaster['discountAmount'] = $searcharray['txtDiscountAmount'];
-        $saleBillMaster['deliverychgs'] = $searcharray['txtDeliveryChg'];
-        $saleBillMaster['totalpacket'] = $searcharray['txtTotalPacket'];
-        $saleBillMaster['totalquantity'] = $searcharray['txtTotalQty'];
-        $saleBillMaster['totalamount'] = $searcharray['txtTotalAmount'];
-        $saleBillMaster['roundoff'] = $searcharray['txtRoundOff'];
-        $saleBillMaster['grandtotal'] = $searcharray['txtGrandTotal'];
+         
+         
+        
+        
+        
+        /*************************************************************/
+            $saleBillMaster['GST_Taxableamount'] = $searcharray['txtTaxableAmount'];
+            $saleBillMaster['GST_Discountamount'] = $searcharray['txtDiscountAmount'];
+            $saleBillMaster['totalpacket'] = $searcharray['txtTotalPacket'];
+            $saleBillMaster['totalquantity'] = $searcharray['txtTotalQty'];
+            $saleBillMaster['totalamount'] = $searcharray['txtTotalAmount'];
+            $saleBillMaster['GST_Totalgstincluded']= $searcharray['txtTotalIncldTaxAmt'];
+            $saleBillMaster['GST_Freightamount']= $searcharray['txtFreight'];
+            $saleBillMaster['GST_Insuranceamount']= $searcharray['txtInsurance'];
+            $saleBillMaster['GST_PFamount']= $searcharray['txtPckFrw'];
+            $saleBillMaster['totalCGST']= $searcharray['txtTotalCGST'];
+            $saleBillMaster['totalSGST']= $searcharray['txtTotalSGST'];
+            $saleBillMaster['totalIGST']= $searcharray['txtTotalIGST'];
+            $saleBillMaster['roundoff']=$searcharray['txtRoundOff'];
+            $saleBillMaster['grandtotal'] = $searcharray['txtGrandTotal'];
+            
+            $saleBillMaster['yearid'] = $session['yearid'];
+            $saleBillMaster['companyid'] = $session['company'];
+            $saleBillMaster['creationdate'] = date("Y-m-d");
+            $saleBillMaster['userid'] = $session['user_id'];
+            $saleBillMaster['IsGST']='Y';
+        
         $saleBillMaster['yearid'] = $session['yearid'];
         $saleBillMaster['companyid'] = $session['company'];
         $saleBillMaster['creationdate'] = date("Y-m-d");
         $saleBillMaster['userid'] = $session['user_id'];
+        
+        
+        
         
         $this->db->where('id', $taxinvoiceId);
         $this->db->update('sale_bill_master' ,$saleBillMaster);
