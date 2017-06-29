@@ -69,7 +69,7 @@ $(document).ready(function() {
                                                  modal: true,
                                                     buttons: {
                                                 Ok: function() {
-                                                     window.location.href = basepath + 'taxinvoice';
+                                                     window.location.href = basepath + 'GSTtaxinvoice';
                                                     $( this ).dialog( "close" );
                                                 }
                                               }
@@ -379,6 +379,7 @@ $(document).on('blur','.discount',function(){
     getTaxableamount($(this).attr("id"),$(this).val());
     getDiscountAmount();
     getTaxAmount();
+    callAllTotalFunction();
 });
 
 $(document).on('change','.cgst',function(){

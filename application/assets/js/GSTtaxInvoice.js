@@ -5,7 +5,7 @@
 $(document).ready(function(){
     
 $( ".legal-menu"+$('#transactionmenu').val() ).addClass( " collapse in " );
-$( ".taxinvoice").addClass( " active " );   
+$( ".GSTtaxinvoice").addClass( "active " );   
     
     
     
@@ -49,6 +49,6 @@ $( ".taxinvoice").addClass( " active " );
    
  
  
-})
+});
 // document load
 

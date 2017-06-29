@@ -7,7 +7,7 @@ class GSTtaxinvoice extends CI_Controller {
         parent::__construct();
         $this->load->model('productmodel', '', TRUE);
         $this->load->model('packetmodel', '', TRUE);
-        $this->load->model('GSTtaxinvoicemodel', '', TRUE);
+        $this->load->model('gsttaxinvoicemodel', '', TRUE);
         $this->load->model('customermastermodel', '', TRUE);
 	$this->load->model('companymodel', '', TRUE);
     }
@@ -17,7 +17,7 @@ class GSTtaxinvoice extends CI_Controller {
         if ($this->session->userdata('logged_in')) {
 
 
-            $result = $this->GSTtaxinvoicemodel->getSaleBillList($session['company'],$session['yearid']);
+            $result = $this->gsttaxinvoicemodel->getSaleBillList($session['company'],$session['yearid']);
 
 
             $page = 'GSTtaxinvoice/list_view';
@@ -45,25 +45,34 @@ class GSTtaxinvoice extends CI_Controller {
                 $salebillno = $this->uri->segment(4);
             }
             //echo($salebillno);
-
-            $headercontent['finalproduct'] = $this->GSTtaxinvoicemodel->getPacketProduct();
-            $headercontent['customer'] = $this->GSTtaxinvoicemodel->getCustomerList();
+            $companyId=$session['company'];
+            $yearId=$session['yearid'];
+            $headercontent['finalproduct'] = $this->gsttaxinvoicemodel->getPacketProduct();
+            $headercontent['customer'] = $this->gsttaxinvoicemodel->getCustomerList();
             /*
-            $headercontent['cstRate'] = $this->GSTtaxinvoicemodel->getCurrentcstrate($session['startyear'] . '-04-01', $session['endyear'] . '-03-31');
-            $headercontent['vatpercentage'] = $this->GSTtaxinvoicemodel->getCurrentvatrate($session['startyear'] . '-04-01', $session['endyear'] . '-03-31');
+            $headercontent['cstRate'] = $this->gsttaxinvoicemodel->getCurrentcstrate($session['startyear'] . '-04-01', $session['endyear'] . '-03-31');
+            $headercontent['vatpercentage'] = $this->gsttaxinvoicemodel->getCurrentvatrate($session['startyear'] . '-04-01', $session['endyear'] . '-03-31');
             */
-            $headercontent['cstRate'] = $this->GSTtaxinvoicemodel->getCurrentcstrate();
-            $headercontent['vatpercentage'] = $this->GSTtaxinvoicemodel->getCurrentvatrate();
+            /*$headercontent['cstRate'] = $this->gsttaxinvoicemodel->getCurrentcstrate();
+            $headercontent['vatpercentage'] = $this->gsttaxinvoicemodel->getCurrentvatrate();*/
             
-            $headercontent['lastSalebillNo'] = $this->GSTtaxinvoicemodel->getlastSaleBillNo($session['company'],$session['yearid']);
+            //gst rate
+            $headercontent['cgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='CGST',$usedfor='O');
+            $headercontent['sgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='SGST',$usedfor='O');
+            $headercontent['igstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='IGST',$usedfor='O');
+            
+            
+            
+            
+            $headercontent['lastSalebillNo'] = $this->gsttaxinvoicemodel->getlastSaleBillNo($session['company'],$session['yearid']);
             
         
 
             if ($salebillno != 0) {
                 $headercontent['mode'] = "Edit";
                 $headercontent['salebillno'] = $salebillno;
-                $result['taxInvoiceMaster'] = $this->GSTtaxinvoicemodel->getSaleBillMasterData($salebillno);
-                $result['taxInvoiceDetail'] = $this->GSTtaxinvoicemodel->getSaleBillDetailData($salebillno);
+                $result['taxInvoiceMaster'] = $this->gsttaxinvoicemodel->getSaleBillMasterData($salebillno);
+                $result['taxInvoiceDetail'] = $this->gsttaxinvoicemodel->getSaleBillDetailData($salebillno);
                 $page = 'GSTtaxinvoice/taxinvoice_add';
             } else {
                 $headercontent['mode'] = "Add";
@@ -96,10 +105,10 @@ class GSTtaxinvoice extends CI_Controller {
         if ($this->session->userdata('logged_in')) {
             $companyId = $session['company'];
             $yearId = $session['yearid'];
-            $result['finalproduct'] = $this->GSTtaxinvoicemodel->getPacketProduct();
-            $result['cgstrate'] = $this->GSTtaxinvoicemodel->getGSTrate($companyId,$yearId,$type='CGST',$usedfor='O');
-            $result['sgstrate'] = $this->GSTtaxinvoicemodel->getGSTrate($companyId,$yearId,$type='SGST',$usedfor='O');
-            $result['igstrate'] = $this->GSTtaxinvoicemodel->getGSTrate($companyId,$yearId,$type='IGST',$usedfor='O');
+            $result['finalproduct'] = $this->gsttaxinvoicemodel->getPacketProduct();
+            $result['cgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='CGST',$usedfor='O');
+            $result['sgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='SGST',$usedfor='O');
+            $result['igstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='IGST',$usedfor='O');
             
 
             $result['divnumber'] = $divNumber;
@@ -115,7 +124,7 @@ class GSTtaxinvoice extends CI_Controller {
              $id = $this->input->post("gstId"); 
              $type= $this->input->post("type");
              
-             $rate = $this->GSTtaxinvoicemodel->getRate($id,$type);
+             $rate = $this->gsttaxinvoicemodel->getRate($id,$type);
              $gstAmount = (($taxableamount * $rate) /100);
              
              $response = array("amt"=>$gstAmount,"type"=>$type);
@@ -173,7 +182,7 @@ class GSTtaxinvoice extends CI_Controller {
                         
                         
            
-            $insrt = $this->GSTtaxinvoicemodel->insertData($voucherMast, $searcharray ,$sale_srl_no);
+            $insrt = $this->gsttaxinvoicemodel->insertData($voucherMast, $searcharray ,$sale_srl_no);
 
             if ($insrt) {
                 echo '1';
@@ -193,7 +202,7 @@ class GSTtaxinvoice extends CI_Controller {
      */
     public function getCreditDaysFromCustomer(){
         $custId = $this->input->post('customerId');
-        $creditDays = $this->GSTtaxinvoicemodel->getCreditDays($custId);
+        $creditDays = $this->gsttaxinvoicemodel->getCreditDays($custId);
        // return $creditDays;
          echo json_encode(
                 array(
@@ -214,7 +223,7 @@ class GSTtaxinvoice extends CI_Controller {
        $yearid = $session['yearid'];
        
         $salebillno = $this->input->post('SaleBillNo');
-        $result = $this->GSTtaxinvoicemodel->checkExistingSalebillNumb($salebillno,$compny,$yearid);
+        $result = $this->gsttaxinvoicemodel->checkExistingSalebillNumb($salebillno,$compny,$yearid);
          if($result==TRUE){
              echo "1";
          }
@@ -230,7 +239,7 @@ class GSTtaxinvoice extends CI_Controller {
 
 	private function generate_serial_no($cid,$yid)
 	{
-		$sale_srl=$this->GSTtaxinvoicemodel->get_last_srl_no($cid,$yid);
+		$sale_srl=$this->gsttaxinvoicemodel->get_last_srl_no($cid,$yid);
 		$srl=$sale_srl['saleBilllastsrlno']+1;
         return $srl;
 	}
@@ -264,45 +273,8 @@ class GSTtaxinvoice extends CI_Controller {
         if ($this->session->userdata('logged_in')) {
             
             $voucherMastId = $searcharray['hdvoucherMastid'];
-                
             $voucherUpd['voucher_date'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
-            
-            
-            
-           /* $saleBillMaster['id'] = $taxinvoiceId;
-           // $saleBillMaster['salebillno'] = $searcharray['txtSaleBillNo'];
-            $saleBillMaster['salebilldate'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
-            $saleBillMaster['customerId'] = $searcharray['customer'];
-           // $saleBillMaster['taxinvoiceno'] = $searcharray['txtTaxInvoiceNo'];
-            $saleBillMaster['taxinvoicedate'] = date("Y-m-d", strtotime($searcharray['taxInvoiceDate']));
-            $saleBillMaster['duedate'] = date("Y-m-d", strtotime($searcharray['txtDueDate']));
-            $saleBillMaster['taxrateType'] = $searcharray['rateType'];
-
-            if ($searcharray['rateType'] == 'V') {
-                $saleBillMaster['taxrateTypeId'] = $searcharray['vat'];
-            } else {
-                $saleBillMaster['taxrateTypeId'] = $searcharray['cst'];
-            }
-
-
-            $saleBillMaster['taxamount'] = $searcharray['txtTaxAmount'];
-            $saleBillMaster['discountRate'] = $searcharray['txtDiscountPercentage'];
-            $saleBillMaster['discountAmount'] = $searcharray['txtDiscountAmount'];
-            $saleBillMaster['deliverychgs'] = $searcharray['txtDeliveryChg'];
-            $saleBillMaster['totalpacket'] = $searcharray['txtTotalPacket'];
-            $saleBillMaster['totalquantity'] = $searcharray['txtTotalQty'];
-            $saleBillMaster['totalamount'] = $searcharray['txtTotalAmount'];
-            $saleBillMaster['roundoff'] = $searcharray['txtRoundOff'];
-            $saleBillMaster['grandtotal'] = $searcharray['txtGrandTotal'];
-            $saleBillMaster['yearid'] = $session['yearid'];
-            $saleBillMaster['companyid'] = $session['company'];
-            $saleBillMaster['creationdate'] = date("Y-m-d");
-            $saleBillMaster['userid'] = $session['user_id'];*/
-
-            $insrt = $this->GSTtaxinvoicemodel->UpdateData($voucherMastId,$taxinvoiceId,$voucherUpd, $searcharray);
-            
-            //$insrt = $this->GSTtaxinvoicemodel->UpdateData($saleBillMaster, $searcharray);
-
+            $insrt = $this->gsttaxinvoicemodel->UpdateData($voucherMastId,$taxinvoiceId,$voucherUpd, $searcharray);
             if ($insrt) {
                 echo '1';
             } else {
@@ -330,8 +302,8 @@ class GSTtaxinvoice extends CI_Controller {
                 $masterId = $this->uri->segment(4);
             }
             //$masterId=  $this->input->post('blendId');   
-            $result['dtlview'] = $this->GSTtaxinvoicemodel->SaleBillDetailsPrint($masterId);
-            $result['headerview'] = $this->GSTtaxinvoicemodel->SaleBillMasterPrint($masterId);
+            $result['dtlview'] = $this->gsttaxinvoicemodel->SaleBillDetailsPrint($masterId);
+            $result['headerview'] = $this->gsttaxinvoicemodel->SaleBillMasterPrint($masterId);
            
             
             
@@ -363,8 +335,8 @@ class GSTtaxinvoice extends CI_Controller {
                 $pdf = $this->pdf->load();
                
                 // retrieve data from model
-                $result['dtlview'] = $this->GSTtaxinvoicemodel->SaleBillDetailsPrint($masterId);
-                $result['headerview'] = $this->GSTtaxinvoicemodel->SaleBillMasterPrint($masterId);
+                $result['dtlview'] = $this->gsttaxinvoicemodel->SaleBillDetailsPrint($masterId);
+                $result['headerview'] = $this->gsttaxinvoicemodel->SaleBillMasterPrint($masterId);
                 $result['amountinword'] = strtoupper( $this->no_to_words($result['headerview']['GrandTotal']));
                 ini_set('memory_limit', '256M'); 
                  $page = 'GSTtaxinvoice/saleBillPdf';
@@ -446,7 +418,7 @@ class GSTtaxinvoice extends CI_Controller {
     public function get_final_product_rate()
     {
         $productPacketId=$this->input->post('productId');
-        $saleRate=$this->GSTtaxinvoicemodel->get_final_product_rate_by_id($productPacketId);
+        $saleRate=$this->gsttaxinvoicemodel->get_final_product_rate_by_id($productPacketId);
       //  echo($saleRate);
         echo json_encode(
                 array(

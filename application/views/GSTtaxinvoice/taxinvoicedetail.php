@@ -33,7 +33,8 @@ padding: 5px;
                             <input type="text" class="discount" id="txtDiscount_0_<?php echo($divnumber); ?>" name="txtDiscount[]" placeholder="Discount"  style="width:100px;"/>
                         </td>
                         <td width="5%">
-                            <input type="text" class="taxableamount" id="txtTaxableAmt_0_<?php echo($divnumber); ?>" name="txtTaxableAmt[]" placeholder="Taxable" readonly="" style="width:100px;"/>
+                            <input type="text" class="taxableamount" id="txtTaxableAmt_0_<?php echo($divnumber); ?>" 
+                                   name="txtTaxableAmt[]" placeholder="Taxable" readonly="" style="width:100px;"/>
                         </td>
                         
                         <td>
@@ -42,11 +43,10 @@ padding: 5px;
                         </td>
                         </tr>
                         <tr>
-                         
+                            <td></td>
                             
-                        </td>
+                        
                         <td>
-                               <td>
                             <!--cgstrate-->
                             <select name="cgst[]" id="cgst_0_<?php echo($divnumber); ?>" style="width:100px;" class="cgst"> 
                                 <option value="0">CGST</option>
