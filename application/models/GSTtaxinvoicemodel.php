@@ -2,10 +2,7 @@
 
 class gsttaxinvoicemodel extends CI_Model {
 
-    /**
-     * 
-     */
-     public function getSaleBillList($cid,$yid){
+       public function getSaleBillList($cid,$yid){
          $data = array();
          $sql = "SELECT
                     sale_bill_master.id,sale_bill_master.salebillno,
@@ -162,50 +159,7 @@ class gsttaxinvoicemodel extends CI_Model {
                 INNER JOIN vat
                 ON sale_bill_master.taxrateTypeId = vat.id
                 WHERE `sale_bill_master`.`id` ='".$masterId."'";
-       /* $sql = "SELECT 
-                    sale_bill_master.id,
-                    sale_bill_master.salebillno,
-                    DATE_FORMAT(
-                      sale_bill_master.salebilldate,
-                      '%d-%m-%Y'
-                    ) AS salebilldate,
-                    sale_bill_master.customerId,
-                    sale_bill_master.taxinvoiceno,
-                    DATE_FORMAT(
-                      sale_bill_master.taxinvoicedate,
-                      '%d-%m-%Y'
-                    ) AS taxinvoicedate,
-                    DATE_FORMAT(
-                      sale_bill_master.duedate,
-                      '%d-%m-%Y'
-                    ) AS duedate,
-                    sale_bill_master.taxrateType,
-                    sale_bill_master.taxrateTypeId,
-                    sale_bill_master.taxamount,
-                    sale_bill_master.discountRate,
-                    sale_bill_master.discountAmount,
-                    sale_bill_master.deliverychgs,
-                    sale_bill_master.totalpacket,
-                    sale_bill_master.totalquantity,
-                    sale_bill_master.totalamount,
-                    sale_bill_master.roundoff,
-                    sale_bill_master.grandtotal,
-                    sale_bill_master.yearid,
-                    sale_bill_master.companyid,
-                    sale_bill_master.creationdate,
-                    sale_bill_master.userid,
-                    customer.customer_name,
-                    customer.`address`,
-                    customer.`cst_number`,
-                    `company`.`company_name`,
-                    `company`.`location` 
-                  FROM
-                    `sale_bill_master` 
-                    INNER JOIN `customer` 
-                      ON `sale_bill_master`.`customerId` = `customer`.`id` 
-                    INNER JOIN `company` 
-                      ON `sale_bill_master`.`companyid` = `company`.`id` 
-                  WHERE `sale_bill_master`.`id` ='".$masterId."'";*/
+       
         
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
