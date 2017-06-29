@@ -2,6 +2,12 @@
 
 class gsttaxinvoicemodel extends CI_Model {
 
+    /**
+     * 
+     * @param type $cid
+     * @param type $yid
+     * @return type
+     */
        public function getSaleBillList($cid,$yid){
          $data = array();
          $sql = "SELECT
