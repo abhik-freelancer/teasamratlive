@@ -181,7 +181,7 @@ class GSTtaxinvoice extends CI_Controller {
              $voucherMast['paid_to'] = NULL;         
                         
                         
-           
+           $sale_srl_no = "";
             $insrt = $this->gsttaxinvoicemodel->insertData($voucherMast, $searcharray ,$sale_srl_no);
 
             if ($insrt) {
@@ -328,16 +328,17 @@ class GSTtaxinvoice extends CI_Controller {
             } else {
                 $masterId = $this->uri->segment(4);
             }
-                // load library
+			 // load library
                 $this->load->library('pdf');
                // $pdf = new pdf();
                 
                 $pdf = $this->pdf->load();
                
                 // retrieve data from model
-                $result['dtlview'] = $this->gsttaxinvoicemodel->SaleBillDetailsPrint($masterId);
-                $result['headerview'] = $this->gsttaxinvoicemodel->SaleBillMasterPrint($masterId);
-                $result['amountinword'] = strtoupper( $this->no_to_words($result['headerview']['GrandTotal']));
+				$result['companyinfo'] = $this->companymodel->getCompanyById($session['company']);
+			    $result['dtlview'] = $this->gsttaxinvoicemodel->SaleBillDetailsPrint($masterId);
+				$result['headerview'] = $this->gsttaxinvoicemodel->SaleBillMasterPrint($masterId);
+				$result['amountinword'] = strtoupper( $this->no_to_words($result['headerview']['GrandTotal']));
                 ini_set('memory_limit', '256M'); 
                  $page = 'GSTtaxinvoice/saleBillPdf';
                 $html = $this->load->view($page, $result, true);

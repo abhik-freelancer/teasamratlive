@@ -238,7 +238,7 @@ if ($bodycontent['taxInvoiceDetail']) {
                                 </select>
                                 <input type="text" id="cgstAmt_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
                                        name="cgstAmt[]" style="width: 90px;" class="cgstAmt"
-                                       value="<?php echo($content['cgstamount']); ?>"/>
+                                       value="<?php echo($content['cgstamount']); ?>" readonly />
 
                             </td>
                             <td colspan="3">
@@ -255,7 +255,7 @@ if ($bodycontent['taxInvoiceDetail']) {
         <?php } ?>
                                 </select>
                                 <input type="text" id="sgstAmt_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
-                                       name="sgstAmt[]" style="width: 90px;" class="sgstAmt" value="<?php echo($content['sgstamount']); ?>" />
+                                       name="sgstAmt[]" style="width: 90px;" class="sgstAmt" value="<?php echo($content['sgstamount']); ?>" readonly />
                             </td>
 
                             <td colspan="2">
@@ -273,7 +273,7 @@ if ($bodycontent['taxInvoiceDetail']) {
         <?php } ?>
                                 </select>
                                 <input type="text" id="igstAmt_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
-                                       name="igstAmt[]" style="width: 90px;" value="<?php echo($content['igstamount']); ?>" class="igstAmt">
+                                       name="igstAmt[]" style="width: 90px;" value="<?php echo($content['igstamount']); ?>" class="igstAmt" readonly >
                             </td>
 
                             <td></td>

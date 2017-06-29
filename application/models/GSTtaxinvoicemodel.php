@@ -82,7 +82,7 @@ class gsttaxinvoicemodel extends CI_Model {
      public function getRate($id,$type){
          $rate=0;
           $sql = "SELECT gstmaster.rate
-                FROM gstmaster WHERE gstmaster.id=".$id." AND gstmaster.gstType='".$type."'";
+                FROM gstmaster WHERE gstmaster.id='".$id."' AND gstmaster.gstType='".$type."'";
          $query = $this->db->query($sql);
           if($query->num_rows()>0){
               $rows=$query->row();
@@ -95,7 +95,7 @@ class gsttaxinvoicemodel extends CI_Model {
         //echo($masterId);
         
         $data = array();
-        $sql =" SELECT
+    /*    $sql ="SELECT
                     sale_bill_details.id,
                     sale_bill_details.salebillmasterid,
                     sale_bill_details.productpacketid,
@@ -112,18 +112,57 @@ class gsttaxinvoicemodel extends CI_Model {
             `product` ON `product_packet`.`productid` = `product`.`id`
             INNER JOIN
             `packet` ON `product_packet`.`packetid` = `packet`.`id`
-            WHERE `sale_bill_details`.`salebillmasterid` = '".$masterId."'";
+            WHERE `sale_bill_details`.`salebillmasterid` = '".$masterId."'"; */
+			
+		
+		$sql = "SELECT
+				 sale_bill_details.id,
+				 sale_bill_details.salebillmasterid,
+				 sale_bill_details.`HSN`,
+				 sale_bill_details.productpacketid,
+				 ROUND(sale_bill_details.packingbox) AS PackingBox,
+				 sale_bill_details.packingnet,
+				 sale_bill_details.quantity,
+				 sale_bill_details.rate,
+				 sale_bill_details.amount,
+				 sale_bill_details.`discount`,
+				 sale_bill_details.taxableamount,
+				 sale_bill_details.`cgstamount`,
+				 sale_bill_details.`cgstrateid`,
+				 sale_bill_details.`sgstamount`,
+				 sale_bill_details.`sgstrateid`,
+				 sale_bill_details.`igstamount`,
+				 sale_bill_details.`igstrateid`,
+				 CONCAT(`product`.`product`,'-',`packet`.`packet`) AS productDescription 
+				 FROM sale_bill_details
+				 INNER JOIN
+				 `product_packet` ON `sale_bill_details`.`productpacketid` = `product_packet`.`id`
+				 INNER JOIN
+				 `product` ON `product_packet`.`productid` = `product`.`id`
+				 INNER JOIN
+				 `packet` ON `product_packet`.`packetid` = `packet`.`id`
+				WHERE `sale_bill_details`.`salebillmasterid` =".$masterId;
+	
       
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
             foreach ($query->result() as $rows) {
                 $data[] = array(
                     "ProductDescription" => $rows->productDescription,
+                    "HSN" => $rows->HSN,
                     "Packet" => $rows->PackingBox,
                     "PacketNet"=>$rows->packingnet,
                     "Quantity"=>$rows->quantity,
                     "Rate"=>$rows->rate,
-                    "Amount"=>$rows->amount
+                    "Amount"=>$rows->amount,
+					"Discount"=>$rows->discount,
+					"Taxableamount"=>$rows->taxableamount,
+					"cgstamount"=>$rows->cgstamount,
+					"sgstamount"=>$rows->sgstamount,
+					"igstamount"=>$rows->igstamount,
+					"cgstRate" =>$this->getRate($rows->cgstrateid,'CGST'),
+					"sgstRate" =>$this->getRate($rows->sgstrateid,'SGST'),
+					"igstRate" =>$this->getRate($rows->igstrateid,'IGST')
                 );
             }
 
@@ -134,79 +173,46 @@ class gsttaxinvoicemodel extends CI_Model {
         }
         
     }
+	
     public function SaleBillMasterPrint($masterId){
         $data = array();
-        $sql=" SELECT
-                    sale_bill_master.id,
-                    sale_bill_master.salebillno,
-                    DATE_FORMAT(sale_bill_master.salebilldate,'%d-%m-%Y')AS salebilldate,
-                    sale_bill_master.customerId,sale_bill_master.taxinvoiceno,
-                    DATE_FORMAT(sale_bill_master.taxinvoicedate,'%d-%m-%Y')AS taxinvoicedate,
-                    DATE_FORMAT(sale_bill_master.duedate,'%d-%m-%Y') AS duedate,
-                    sale_bill_master.vehichleno,
-                    sale_bill_master.taxrateType,sale_bill_master.taxrateTypeId,
-                    sale_bill_master.taxamount,sale_bill_master.discountRate,
-                    sale_bill_master.discountAmount,sale_bill_master.deliverychgs,sale_bill_master.totalpacket,
-                    sale_bill_master.totalquantity,sale_bill_master.totalamount,
-                    sale_bill_master.roundoff,sale_bill_master.grandtotal,sale_bill_master.yearid,
-                    sale_bill_master.companyid,sale_bill_master.creationdate,sale_bill_master.userid,
-                    customer.customer_name,customer.`address`,customer.`cst_number`,
-                    customer.`tin_number`,customer.`pin_number`,customer.`telephone`,
-                    `company`.`company_name`,`company`.`location`,company.vat_number,company.cst_number AS compnyCST,
-                    vat.vat_rate
-                FROM `sale_bill_master`
-                INNER JOIN
-                `customer` ON `sale_bill_master`.`customerId` = `customer`.`id`
-                INNER JOIN
-                 `company` ON `sale_bill_master`.`companyid` =`company`.`id`
-                INNER JOIN vat
-                ON sale_bill_master.taxrateTypeId = vat.id
-                WHERE `sale_bill_master`.`id` ='".$masterId."'";
-       /* $sql = "SELECT 
-                    sale_bill_master.id,
-                    sale_bill_master.salebillno,
-                    DATE_FORMAT(
-                      sale_bill_master.salebilldate,
-                      '%d-%m-%Y'
-                    ) AS salebilldate,
-                    sale_bill_master.customerId,
-                    sale_bill_master.taxinvoiceno,
-                    DATE_FORMAT(
-                      sale_bill_master.taxinvoicedate,
-                      '%d-%m-%Y'
-                    ) AS taxinvoicedate,
-                    DATE_FORMAT(
-                      sale_bill_master.duedate,
-                      '%d-%m-%Y'
-                    ) AS duedate,
-                    sale_bill_master.taxrateType,
-                    sale_bill_master.taxrateTypeId,
-                    sale_bill_master.taxamount,
-                    sale_bill_master.discountRate,
-                    sale_bill_master.discountAmount,
-                    sale_bill_master.deliverychgs,
-                    sale_bill_master.totalpacket,
-                    sale_bill_master.totalquantity,
-                    sale_bill_master.totalamount,
-                    sale_bill_master.roundoff,
-                    sale_bill_master.grandtotal,
-                    sale_bill_master.yearid,
-                    sale_bill_master.companyid,
-                    sale_bill_master.creationdate,
-                    sale_bill_master.userid,
-                    customer.customer_name,
-                    customer.`address`,
-                    customer.`cst_number`,
-                    `company`.`company_name`,
-                    `company`.`location` 
-                  FROM
-                    `sale_bill_master` 
-                    INNER JOIN `customer` 
-                      ON `sale_bill_master`.`customerId` = `customer`.`id` 
-                    INNER JOIN `company` 
-                      ON `sale_bill_master`.`companyid` = `company`.`id` 
-                  WHERE `sale_bill_master`.`id` ='".$masterId."'";*/
-        
+        $sql="SELECT 
+				  sale_bill_master.id,
+				  sale_bill_master.salebillno,
+				  DATE_FORMAT(sale_bill_master.salebilldate,'%d-%m-%Y' ) AS salebilldate,
+				  sale_bill_master.customerId,
+				  sale_bill_master.taxinvoiceno,
+				  DATE_FORMAT(sale_bill_master.taxinvoicedate,'%d-%m-%Y') AS taxinvoicedate,
+				  DATE_FORMAT(sale_bill_master.duedate,'%d-%m-%Y') AS duedate,
+				  sale_bill_master.vehichleno,
+				  sale_bill_master.totalpacket,
+				  sale_bill_master.totalquantity,
+				  sale_bill_master.totalamount,
+				  sale_bill_master.grandtotal,
+				  sale_bill_master.yearid,
+				  sale_bill_master.companyid,
+				  sale_bill_master.creationdate,
+				  sale_bill_master.userid,
+				  customer.customer_name,
+				  customer.`address`,
+				  customer.`GST_Number` as customerGSTNo,
+				  customer.`tin_number`,
+				  customer.`pin_number`,
+				  customer.`telephone`,
+				  `company`.`company_name`,
+				  `company`.`location`,
+				   company.`gst_number` AS GSTNumber,
+				   state_master.`state_name`
+				 FROM
+					`sale_bill_master` 
+					INNER JOIN `customer` 
+					ON `sale_bill_master`.`customerId` = `customer`.`id` 
+					INNER JOIN `company` 
+					ON `sale_bill_master`.`companyid` = `company`.`id` 
+					LEFT JOIN state_master
+					ON customer.`state_id` = state_master.`id`
+				WHERE `sale_bill_master`.`id`=".$masterId;
+     
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
             foreach ($query->result() as $rows) {
@@ -219,25 +225,18 @@ class gsttaxinvoicemodel extends CI_Model {
                     "vehichleno"=>$rows->vehichleno,
                     "Customer"=>$rows->customer_name,
                     "CustomerAddress"=>$rows->address,
-                    "CustomerCST"=>$rows->cst_number,
-                    "TotalPacket"=>$rows->totalpacket,
+                   "TotalPacket"=>$rows->totalpacket,
                     "TotalQty"=>$rows->totalquantity,
                     "TotalAmount"=>$rows->totalamount,
-                    "TaxRateType"=>$rows->taxrateType,
-                    "vat"=>$rows->vat_rate,
-                    "TaxAmount"=>$rows->taxamount,
-                    "DiscountRate"=>$rows->discountRate,
-                    "DiscountAmount"=>$rows->discountAmount,
-                    "DeliveryChgs"=>$rows->deliverychgs,
-                    "RoundOff"=>$rows->roundoff,
                     "GrandTotal"=>$rows->grandtotal,
                     "Company"=>$rows->company_name, 
                     "CompanyLocation"=>$rows->location, 
-					"CompanyVatNumber" => $rows->vat_number,
-					"CompanyCstNumber" => $rows->compnyCST,
+					"CompanyGSTIN" => $rows->GSTNumber,
                     "TinNumber"=>$rows->tin_number,
                     "PinNumber"=>$rows->pin_number,
-                    "telephone"=>$rows->telephone
+                    "telephone"=>$rows->telephone,
+                    "customerGSTNo"=>$rows->customerGSTNo,
+					"custStatename" => $rows->state_name
                 );
             }
 
