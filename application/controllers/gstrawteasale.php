@@ -1,6 +1,6 @@
 <?php
 //we need to call PHP's session object to access it through CI
-class rawteasale extends CI_Controller {
+class gstrawteasale extends CI_Controller {
 
      function __construct() {
         parent::__construct();
@@ -12,6 +12,8 @@ class rawteasale extends CI_Controller {
         $this->load->model('rawteasalemodel','',TRUE);
         $this->load->model('customermastermodel','',TRUE);
         $this->load->model('companymodel', '', TRUE);
+        $this->load->model('gsttaxinvoicemodel', '', TRUE);
+        
     }
     
     
@@ -23,7 +25,7 @@ class rawteasale extends CI_Controller {
             $compny = $session['company'];
             $year = $session['yearid'];
             $result = $this->rawteasalemodel->getRawTeasaleList($compny,$year);
-            $page = 'raw_tea_sale/list_view';
+            $page = 'raw_tea_sale/listgst';
             $header = '';
             $headercontent=NULL;
             createbody_method($result, $page, $header, $session, $headercontent);
@@ -61,13 +63,13 @@ class rawteasale extends CI_Controller {
                 $result['rawteasaleMastData'] = $this->rawteasalemodel->getRawTeaSalemasterData($rawteasaleMastId);
                 $result['rawteasaleDtlData'] = $this->rawteasalemodel->getRawTeaSaleDtlData($rawteasaleMastId);
                 
-                $page = 'raw_tea_sale/edit_raw_tea_sale.php';
+                $page = 'raw_tea_sale/gstedit_raw_tea_sale.php';
                 
             } else {
                 $headercontent['mode'] = "Add";
                 $headercontent['rawteasaleMastId']="";
                 $result = NULL;
-                $page = 'raw_tea_sale/add_raw_tea_sale.php';
+                $page = 'raw_tea_sale/gstadd_raw_tea_sale.php';
             }
             
         
@@ -127,11 +129,17 @@ class rawteasale extends CI_Controller {
            $lotNum  = $this->input->post('lotNum');
            $grade =  $this->input->post('grade');
            $divnumber = $this->input->post('divSerialNumber');
+           $companyId = $session['company'];
+           $yearId = $session['yearid'];
            
             $result['groupStock'] = $this->rawteasalemodel->getTeaStock($garden,$invoice,$lotNum,$grade);
             $result['divnumber'] = $divnumber;
+            $result['cgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='CGST',$usedfor='O');
+            $result['sgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='SGST',$usedfor='O');
+            $result['igstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='IGST',$usedfor='O');
+            
             if( $result['groupStock']){
-                $page = 'raw_tea_sale/teaStockDtl';
+                $page = 'raw_tea_sale/gstteaStockDtl';
                 $this->load->view($page, $result);
             }else{
                 echo "0";
@@ -141,7 +149,29 @@ class rawteasale extends CI_Controller {
             redirect('login', 'refresh');
        }
     }
-    
+    /**
+     * @method getAmount
+     */
+    public function getAmount(){
+         if ($this->session->userdata('logged_in')) {
+             $taxableamount = $this->input->post("taxableamount");
+             $id = $this->input->post("gstId"); 
+             $type= $this->input->post("type");
+             
+             $rate = $this->gsttaxinvoicemodel->getRate($id,$type);
+             $gstAmount = (($taxableamount * $rate) /100);
+             
+             $response = array("amt"=>$gstAmount,"type"=>$type);
+           
+             
+             header('Content-Type: application/json');
+             echo json_encode($response);
+             exit;
+            
+         }  else {
+             redirect('login', 'refresh');
+         }
+    }
     /**
      * @access public
      * @date 26-05-2016

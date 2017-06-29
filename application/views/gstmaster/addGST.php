@@ -63,7 +63,7 @@
                    </select>
                </div>
                 <div class="form-group">
-                   <label for="gstFor">Used</label>
+                   <label for="gstFor">Input/Output</label>
                    <select id="gstFor" name="gstFor" class="form-control">
                        <option value="">--Select--</option>
                        <option value="O"  <?php if($bodycontent['gstdata']['usedfor']=="O"){echo("selected='selected'");} ?>>Output</option>
