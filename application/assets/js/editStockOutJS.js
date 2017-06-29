@@ -18,7 +18,7 @@ $(document).ready(function() {
     });
 
 
-
+ $("#customer").customselect();
 
     $(document).on('blur', ".usedBag", function() {
         var bagId = $(this).attr('id');

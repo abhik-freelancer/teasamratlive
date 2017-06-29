@@ -84,14 +84,13 @@ table.gridtable td {
   <tr>
     <td>CN No.</td>
     <td><input type="text"  id="cnNo" name="cnNo" value=""/></td>
-    <td>Vendor</td>
+    <td>Customer</td>
     <td>
-    	<select name="vendor" id="vendor" class='custom-select' >
+    	<select name="customer" id="customer" class='custom-select' >
             <option value="0">Select</option>
-            <?php foreach ($header['vendor'] as $content) : ?>
-                <option value="<?php echo $content->vid; ?>"
-                <?php if($content->vid==$bodycontent['purchaseMaster']->vendor_id){echo("selected='selected'");}else{echo('');}?>><?php echo $content->vendor_name; ?></option>
-                <?php endforeach; ?>
+            <?php foreach ($header['customer'] as $content) : ?>
+                <option value="<?php echo $content->vid; ?>"><?php echo $content->customer_name; ?></option>
+            <?php endforeach; ?>
 
          </select> 
         <div id="vendor_err" style="margin-left:210px;margin-top:-21px;display:none;"><img src="<?php echo base_url(); ?>application/assets/images/vendor_validation.gif" /></div>

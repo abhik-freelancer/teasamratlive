@@ -6,7 +6,7 @@ class stocktransferout extends CI_Controller {
      function __construct() {
         parent::__construct();
 
-        $this->load->model('vendormastermodel', '', TRUE);
+        $this->load->model('customermastermodel', '', TRUE);
         $this->load->model('warehousemastermodel', '', TRUE);
         $this->load->model('grademastermodel', '', TRUE);
         $this->load->model('gardenmastermodel', '', TRUE);
@@ -24,6 +24,7 @@ class stocktransferout extends CI_Controller {
             $result = $this->stocktransferoutmodel->getStockOutList();
             $page = 'stocktransfer_out/list_view';
             $header = '';
+			$headercontent = "";
             createbody_method($result, $page, $header, $session, $headercontent);
         } else {
             redirect('login', 'refresh');
@@ -48,7 +49,9 @@ class stocktransferout extends CI_Controller {
                 
         }
         $headercontent['garden'] = $this->gardenmastermodel->gardenlist();
-        $headercontent['vendor'] = $this->vendormastermodel->vendorlist();
+        $headercontent['customer'] = $this->customermastermodel->custoemrlist($session);
+		
+		
           
             
              if ($stockoutMastrid != 0) {
@@ -169,7 +172,7 @@ class stocktransferout extends CI_Controller {
       //  exit;
         $stockoutMaster['refrence_number'] =$searcharray['refrence_no'];
         $stockoutMaster['transfer_date']=date("Y-m-d",  strtotime($searcharray['transferDt']));
-        $stockoutMaster['vendor_id'] = $searcharray['vendor'];
+        $stockoutMaster['customer_id'] = $searcharray['customer'];
         $stockoutMaster['cn_no'] = $searcharray['cnNo'];
         $stockoutMaster['stock_outBags'] = $searcharray['txtTotalstockOutBag'];
         $stockoutMaster['stock_outPrice'] = $searcharray['txtTotalStockPrice'];
@@ -206,7 +209,7 @@ class stocktransferout extends CI_Controller {
                     {
                         $stockOutMastr['refrence_number'] = $searcharray['refrence_no'];
                         $stockOutMastr['transfer_date'] = date("Y-m-d",  strtotime($searcharray['transferDt']));
-                        $stockOutMastr['vendor_id'] = $searcharray['vendor'];
+                        $stockOutMastr['customer_id'] = $searcharray['customer'];
                         $stockOutMastr['cn_no'] = $searcharray['cnNo'];
                         $stockOutMastr['stock_outBags'] = $searcharray['txtTotalstockOutBag'];
                         $stockOutMastr['stock_outPrice'] = $searcharray['txtTotalStockPrice'];

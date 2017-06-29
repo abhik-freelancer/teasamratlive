@@ -17,7 +17,7 @@
 
             <th>Refrence No</th>
             <th>Transfer Date</th>
-            <th>Vendor</th>
+            <th>Customer</th>
             <th>Stock Out Bag</th>
             <th>Total Stock Out(Kgs.)</th>
             <th>Action</th>
@@ -32,7 +32,7 @@
 
              <td><?php echo($content->refrence_number);?></td>
              <td><?php echo($content->TransferDt);?></td>
-             <td><?php echo($content->vendor_name);?></td>
+             <td><?php echo($content->customer_name);?></td>
              <td align="right"><?php echo($content->stock_outBags);?></td>
              <td align="right"><?php echo($content->totalStockOutKgs);?></td>
              <td>
@@ -57,6 +57,7 @@
              <td> &nbsp;</td>
              <td> No</td>
              <td> Data Found..</td>
+             <td> &nbsp;</td>
              <td> &nbsp;</td>
             
          

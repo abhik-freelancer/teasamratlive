@@ -20,7 +20,7 @@ $(document).ready(function() {
         maxDate: maxDate
     });
 
- $("#vendor").customselect();
+ $("#customer").customselect();
 
     $("#viewStock").click(function() {
 

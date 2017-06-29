@@ -229,11 +229,11 @@ public function getPurchasedBag($bagDtlId){
 
 
 
-       $this->db->select('`stocktransfer_out_master`.`id` ,
+       $this->db->select('`stocktransfer_out_master`.`id` AS stockTransmastId,
                             `stocktransfer_out_master`.`refrence_number` ,
                             `stocktransfer_out_master`.`transfer_date`,
                             `stocktransfer_out_master`.`cn_no`,
-                            `stocktransfer_out_master`.`vendor_id` ,
+                            `stocktransfer_out_master`.`customer_id` ,
                            `stocktransfer_out_master`.`stock_outBags`,
                            `stocktransfer_out_master`.`stock_outPrice`,
                            `stocktransfer_out_master`.`stock_outKgs`');
@@ -250,7 +250,7 @@ public function getPurchasedBag($bagDtlId){
                     "refrence_number" => $rows->refrence_number,
                     "transferDt" => date('d-m-Y', strtotime($rows->transfer_date)),
                     "cn_no" =>$rows->cn_no,
-                    "vendorid" => $rows->vendor_id,
+                    "customer_id" => $rows->customer_id,
                     "stock_outBags"=>$rows->stock_outBags,
                     "stock_outKgs"=>$rows->stock_outKgs,
                     "stock_outPrice"=>$rows->stock_outPrice
@@ -358,11 +358,11 @@ public function getPurchasedBag($bagDtlId){
                 `stocktransfer_out_master`.`refrence_number`,
                  `stocktransfer_out_master`.`stock_outBags`,
                 DATE_FORMAT(`stocktransfer_out_master`.`transfer_date`,'%d-%m-%Y') AS TransferDt,
-                `vendor`.`vendor_name`,
+                `customer`.`customer_name`,
                 SUM(`stocktransfer_out_detail`.`num_of_stockout_bag`*`stocktransfer_out_detail`.`qty_stockout_kg`) AS totalStockOutKgs 
                 FROM `stocktransfer_out_master`
-                INNER JOIN `vendor`
-                ON `vendor`.`id`=`stocktransfer_out_master`.`vendor_id`
+                INNER JOIN `customer`
+                ON `customer`.`id`=`stocktransfer_out_master`.`customer_id`
                 INNER JOIN `stocktransfer_out_detail`
                 ON `stocktransfer_out_detail`.`stocktransfer_out_master_id`=`stocktransfer_out_master`.id
                 GROUP BY `stocktransfer_out_master`.id ORDER BY stocktransfer_out_master.`transfer_date` DESC";

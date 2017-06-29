@@ -1,4 +1,7 @@
 <script src="<?php echo base_url(); ?>application/assets/js/editStockOutJS.js"></script> 
+<script src="<?php echo base_url(); ?>application/assets/js/jquery-customselect.js"></script> 
+<link rel="stylesheet" href="<?php echo base_url(); ?>application/assets/css/jquery-customselect.css" />
+
 <!-- CSS goes in the document HEAD or added to your external stylesheet -->
 <style type="text/css">
 table.gridtable {
@@ -31,6 +34,43 @@ box-shadow: 0 0 10px rgba(0,0,0,0.6);
 -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.6);
 -o-box-shadow: 0 0 10px rgba(0,0,0,0.6);
 }
+
+
+ .custom-select {
+    position: relative;
+    width: 200px;
+    height:25px;
+    line-height:10px;
+  font-size: 9px;
+    
+ 
+}
+.custom-select a {
+  display: block;
+  width: 200px;
+  height: 25px;
+  padding: 8px 6px;
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: "Open Sans",helvetica,arial,sans-serif;
+    font-size: 9px;
+}
+.custom-select div ul li.active {
+    display: block;
+    cursor: pointer;
+    font-size: 9px;
+}
+
+
+.custom-select input {
+    width: 165px;
+    font-family: "Open Sans",helvetica,arial,sans-serif;
+    font-size: 9px;
+}
+
+
+
 </style>
 <!-- Table goes in the document BODY -->
 
@@ -56,14 +96,15 @@ box-shadow: 0 0 10px rgba(0,0,0,0.6);
   <tr>
     <td>CN No.</td>
     <td><input type="text"  id="cnNo" name="cnNo" value="<?php echo($bodycontent['stockOutMaster']['cn_no']);?>"/></td>
-    <td>Vendor</td>
+    <td>Customer</td>
     <td>
-    	<select name="vendor" id="vendor" class='custom-select' >
-            <option value="0">Select</option>
-            <?php foreach ($header['vendor'] as $content) : ?>
-                <option value="<?php echo $content->vid; ?>"
-                <?php if($bodycontent['stockOutMaster']['vendorid']==$content->vid){echo('selected');}else{echo('');}?>><?php echo $content->vendor_name; ?></option>
-                <?php endforeach; ?>
+    	<select name="customer" id="customer" class='custom-select' >
+			<option value="0">Select</option>
+            <?php foreach ($header['customer'] as $content) : ?>
+                <option value="<?php echo $content->vid; ?>" <?php if($bodycontent['stockOutMaster']['customer_id']==$content->vid){echo('selected');}else{echo('');}?>><?php echo $content->customer_name; ?></option>
+            <?php endforeach; ?>
+			
+			
 
          </select> 
         <div id="vendor_err" style="margin-left:210px;margin-top:-21px;display:none;"><img src="<?php echo base_url(); ?>application/assets/images/vendor_validation.gif" /></div>
@@ -87,13 +128,13 @@ box-shadow: 0 0 10px rgba(0,0,0,0.6);
 </table>
 
 </div>
-   <div id="dialog-new-save" title="Blending" style="display:none;">
-       <span> Data save successfully..</span>
+   <div id="dialog-new-save" title="StockOut Edit" style="display:none;">
+       <span> Data updated successfully..</span>
    </div>
-   <div id="dialog-error-save" title="Blending" style="display:none;">
+   <div id="dialog-error-save" title="StockOut Edit" style="display:none;">
        <span> Error in save..</span>
    </div> 
-   <div id="dialog-validation-save" title="Blending" style="display:none;">
+   <div id="dialog-validation-save" title="StockOut Edit" style="display:none;">
        <span> Validation Fail..</span>
    </div>  
     
@@ -138,7 +179,7 @@ box-shadow: 0 0 10px rgba(0,0,0,0.6);
     
 </div>
 <!-- massage for exist id in table-->
-<div id="dialog-for-id-in-table" title="Blending" style="display:none;">
+<div id="dialog-for-id-in-table" title="StockOut Edit" style="display:none;">
        <span> This combination already in table. </span>
 </div>
     
