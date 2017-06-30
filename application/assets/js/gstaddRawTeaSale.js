@@ -337,7 +337,7 @@ $(document).ready(function() {
                     {
                         type: 'POST',
                         dataType: 'json',
-                        url: basepath + "rawteasale/insertRawteaSale",
+                        url: basepath + "gstrawteasale/insertRawteaSale",
                         data: {formDatas: formData},
                         success: function(data) {
 
@@ -348,7 +348,7 @@ $(document).ready(function() {
                                     modal: true,
                                     buttons: {
                                         "Ok": function() {
-                                            window.location.href = basepath + 'rawteasale';
+                                            window.location.href = basepath + 'gstrawteasale';
                                             $(this).dialog("close");
                                         }
                                     }
@@ -416,6 +416,7 @@ $(document).on("change",".cgst",function(){
         var dtl_id = DtlId[1];
         var amt=getGSTTaxAmount($(this).val(),dtl_id,"CGST");
         $("#cgstAmt_"+dtl_id).val(amt);
+        callAllTotalFunction();
 });
 
 $(document).on("change",".sgst",function(){
@@ -424,6 +425,7 @@ $(document).on("change",".sgst",function(){
         var dtl_id = DtlId[1];
         var amt=getGSTTaxAmount($(this).val(),dtl_id,"SGST");
         $("#sgstAmt_"+dtl_id).val(amt);
+        callAllTotalFunction();
 });
 $(document).on("change",".igst",function(){
         var bagId = $(this).attr('id');
@@ -431,6 +433,7 @@ $(document).on("change",".igst",function(){
         var dtl_id = DtlId[1];
         var amt=getGSTTaxAmount($(this).val(),dtl_id,"IGST");
         $("#igstAmt_"+dtl_id).val(amt);
+        callAllTotalFunction();
 });
 
 
@@ -686,7 +689,12 @@ function callAllTotalFunction() {
     getTotalSaleOutKgs();
     getTotalSalePrice();
     getDiscountAmount();
-    getTaxAmount();
+    //getTaxAmount();
+    getGSTtaxbleAmount();
+    getTotalCGST();
+    getTotalSGST();
+    getTotalIGST();
+    totalTaxIncludedAmount();
     getGrandTotal();
 
 }
@@ -749,75 +757,82 @@ function getTotalAmount() {
     return totalAmount.toFixed(2);
 
 }
-
+/**
+ * @author amiabhik@gmail.com
+ * @GST
+ * @returns {unresolved}
+ */
 function getDiscountAmount() {
-    var totalamount = 0;
-    var discountRate = 0;
-    var discountAmount = 0;
-    totalamount = parseFloat(getTotalAmount());
-    discountRate = parseFloat($("#txtDiscountPercentage").val() == "" ? 0 : $("#txtDiscountPercentage").val());
-
-    discountAmount = parseFloat((totalamount * discountRate) / 100);
-
-    $("#txtDiscountAmount").val(discountAmount.toFixed(2));
-
+   var discountAmount = 0;
+   $('.discount').each(function(){
+       discountAmount = discountAmount + parseFloat( $(this).val()||0);
+   });
+   $("#txtDiscountAmount").val(discountAmount.toFixed(2));
     return discountAmount.toFixed(2);
 
 }
-
-
 /**
- * @name getTaxAmount
- * @returns {undefined}
- * @description vatrate or cstrate on tax
+ * @author amiabhik@gmail.com
+ * @GST
+ * @returns {unresolved}
  */
-function getTaxAmount() {
-    var TaxRate = 0;
-    var discountAmount = 0;
-    var deliveryChgs=0;
-    var amountAfterDiscount = 0;
-    var totalAmount = 0;
-    var TaxAmount = 0;
-    var rateType = "";
-    var rate = $("input[type='radio'][name='rateType']:checked");
-
-    if (rate.length > 0) {
-        rateType = rate.val();
-    }
-    if (rateType == "V") {
-        TaxRate =parseFloat($("#vat option:selected").text()=='Select'?0:$("#vat option:selected").text());
-    } else {
-        TaxRate =parseFloat($("#cst option:selected").text()=='Select'?0:$("#cst option:selected").text());
-    }
-    deliveryChgs=parseFloat($("#txtDeliveryChg").val()==""?0:$("#txtDeliveryChg").val());
-    totalAmount = parseFloat(getTotalAmount());
-    discountAmount = parseFloat(getDiscountAmount());
-    amountAfterDiscount = parseFloat(totalAmount - discountAmount + deliveryChgs);
-    TaxAmount = parseFloat((amountAfterDiscount * TaxRate) / 100);
-
-    $("#txtTaxAmount").val(TaxAmount.toFixed(2));
-
-    return TaxAmount.toFixed(2);
+function getGSTtaxbleAmount(){
+    var gstTaxableTotatlAmount =0;
+    $('.taxableamount').each(function(){
+        gstTaxableTotatlAmount = gstTaxableTotatlAmount + parseFloat($(this).val()||0);
+    });
+    
+    $("#txtGstTaxableAmt").val(gstTaxableTotatlAmount.toFixed(2));
+    return gstTaxableTotatlAmount.toFixed(2);
 }
+function getTotalCGST(){
+    var totalCGSTAmount =0;
+    $(".cgstAmt").each(function(){
+        totalCGSTAmount = totalCGSTAmount + parseFloat($(this).val()||0);
+    });
+    $("#txtTotalCGST").val(totalCGSTAmount.toFixed(2));
+}
+function getTotalSGST(){
+    var totalSGSTAmt=0;
+    $(".sgstAmt").each(function(){
+        totalSGSTAmt =totalSGSTAmt + parseFloat($(this).val()||0);
+    });
+    $("#txtTotalSGST").val(totalSGSTAmt.toFixed(2));
+}
+function getTotalIGST(){
+    var totalIGSTAmt=0;
+    $(".igstAmt").each(function(){
+        totalIGSTAmt =totalIGSTAmt + parseFloat($(this).val()||0);
+    });
+    $("#txtTotalIGST").val(totalIGSTAmt.toFixed(2));
+}
+function totalTaxIncludedAmount(){
+    var taxableAmount = $("#txtGstTaxableAmt").val()||0;
+    var cgstamount =  $("#txtTotalCGST").val()||0;
+    var sgstamount = $("#txtTotalSGST").val()||0;
+    var igstamount = $("#txtTotalIGST").val()||0;
+    
+    var totalTaxIncludedAmount = parseFloat(taxableAmount)+ parseFloat(cgstamount) + parseFloat(sgstamount) + parseFloat(igstamount);
+    $("#txtTotalIncldTaxAmt").val(totalTaxIncludedAmount.toFixed(2));
+    return totalTaxIncludedAmount;
+    
+}
+
 
 
 
 function getGrandTotal(){
-    var totalAmount=0;
-    var discountAmount=0;
-    var deliveryChgs=0;
-    var taxAmount =0;
-    var roundoff =0;
-    var grandTotal =0 ;
+    var totalGSTIncludedamount=0;
+    /*var freightCharges = $("#txtFreight").val()||0;
+    var insurance = $("#txtInsurance").val()||0;
+    var pkgfrwd =$("#txtPckFrw").val()||0;*/
+    var roundoff=0;
+    var grandTotal = 0;
     
-    totalAmount = parseFloat(getTotalAmount());
-    discountAmount =parseFloat(getDiscountAmount());
-    taxAmount = parseFloat(getTaxAmount());
-    roundoff = parseFloat($("#txtRoundOff").val()==""?0:$("#txtRoundOff").val());
-
-    deliveryChgs=parseFloat($("#txtDeliveryChg").val()==""?0:$("#txtDeliveryChg").val());
+     roundoff = parseFloat($("#txtRoundOff").val()==""?0:$("#txtRoundOff").val());
     
-    grandTotal = parseFloat(((totalAmount - discountAmount + deliveryChgs)+ taxAmount)+(roundoff));
+    totalGSTIncludedamount = parseFloat(totalTaxIncludedAmount());
+    grandTotal = (parseFloat(totalGSTIncludedamount))+(roundoff);
     
     $("#txtGrandTotal").val(grandTotal.toFixed(2));
     return grandTotal.toFixed(2);

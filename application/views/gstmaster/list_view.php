@@ -41,7 +41,7 @@
              <td><?php echo($row['gstDescription']);?></td>
              <td><?php echo($row['gstType']);?></td>
              <td><?php echo($row['rate']);?></td>
-             <td><?php if($row['usedfor']=="O"){echo("OutPut");}else{echo("OutPut");}?></td>
+             <td><?php if($row['usedfor']=="O"){echo("OutPut");}else{echo("InPut");}?></td>
              <td>
                  <a href="<?php echo base_url(); ?>GSTmaster/addGST/id/<?php echo($row['id']); ?>" class="btn btn-info btn-xs" role="button">Edit</a>
                  <a href="#" class="btn btn-danger  btn-xs" role="button">Del</a>

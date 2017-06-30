@@ -24,7 +24,7 @@ class gstrawteasale extends CI_Controller {
             
             $compny = $session['company'];
             $year = $session['yearid'];
-            $result = $this->rawteasalemodel->getRawTeasaleList($compny,$year);
+            $result = $this->rawteasalemodel->getGSTRawTeasaleList($compny,$year);
             $page = 'raw_tea_sale/listgst';
             $header = '';
             $headercontent=NULL;
@@ -232,58 +232,22 @@ class gstrawteasale extends CI_Controller {
         parse_str($formData, $searcharray);
         $rawteasale = array();
         $voucherMast = array();
-        
-      //  $srl_no = $this->GetSerialNo();
-     //   $invoice_no=$this->get_raw_tea_sale_InvoiceNo($srl_no,$session['company']);
-        
-      
-        
-       // $rawteasale['invoice_no'] = $invoice_no;
-        
-      /*  $rawteasale['invoice_no'] = $searcharray['invoice_no'];
-        $rawteasale['sale_date'] = date("Y-m-d", strtotime($searcharray['saleDt']));
-        $rawteasale['customer_id'] = $searcharray['customer'];
-        $rawteasale['vehichleno'] = $searcharray['vehichleno'];
-        $rawteasale['taxrateType'] = $searcharray['rateType'];
-        
-     if ($searcharray['rateType'] == 'V') {
-                $rawteasale['taxrateTypeId'] = $searcharray['vat'];
-            } else {
-                $rawteasale['taxrateTypeId'] = $searcharray['cst'];
-            }
-        $rawteasale['taxamount'] = $searcharray['txtTaxAmount'];
-        $rawteasale['discountRate'] = $searcharray['txtDiscountPercentage'];
-        $rawteasale['discountAmount'] = $searcharray['txtDiscountAmount'];
-        $rawteasale['deliverychgs'] = $searcharray['txtDeliveryChg'];
-        $rawteasale['total_sale_bag'] = $searcharray['txtTotalSaleBag'];
-        $rawteasale['total_sale_qty'] = $searcharray['txtSaleOutKgs'];
-        $rawteasale['totalamount'] = $searcharray['txtTotalSalePrice'];
-        $rawteasale['roundoff'] = $searcharray['txtRoundOff'];
-        $rawteasale['grandtotal'] = $searcharray['txtGrandTotal'];
-       
-        $rawteasale['company_id'] = $session['company'];
-        $rawteasale['year_id'] = $session['yearid'];*/
-       
-      //   $insrt= $this->rawteasalemodel->insertData($rawteasale,$searcharray);
+        $voucherMast['voucher_number'] = NULL;         
+        $voucherMast['voucher_date'] = date("Y-m-d", strtotime($searcharray['saleDt']));
+        $voucherMast['narration'] = "Garden tea sale "." on Dated ".date("Y-m-d", strtotime($searcharray['saleDt']));         
+        $voucherMast['cheque_number'] =NULL;         
+        $voucherMast['cheque_date'] = NULL;         
+        $voucherMast['transaction_type'] = 'RS';         
+        $voucherMast['created_by'] = $session['user_id'];         
+        $voucherMast['company_id'] = $session['company'];         
+        $voucherMast['year_id'] =  $session['yearid']; 
+        $voucherMast['serial_number'] = 1;
+        $voucherMast['vouchertype'] =NULL;         
+        $voucherMast['branchid'] = NULL;         
+        $voucherMast['paid_to'] = NULL;         
         
         
-        
-             $voucherMast['voucher_number'] = NULL;         
-             $voucherMast['voucher_date'] = date("Y-m-d", strtotime($searcharray['saleDt']));
-             $voucherMast['narration'] = "Sale against Invoice No ".$searcharray['invoice_no']." Date ".date("Y-m-d", strtotime($searcharray['saleDt']));         
-             $voucherMast['cheque_number'] =NULL;         
-             $voucherMast['cheque_date'] = NULL;         
-             $voucherMast['transaction_type'] = 'RS';         
-             $voucherMast['created_by'] = $session['user_id'];         
-             $voucherMast['company_id'] = $session['company'];         
-             $voucherMast['year_id'] =  $session['yearid']; 
-             $voucherMast['serial_number'] = 1;
-             $voucherMast['vouchertype'] =NULL;         
-             $voucherMast['branchid'] = NULL;         
-             $voucherMast['paid_to'] = NULL;         
-        
-        
-        $insrt= $this->rawteasalemodel->insertData($voucherMast,$searcharray);
+        $insrt= $this->rawteasalemodel->GSTinsertData($voucherMast,$searcharray);
         if($insrt){
             echo '1';
         }else{

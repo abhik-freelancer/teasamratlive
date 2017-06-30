@@ -637,7 +637,7 @@ class gsttaxinvoicemodel extends CI_Model {
                 yearid,
                 yeartag
             FROM serialmaster
-            WHERE companyid=".$company." AND yearid=".$year." AND module='SALE'";
+            WHERE companyid=".$company." AND yearid=".$year." AND module='SLGST' LOCK IN SHARE MODE";
         
                   $query = $this->db->query($sql);
 		  if ($query->num_rows() > 0) {

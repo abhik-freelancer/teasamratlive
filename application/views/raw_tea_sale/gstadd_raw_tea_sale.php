@@ -77,10 +77,10 @@
         <td width="20%"><input type="text" name="vehichleno" id="vehichleno" /></td>
    </tr>
   <tr>
-      
-  <td colspan="4">
+      <td>Place of supply</td>
+      <td><input type="text" id="txtplaceofsupply" name="txtplaceofsupply" value="" style="width:240px;"/></td>
+      <td>&nbsp;</td>      <td>&nbsp;</td>
 
-  </td>
   </tr>
 </table>
     
@@ -161,63 +161,42 @@
   <tr>
     <td>Total Sale Bag</td>
     <td><input type="text" id="txtTotalSaleBag" name="txtTotalSaleBag" value="" style="text-align:right;"/></td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td>CGST</td>
+    <td><input type="text" id="txtTotalCGST" name="txtTotalCGST"  value="" style="text-align:right;"/> </td>
   </tr>
   <tr>
     <td>Total Sale(Kgs)</td>
     <td><input type="text" id="txtSaleOutKgs" name="txtSaleOutKgs" value="" style="text-align:right;"/></td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td>SGST</td>
+    <td><input type="text" id="txtTotalSGST" name="txtTotalSGST"  value="" style="text-align:right;"/></td>
   </tr>
   
   <tr>
     <td>Total Amount</td>
     <td><input type="text" id="txtTotalSalePrice" name="txtTotalSalePrice" value="" style="text-align:right;"/></td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td>IGST</td>
+    <td><input type="text" id="txtTotalIGST" name="txtTotalIGST"  value="" style="text-align:right;"/></td>
   </tr>
   <tr>
     <td>Discount</td>
-    <td><input type="text" name="txtDiscountPercentage" id="txtDiscountPercentage" value="" style="text-align:right;"/>(%) </td>
-    <td>Amount</td>
     <td><input type="text" id="txtDiscountAmount" name="txtDiscountAmount" value="" style="text-align:right;"/></td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
   </tr>
-
   <tr>
-    <td>Delivery Chgs</td>
-    <td><input type="text" name="txtDeliveryChg" id="txtDeliveryChg" value="" style="text-align:right;"/></td>
-    <td></td>
-    <td></td>
+      <td>Taxable Amount</td>
+      <td><input type="text" id="txtGstTaxableAmt" name="txtGstTaxableAmt" value="" style="text-align:right;"/></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
   </tr>
-
   <tr>
-    <td>
-        [Vat]<input type="radio" name="rateType" <?php if($header['mode']=='Add'){echo("checked=checked");} ?> id="rateType" value="V" >
-        [CST]<input type="radio" name="rateType"  id="rateType" value="C" > 
-    </td>
-    <td>
-        <div id="divVat" <?php if($header['mode']=='Add'){echo('style="display:block"');} ?>  <?php if($bodycontent['taxInvoiceMaster']['taxrateType']=='V'){echo('style="display:block"');}else{echo('style="display:none"');}?>>
-        	 <select id="vat" name="vat">
-	            	<option value="0">Select</option>
-                        <?php foreach ($header['vatpercentage'] as $rows){ ?>
-                        <option value="<?php echo($rows->id); ?>" > <?php echo($rows->vat_rate); ?></option>
-                        <?php } ?>
-                </select>
-        </div>
-        <div id="divCst" <?php if($bodycontent['taxInvoiceMaster']['taxrateType']=='C'){echo('style="display:block"');}else{echo('style="display:none"');}?>>
-        	 <select name="cst" id="cst">
-            	<option value="0">Select</option>
-                <?php foreach ($header['cstRate'] as $rows){ ?>
-                        <option value="<?php echo($rows->id); ?>"> <?php echo($rows->cst_rate); ?></option>
-                <?php } ?>
-                
-            </select>
-        </div>	
-    </td>
-    <td>Tax Amount</td>
-    <td><input type="text" id="txtTaxAmount" name="txtTaxAmount" value="" style="text-align:right;"/></td>
+      <td>Tax(GST)Incl.</td>
+      <td><input type="text" id="txtTotalIncldTaxAmt" name="txtTotalIncldTaxAmt" value="" style="text-align:right;"/></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
   </tr>
+  
+  
   
   <tr>
     <td>Round off</td>

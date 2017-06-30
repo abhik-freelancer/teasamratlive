@@ -16,7 +16,7 @@ class rawteasalemodel extends CI_Model {
                 FROM rawteasale_master
                 INNER JOIN customer
                 ON customer.`id`=rawteasale_master.`customer_id`
-                WHERE rawteasale_master.`company_id`=".$cmpny ." AND rawteasale_master.`year_id`=".$year;
+                WHERE rawteasale_master.`company_id`=".$cmpny ." AND rawteasale_master.`year_id`=".$year." AND rawteasale_master.isGST='N'";
         
         $query = $this->db->query($sql); 
         if($query->num_rows() >0){
@@ -39,7 +39,40 @@ class rawteasalemodel extends CI_Model {
     }
     
     
-    
+    public function getGSTRawTeasaleList($cmpny,$year){
+        $data = array();
+        $sql = "SELECT 
+                rawteasale_master.id,
+                rawteasale_master.`invoice_no`,
+                DATE_FORMAT(rawteasale_master.`sale_date`,'%d-%m-%Y') AS saleDate,
+                rawteasale_master.`total_sale_bag`,
+                rawteasale_master.`total_sale_qty`,
+                rawteasale_master.`grandtotal`,
+                `customer`.`customer_name`
+                FROM rawteasale_master
+                INNER JOIN customer
+                ON customer.`id`=rawteasale_master.`customer_id`
+                WHERE rawteasale_master.`company_id`=".$cmpny ." AND rawteasale_master.`year_id`=".$year." AND rawteasale_master.isGST='Y'";
+        
+        $query = $this->db->query($sql); 
+        if($query->num_rows() >0){
+            foreach ($query->result() as $rows){
+                $data[]= array(
+                    "rawteaSaleMastId" => $rows->id,
+                    "invoice_no" => $rows->invoice_no,
+                    "saleDate" => $rows->saleDate,
+                    "total_sale_bag" => $rows->total_sale_bag,
+                    "total_sale_qty" => $rows->total_sale_qty,
+                    "grandtotal" => $rows->grandtotal,
+                    "customer_name" => $rows->customer_name
+                );
+            }
+            return $data;
+        }
+        else{
+             return $data;
+        }
+    }
     
     
         public function getTeaStock($garden = "", $invoice = "", $lotnumber = "", $grade = "") {
@@ -419,6 +452,44 @@ public function getBlendedBag($bagDtlId){
             echo $exc->getTraceAsString();
         }
     }
+    /**
+     * @author amiabhik@gmail.com
+     * @param type $voucherMaster
+     * @param type $searcharray
+     * @return boolean
+     * @method GSTinsertData
+     */
+    public function GSTinsertData($voucherMaster, $searcharray) {
+
+        try {
+            $rawTeaSaleInvoice = "";
+            $session = sessiondata_method();
+            $this->db->trans_begin();
+            $voucherMaster['voucher_number']= $this->getSerialNumber($session['company'], $session['yearid']);
+            $this->db->insert('voucher_master', $voucherMaster);
+            $vMastId = $this->db->insert_id();
+            $rawTeaSaleInvoice = $voucherMaster['voucher_number'];
+            
+            $this->GSTinsertintoVouchrDtl($vMastId,$searcharray);
+            
+            $this->GSTinsertintoRawTeaSaleMaster($vMastId,$searcharray,$rawTeaSaleInvoice);
+            $rawteassaleMastId = $this->db->insert_id();
+            $this->GSTinsertrawTeaSaleDtl($rawteassaleMastId, $searcharray);
+            $this->insertBillMaster($rawteassaleMastId, $searcharray);
+          
+
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                return false;
+            } else {
+                $this->db->trans_commit();
+                return true;
+            }
+        } catch (Exception $exc) {
+            echo $exc->getTraceAsString();
+        }
+    }
+    
     
     private function getSerialNumber($company,$year){
         $lastnumber = (int)(0);
@@ -437,7 +508,7 @@ public function getBlendedBag($bagDtlId){
                 yearid,
                 yeartag
             FROM serialmaster
-            WHERE companyid=".$company." AND yearid=".$year." AND module='SALE'";
+            WHERE companyid=".$company." AND yearid=".$year." AND module='SLGST' LOCK IN SHARE MODE";
         
                   $query = $this->db->query($sql);
 		  if ($query->num_rows() > 0) {
@@ -493,8 +564,147 @@ public function insertBillMaster($newSaleId, $searcharray){
         
     }
 
+/**
+ * @author Abhik Ghosh<amiabhik@gmail.com>
+ * @param type $vMastId
+ * @param type $searcharray
+ */
+  public function GSTinsertintoVouchrDtl($vMastId,$searcharray){
+            
+       $this->deleteVoucherDetailData($vMastId);
+            
+       $session = sessiondata_method();
+       $vouchrDtlCus = array();
+       $vouchrDtlSale =array();
+       $vouchrDtlVat = array();
+          
+       $cusAccId = $this->getCustomerAccId($searcharray['customer'],$session['company']);
+       $saleAccId = $this->getSaleAccId($session['company']);
+       $vatAccId = $this->getVatAccId($session['company']);
+       
+       $totalAmt =$searcharray['txtGrandTotal']; // For Cuss acc Debt
+       
+       $sAmount = $searcharray['txtGstTaxableAmt']+ $searcharray["txtRoundOff"];;
+       $saleAmt = $sAmount ; // for sale
+       //$vatAmt = $searcharray['txtTaxAmount']; // for vat
+       
+       
+       
+       //For Customer Acc
+       $vouchrDtlCus['voucher_master_id'] = $vMastId;
+       $vouchrDtlCus['account_master_id'] = $cusAccId;
+       $vouchrDtlCus['voucher_amount'] = $totalAmt;
+       $vouchrDtlCus['is_debit'] ='Y' ;
+       $vouchrDtlCus['account_id_for_trial'] = NULL;
+       $vouchrDtlCus['subledger_id'] = NULL;
+       $vouchrDtlCus['is_master'] = NULL;
+       $this->db->insert('voucher_detail', $vouchrDtlCus);
+       
+        //For Sale Acc
+       $vouchrDtlSale['voucher_master_id'] = $vMastId;
+       $vouchrDtlSale['account_master_id'] = $saleAccId;
+       $vouchrDtlSale['voucher_amount'] = $saleAmt;
+       $vouchrDtlSale['is_debit'] ='N' ;
+       $vouchrDtlSale['account_id_for_trial'] = NULL;
+       $vouchrDtlSale['subledger_id'] = NULL;
+       $vouchrDtlSale['is_master'] = NULL;
+       $this->db->insert('voucher_detail', $vouchrDtlSale);
+       
+       
 
-
+// for GST(cgst+sgst+igst)
+       $numberofDetails = count($searcharray['txtBagDtlId']);
+       $cgstarray=array();
+       $sgstarray =array();
+       $igstarray =array();
+       for ($i = 0; $i < $numberofDetails; $i++) {
+            $cgstarray[] =array("id"=>$searcharray['cgst'][$i],"cgstamount"=>$searcharray['cgstAmt'][$i]);
+            $sgstarray[] = array("id"=>$searcharray['sgst'][$i],"sgstamount"=>$searcharray['sgstAmt'][$i]);
+            $igstarray[] = array("id"=>$searcharray['igst'][$i],"igstamount"=>$searcharray['igstAmt'][$i]);
+       }
+       //*************************************//
+    $groups = array();
+    $key = 0;
+    foreach ($cgstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'cgstamount' => $item['cgstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['cgstamount'] = $groups[$key]['cgstamount'] + $item['cgstamount'];
+        }
+        $key++;
+    }
+    foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["cgstamount"], "CGST");
+    }
+    /*******************SGST******************************/
+     $groups = array();
+     $key = 0;
+    foreach ($sgstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'sgstamount' => $item['sgstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['sgstamount'] = $groups[$key]['sgstamount'] + $item['sgstamount'];
+        }
+        $key++;
+    }
+     foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["sgstamount"], "SGST");
+    }
+    /**************************IGST***********************/
+     $groups = array();
+     $key = 0;
+    foreach ($igstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'igstamount' => $item['igstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['igstamount'] = $groups[$key]['igstamount'] + $item['igstamount'];
+        }
+        $key++;
+    }
+     foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["igstamount"], "IGST");
+    }
+        
+}
+ private function GSTinsertionOnVoucherDetails($vouchermasterId,$gstId,$gstAmount,$gstType){
+       $sql="SELECT gstmaster.accountId
+                FROM gstmaster
+             WHERE gstmaster.id =".$gstId." AND gstmaster.gstType ='".$gstType."'";
+       if($gstId!=0){
+        $accountId = $this->db->query($sql)->row()->accountId;
+       }
+       if($gstId!=0){
+                $vouchrDtlVat['voucher_master_id'] = $vouchermasterId;
+                $vouchrDtlVat['account_master_id'] = $accountId;
+                $vouchrDtlVat['voucher_amount'] = $gstAmount;
+                $vouchrDtlVat['is_debit'] ='N' ;
+                $vouchrDtlVat['account_id_for_trial'] = NULL;
+                $vouchrDtlVat['subledger_id'] = NULL;
+                $vouchrDtlVat['is_master'] = NULL;
+                $this->db->insert('voucher_detail', $vouchrDtlVat);
+       }
+   }
 
 /*@method insertintoVouchrDtl
      * @date 01-06-2016
@@ -556,13 +766,77 @@ public function insertBillMaster($newSaleId, $searcharray){
        }
        
        
-        }
+}
         
           public function deleteVoucherDetailData($voucherId){
         
          $this->db->where('voucher_master_id', $voucherId);
          $this->db->delete('voucher_detail');
     }
+    
+    public function GSTinsertintoRawTeaSaleMaster($vMastId,$searcharray,$rawTeaSaleInvoice){
+        $session=  sessiondata_method();
+        $rawteasale = array();
+        
+        $rawteasale['invoice_no'] = $rawTeaSaleInvoice;//$searcharray['invoice_no'];
+        $rawteasale['sale_date'] = date("Y-m-d", strtotime($searcharray['saleDt']));
+        $rawteasale['customer_id'] = $searcharray['customer'];
+        $rawteasale['voucher_master_id'] = $vMastId;
+        $rawteasale['vehichleno'] = $searcharray['vehichleno'];
+        $rawteasale['placeofsupply']=$searcharray['txtplaceofsupply'];
+               
+        $rawteasale['gstTaxableAmount'] = $searcharray['txtGstTaxableAmt'];
+        
+        $rawteasale['gstTaxincludedAmt'] = $searcharray['txtTotalIncldTaxAmt'];
+        $rawteasale['discountAmount'] = $searcharray['txtDiscountAmount'];
+        $rawteasale['total_sale_bag'] = $searcharray['txtTotalSaleBag'];
+        $rawteasale['total_sale_qty'] = $searcharray['txtSaleOutKgs'];
+        $rawteasale['totalamount'] = $searcharray['txtTotalSalePrice'];
+        
+        $rawteasale['totalCGST'] = $searcharray['txtTotalCGST'];
+        $rawteasale['totalSGST'] = $searcharray['txtTotalSGST'];
+        $rawteasale['totalIGST'] = $searcharray['txtTotalIGST'];
+        
+        
+        $rawteasale['roundoff'] = $searcharray['txtRoundOff'];
+        $rawteasale['grandtotal'] = $searcharray['txtGrandTotal'];
+       
+        $rawteasale['company_id'] = $session['company'];
+        $rawteasale['year_id'] = $session['yearid'];
+        $rawteasale['isGST']='Y';
+        
+        $this->db->insert('rawteasale_master', $rawteasale);
+        
+    }
+    
+    public function GSTinsertrawTeaSaleDtl($masterId, $dtlArr) {
+        $rawteaSaleDtl = array();
+        $numberOfDtl = count($dtlArr['txtBagDtlId']);
+        for ($i = 0; $i < $numberOfDtl; $i++) {
+            $rawteaSaleDtl['rawteasale_master_id'] = $masterId;
+            $rawteaSaleDtl['purchase_detail_id'] = $dtlArr['txtpurchaseDtl'][$i];
+            $rawteaSaleDtl['purchase_bag_id'] = $dtlArr['txtBagDtlId'][$i];
+            $rawteaSaleDtl['num_of_sale_bag'] = ($dtlArr['txtused'][$i] == "" ? 0 : $dtlArr['txtused'][$i]);
+            $rawteaSaleDtl['qty_of_sale_bag'] = $dtlArr['txtnetinBag'][$i];
+            $rawteaSaleDtl['rate'] = ($dtlArr['txtrate'][$i] == "" ? 0 : $dtlArr['txtrate'][$i]);
+
+            $rawteaSaleDtl['amt'] = ($dtlArr['txtBlendedPrice'][$i] == "" ? 0 : $dtlArr['txtBlendedPrice'][$i]);
+            $rawteaSaleDtl['gstdiscount'] = ($dtlArr['txtdiscount'][$i] == "" ? 0 : $dtlArr['txtdiscount'][$i]);
+            $rawteaSaleDtl['gstTaxableamount'] = ($dtlArr['txtTotalRowAmt'][$i] == "" ? 0 : $dtlArr['txtTotalRowAmt'][$i]);
+            $rawteaSaleDtl['cgstRateId'] = ($dtlArr['cgst'][$i] == "" ? 0 : $dtlArr['cgst'][$i]);
+            $rawteaSaleDtl['cgstamt'] = ($dtlArr['cgstAmt'][$i] == "" ? 0 : $dtlArr['cgstAmt'][$i]);
+            $rawteaSaleDtl['sgstRateId'] = ($dtlArr['sgst'][$i] == "" ? 0 : $dtlArr['sgst'][$i]);
+            $rawteaSaleDtl['sgstamt'] = ($dtlArr['sgstAmt'][$i] == "" ? 0 : $dtlArr['sgstAmt'][$i]);
+            $rawteaSaleDtl['igstRateId'] = ($dtlArr['igst'][$i] == "" ? 0 : $dtlArr['igst'][$i]);
+            $rawteaSaleDtl['igstamt'] = ($dtlArr['igstAmt'][$i] == "" ? 0 : $dtlArr['igstAmt'][$i]);
+            $rawteaSaleDtl['HSN'] = ($dtlArr['HSN'][$i] == "" ? 0 : $dtlArr['HSN'][$i]);
+            
+         
+            $this->db->insert('rawteasale_detail', $rawteaSaleDtl);
+         
+        }
+    }
+    
     
     
     public function insertintoRawTeaSaleMaster($vMastId,$searcharray,$rawTeaSaleInvoice){

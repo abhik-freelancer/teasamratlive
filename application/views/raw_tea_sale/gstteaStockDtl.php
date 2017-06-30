@@ -55,7 +55,7 @@
             </td>
             
              <td align="right" >
-                <input type="text" id="txtBlendKg_<?php echo($rows['PbagDtlId']); ?>" name="txtBlendKg[]" disabled="disabled" value="" style="border: 1px solid #008000; color: #480091; width: 70px;border-radius:5px; text-align: right;"/>
+                <input type="text" id="txtBlendKg_<?php echo($rows['PbagDtlId']); ?>" name="txtBlendKg[]" readonly="readonly" value="" style="border: 1px solid #008000; color: #480091; width: 70px;border-radius:5px; text-align: right;"/>
             </td>       
             
             <!--blended cost-->
@@ -64,7 +64,7 @@
                        style="background-color : #EEEEEE;border: 1px solid #008000;width: 50px;border-radius:5px;" value="" onkeypress="checkNumeric(this);"/>
             </td>
            <td>
-                <input type="text" id="txtBlendedPrice_<?php echo($rows['PbagDtlId']); ?>" name="txtBlendedPrice[]" value="" disabled="disabled"
+               <input type="text" id="txtBlendedPrice_<?php echo($rows['PbagDtlId']); ?>" name="txtBlendedPrice[]" value="" readonly="readonly"
                       style="background-color : #EEEEEE;border: 1px solid #008000;width: 50px;border-radius:5px;width:90px;" />
            </td>
            <td>
@@ -72,8 +72,8 @@
                       class="discount"  style="background-color : #EEEEEE;border: 1px solid #008000;width: 50px;border-radius:5px;width:90px;" placeholder="discount" />
            </td>
            <td>
-               <input type="text" id="txtTotalRowAmt_<?php echo($rows['PbagDtlId']); ?>" name="txtTotalRowAmt[]" value="" placeholder="amount"
-                      style="background-color : #EEEEEE;border: 1px solid #008000;width: 50px;border-radius:5px;width:90px;" disabled="disabled"/>
+               <input type="text" class="taxableamount" id="txtTotalRowAmt_<?php echo($rows['PbagDtlId']); ?>" name="txtTotalRowAmt[]" value="" placeholder="amount"
+                      style="background-color : #EEEEEE;border: 1px solid #008000;width: 50px;border-radius:5px;width:90px;" readonly="readonly"/>
            </td>
            
             
@@ -91,7 +91,7 @@
                                     </option>
                                 <?php } ?>
                 </select>
-                <input type="text"  id="cgstAmt_<?php echo($rows['PbagDtlId']); ?>" name="cgstAmt[]" style="width: 50px;" class="cgstAmt">
+                <input type="text" readonly="readonly"  id="cgstAmt_<?php echo($rows['PbagDtlId']); ?>" name="cgstAmt[]" style="width: 50px;" class="cgstAmt">
             </td>            
             
             <td colspan="2">
@@ -103,10 +103,10 @@
                                     </option>
                                 <?php } ?>
                 </select>
-                <input type="text" id="sgstAmt_<?php echo($rows['PbagDtlId']); ?>" name="sgstAmt[]" style="width: 50px;" class="sgstAmt">
+                <input type="text" readonly="readonly" id="sgstAmt_<?php echo($rows['PbagDtlId']); ?>" name="sgstAmt[]" style="width: 50px;" class="sgstAmt">
             </td>
             
-            <td colspan="10">
+            <td colspan="3">
                 <select name="igst[]" id="igst_<?php echo($rows['PbagDtlId']); ?>" style="width:100px;" class="igst"> 
                                 <option value="0">IGST</option>
                                 <?php foreach ($igstrate as $row) { ?>
@@ -115,9 +115,13 @@
                                     </option>
                                 <?php } ?>
                 </select>
-                 <input type="text" id="igstAmt_<?php echo($rows['PbagDtlId']); ?>" name="igstAmt[]" style="width: 50px;" class="igstAmt">
-            </td>
+                 <input type="text" readonly="readonly" id="igstAmt_<?php echo($rows['PbagDtlId']); ?>" name="igstAmt[]" style="width: 50px;" class="igstAmt">
             
+            
+            </td>
+            <td colspan="7">
+                <input type="text" id="HSN_<?php echo($rows['PbagDtlId']); ?>" name="HSN[]" style="width: 100px;" class="HSN" placeholder="HSN">
+            </td>
             
             
 
