@@ -669,7 +669,7 @@ class gsttaxinvoicemodel extends CI_Model {
         'SERIAL' => $lastnumber,
         'lastnumber' => $lastnumber
         );
-        $array = array('companyid' => $company, 'yearid' => $year, 'module' => "SALE");
+        $array = array('companyid' => $company, 'yearid' => $year, 'module' => "SLGST");
         $this->db->where($array); 
         $this->db->update('serialmaster', $data);
         

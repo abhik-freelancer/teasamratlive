@@ -38,9 +38,9 @@
              <td align="right"><?php echo($content['total_sale_qty']);?></td>
              <td align="right"><?php echo($content['grandtotal']);?></td>
              <td>
-                 <!--<a href="<?php echo base_url(); ?>rawteasale/addRawTeaSale/id/<?php echo($content['rawteaSaleMastId']); ?>" class="showtooltip" title="Edit">
+                 <a href="<?php echo base_url(); ?>gstrawteasale/addRawTeaSale/id/<?php echo($content['rawteaSaleMastId']); ?>" class="showtooltip" title="Edit">
                   <img src="<?php echo base_url(); ?>application/assets/images/edit_ab.png" id="editRwTeasale" title="" alt=""/>
-                 </a>-->
+                 </a>
                  
                  <!-- <a href="<?php echo base_url(); ?>rawteasale/printrawTeaSale/rawteasalemastid/<?php echo($content['rawteaSaleMastId']); ?>" class="showtooltip" title="Print" target="_blank">
                  <img src="<?php echo base_url(); ?>application/assets/images/print_sheet.png" id="prnSaleBill"  title="Print" alt="Print"/>

@@ -320,6 +320,47 @@ public function getBlendedBag($bagDtlId){
            return 0;
        }
      }
+     /**
+      * @date 01/07/2017
+      * @author Abhik Ghosh<amiabhik@gmail.com>
+      * @method GSTupdateRawTeaSale
+      * @param type $vouchermastId
+      * @param type $masterData
+      * @param type $detail
+      * @return boolean
+      */
+     public function GSTupdateRawTeaSale($vouchermastId,$masterData = array(), $detail = array()){
+     
+        try {
+                $this->db->trans_begin();
+                $this->db->where('id',$vouchermastId);
+                $this->db->update('voucher_master', $masterData);
+               
+                //voucher details
+                $this->GSTinsertintoVouchrDtl($vouchermastId,$detail); //{GST}
+                
+                
+                
+                $this->GSTupdateRawTeaSaleMaster($detail);//{GST}
+                
+              
+                $rawteasleMastId = $detail['txtrawTeaSaleMastId'];
+                $this->db->delete('rawteasale_detail', array('rawteasale_master_id' => $rawteasleMastId));
+                $this->GSTinsertrawTeaSaleDtl($rawteasleMastId, $detail);//{GST}
+                
+                $this->updateBillMaster($rawteasleMastId, $detail);
+
+                if ($this->db->trans_status() === FALSE) {
+                    $this->db->trans_rollback();
+                    return false;
+                } else {
+                    $this->db->trans_commit();
+                    return true;
+                }
+            } catch (Exception $exc) {
+                echo $exc->getTraceAsString();
+            }
+    }
      
      
      /*Update Raw tea sale */
@@ -368,8 +409,43 @@ public function getBlendedBag($bagDtlId){
         $this->db->update("customerbillmaster",$billMasterArray);
         //echo $this->db->last_query();
     } 
-    
-    
+    /**
+     * @author Abhik Ghosh<amiabhik@gmail.com>
+     * @method GSTupdateRawTeaSaleMaster
+     * @param type $searcharray
+     */
+    public function GSTupdateRawTeaSaleMaster($searcharray){
+        $session = sessiondata_method();
+        
+        $rawTeasalemaster=array();
+        
+        $rawTeasalemasterId = $searcharray['txtrawTeaSaleMastId'];
+        
+        //$rawTeasalemaster['invoice_no'] = $searcharray['invoice_no'];
+        $rawTeasalemaster['sale_date'] = date("Y-m-d", strtotime($searcharray['saleDt']));
+        $rawTeasalemaster['customer_id'] = $searcharray['customer'];
+        $rawTeasalemaster['voucher_master_id'] = $searcharray['txthdVoucherMastId'];
+        $rawTeasalemaster['vehichleno'] = $searcharray['vehichleno'];
+        $rawTeasalemaster['placeofsupply']=$searcharray['txtplaceofsupply'];
+
+        $rawTeasalemaster['gstTaxableAmount'] = $searcharray['txtGstTaxableAmt'];
+        
+        $rawTeasalemaster['gstTaxincludedAmt'] = $searcharray['txtTotalIncldTaxAmt'];
+        $rawTeasalemaster['discountAmount'] = $searcharray['txtDiscountAmount'];
+        $rawTeasalemaster['total_sale_bag'] = $searcharray['txtTotalSaleBag'];
+        $rawTeasalemaster['total_sale_qty'] = $searcharray['txtSaleOutKgs'];
+        $rawTeasalemaster['totalamount'] = $searcharray['txtTotalSalePrice'];
+        
+        $rawTeasalemaster['totalCGST'] = $searcharray['txtTotalCGST'];
+        $rawTeasalemaster['totalSGST'] = $searcharray['txtTotalSGST'];
+        $rawTeasalemaster['totalIGST'] = $searcharray['txtTotalIGST'];
+        $rawTeasalemaster['roundoff'] = $searcharray['txtRoundOff'];
+        $rawTeasalemaster['grandtotal'] = $searcharray['txtGrandTotal'];
+        $rawTeasalemaster['isGST']='Y';
+        
+        $this->db->where('id',$rawTeasalemasterId);
+        $this->db->update('rawteasale_master',$rawTeasalemaster);
+    }
     
     
     
@@ -540,7 +616,7 @@ public function getBlendedBag($bagDtlId){
         'SERIAL' => $lastnumber,
         'lastnumber' => $lastnumber
         );
-        $array = array('companyid' => $company, 'yearid' => $year, 'module' => "SALE");
+        $array = array('companyid' => $company, 'yearid' => $year, 'module' => "SLGST");
         $this->db->where($array); 
         $this->db->update('serialmaster', $data);
         
@@ -1008,6 +1084,167 @@ function getCustomerAccId($cus_id,$compny){
         }
         
     }
+    public function GSTRawTeaSalemasterData($rawteaslMastId){
+        $sql = "SELECT 
+                rawteasale_master.id,
+                rawteasale_master.`invoice_no`,
+                DATE_FORMAT(rawteasale_master.`sale_date`,'%d-%m-%Y') AS saleDate,
+                rawteasale_master.`customer_id`,
+                rawteasale_master.`voucher_master_id`,
+                rawteasale_master.`vehichleno`,
+                rawteasale_master.`taxrateType`,
+                rawteasale_master.`taxrateTypeId`,
+                rawteasale_master.`discountRate`,
+                rawteasale_master.`discountAmount`,
+                rawteasale_master.`deliverychgs`,
+                rawteasale_master.`taxamount`,
+                rawteasale_master.`totalamount`,
+                rawteasale_master.`roundoff`,
+                rawteasale_master.`total_sale_bag`,
+                rawteasale_master.`total_sale_qty`,
+                rawteasale_master.`grandtotal`,
+                
+                rawteasale_master.company_id,
+                rawteasale_master.year_id,
+                rawteasale_master.isGST,
+                rawteasale_master.placeofsupply,
+                rawteasale_master.gstTaxableAmount,
+                rawteasale_master.gstTaxincludedAmt,
+                rawteasale_master.totalCGST,
+                rawteasale_master.totalSGST,
+                rawteasale_master.totalIGST
+              FROM
+                rawteasale_master 
+                WHERE rawteasale_master.`id`=".$rawteaslMastId;
+        
+         $query = $this->db->query($sql); 
+        if($query->num_rows() >0){
+            foreach ($query->result() as $rows){
+                $data= array(
+                    "rawteaSaleMastId" => $rows->id,
+                    "placeofsupply"=>$rows->placeofsupply,
+                    "gstTaxableAmount"=>$rows->gstTaxableAmount,
+                    "gstTaxincludedAmt"=>$rows->gstTaxincludedAmt,
+                    "totalCGST"=>$rows->totalCGST,
+                    "totalSGST"=>$rows->totalSGST,
+                    "totalIGST"=>$rows->totalIGST,
+                    "invoice_no" => $rows->invoice_no,
+                    "saleDate" => $rows->saleDate,
+                    "customer_id" => $rows->customer_id,
+                    "voucher_master_id" => $rows->voucher_master_id,
+                    "vehichleno" => $rows->vehichleno,
+                    "taxrateType" => $rows->taxrateType,
+                    "taxrateTypeId" => $rows->taxrateTypeId,
+                    "taxamount" => $rows->taxamount,
+                    "discountRate" => $rows->discountRate,
+                    "discountAmount"=> $rows->discountAmount,
+                    "deliverychgs"=> $rows->deliverychgs,
+                    "totalamount"=> $rows->totalamount,
+                    "roundoff"=> $rows->roundoff,
+                    "total_sale_bag" => $rows->total_sale_bag,
+                    "total_sale_qty" => $rows->total_sale_qty,
+                    "grandtotal" => $rows->grandtotal
+                    
+                );
+            }
+            return $data;
+        }
+        else{
+             return $data;
+        }
+        
+    }
+    
+     public function GSTRawTeaSaleDtlData($rawteaSlMastid){
+     $sql="SELECT 
+            `rawteasale_detail`.`rawteasale_master_id`,
+            `rawteasale_detail`.`id`,
+            `rawteasale_detail`.`num_of_sale_bag`,
+            `rawteasale_detail`.`qty_of_sale_bag`,
+            `rawteasale_detail`.`rate`,
+            `rawteasale_detail`.`purchase_bag_id`,
+            `rawteasale_detail`.`purchase_detail_id`,
+            `rawteasale_detail`.amt,
+            `rawteasale_detail`.cgstRateId,
+            `rawteasale_detail`.cgstamt,
+            `rawteasale_detail`.sgstRateId,
+            `rawteasale_detail`.sgstamt,
+            `rawteasale_detail`.igstRateId,
+            `rawteasale_detail`.igstamt,
+            `rawteasale_detail`.gstdiscount,
+            `rawteasale_detail`.gstTaxableamount,
+            `rawteasale_detail`.HSN,
+            PID.`id` AS purchaseDtl,
+            PID.`teagroup_master_id`,
+            PID.`invoice_number`,
+            PID.`price`,
+            PID.`cost_of_tea`,
+            PID.`lot`,
+            PID.`garden_id`, 
+            PID.`grade_id`,
+            garden_master.`garden_name`,
+            grade_master.`grade`,
+            location.`location`,
+            `teagroup_master`.`group_code`
+            FROM
+            `rawteasale_detail`
+            INNER JOIN
+            `purchase_invoice_detail` AS PID
+            ON `rawteasale_detail`.`purchase_detail_id`=PID.`id`
+            INNER JOIN garden_master ON PID.`garden_id` = garden_master.`id`
+            INNER JOIN grade_master ON PID.`grade_id` = grade_master.`id`
+            INNER JOIN 
+             do_to_transporter DOT ON PID.`id`= DOT.`purchase_inv_dtlid` AND DOT.`in_Stock`='Y'
+            INNER JOIN `location` ON DOT.`locationId`=`location`.`id` 
+            INNER JOIN `teagroup_master` ON PID.`teagroup_master_id` = `teagroup_master`.`id`
+            WHERE `rawteasale_detail`.`rawteasale_master_id`=".$rawteaSlMastid;
+     
+     
+     
+     
+    $query = $this->db->query($sql);
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                    
+                $saleBag = ($this->getPurchasedBag($rows->purchase_bag_id) - ($this->getsaleOutBag($rows->purchase_bag_id)+$this->getstockOutBag($rows->purchase_bag_id)+$this->getBlendedBag($rows->purchase_bag_id)));
+                $data[] = array(
+                    "purchaseDtl" => $rows->purchase_detail_id,
+                    "PbagDtlId" => $rows->purchase_bag_id,
+                    "BagNet" => $rows->qty_of_sale_bag,
+                    "Garden" => $rows->garden_name,
+                    "Invoice" => $rows->invoice_number,
+                    "Group" => $rows->group_code,
+                    "Grade" => $rows->grade,
+                    "Location" => $rows->location,
+                    "Numberofbags" => $saleBag,
+                    "kgperbag" => $rows->qty_of_sale_bag,
+                    "rate" => $rows->rate,
+                    "pricePerBag"=>$rows->cost_of_tea,
+                    "NetBags" => ($saleBag * $rows->qty_of_sale_bag), 
+                    "saleBagNo" => $rows->num_of_sale_bag,
+                    "saleCost" =>($rows->num_of_sale_bag * $rows->qty_of_sale_bag * $rows->rate ),
+                    "saleKgs" => number_format($rows->qty_of_sale_bag * $rows->num_of_sale_bag, 2),
+                    "amt"=>$rows->amt,
+                    "cgstRateId"=>$rows->cgstRateId,
+                    "cgstamt"=>$rows->cgstamt,
+                    "sgstRateId"=>$rows->sgstRateId,
+                    "sgstamt"=>$rows->sgstamt,
+                    "igstRateId"=>$rows->igstRateId,
+                    "igstamt"=>$rows->igstamt,
+                    "gstdiscount"=>$rows->gstdiscount,
+                    "gstTaxableamount"=>$rows->gstTaxableamount,
+                    "HSN"=>$rows->HSN
+                );
+            }
+
+
+            return $data;
+        } else {
+            return $data;
+        }
+}
+    
+    
     
     
     public function getRawTeaSalemasterData($rawteaslMastId){

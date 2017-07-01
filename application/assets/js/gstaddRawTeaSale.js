@@ -331,13 +331,21 @@ $(document).ready(function() {
             var formData = $("#frmAddRawsaleTea").serialize();
             formData = decodeURI(formData);
             
-           // $("#saveRawsaleTea").css("display","none");
+           $("#saveRawsaleTea").css("display","none");
+            var url="";
+            var mode=$("#modeofoperation").val();
+            if(mode=="Edit"){
+                //updateRawTeaSale
+                url=basepath + "gstrawteasale/updateRawTeaSale";
+            }else{
+                url=basepath + "gstrawteasale/insertRawteaSale";
+            }
             
             $.ajax(
                     {
                         type: 'POST',
                         dataType: 'json',
-                        url: basepath + "gstrawteasale/insertRawteaSale",
+                        url: url,
                         data: {formDatas: formData},
                         success: function(data) {
 
@@ -361,7 +369,7 @@ $(document).ready(function() {
                                     buttons: {
                                         "Ok": function() {
                                             $(this).dialog("close");
-                                          //   $("#saveRawsaleTea").css("display","block");
+                                           $("#saveRawsaleTea").css("display","block");
                                         }
                                     }
                                 });

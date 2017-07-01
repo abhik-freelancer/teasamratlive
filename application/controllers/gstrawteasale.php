@@ -53,17 +53,26 @@ class gstrawteasale extends CI_Controller {
         }
        $headercontent['garden'] = $this->gardenmastermodel->gardenlist();
        $headercontent['customerlist'] = $this->customermastermodel->custoemrlist($session);
-       $headercontent['cstRate'] = $this->rawteasalemodel->getCurrentcstrate();
-       $headercontent['vatpercentage'] = $this->rawteasalemodel->getCurrentvatrate();
+       
+            
           
             
              if ($rawteasaleMastId != 0) {
                 $headercontent['mode'] = "Edit";
                 $headercontent['rawteasaleMastId']=$rawteasaleMastId;
-                $result['rawteasaleMastData'] = $this->rawteasalemodel->getRawTeaSalemasterData($rawteasaleMastId);
-                $result['rawteasaleDtlData'] = $this->rawteasalemodel->getRawTeaSaleDtlData($rawteasaleMastId);
                 
-                $page = 'raw_tea_sale/gstedit_raw_tea_sale.php';
+                 $companyId = $session['company'];
+                 $yearId = $session['yearid'];
+                
+                $result['cgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='CGST',$usedfor='O');
+                $result['sgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='SGST',$usedfor='O');
+                $result['igstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='IGST',$usedfor='O');
+                
+                
+                $result['rawteasaleMastData'] = $this->rawteasalemodel->GSTRawTeaSalemasterData($rawteasaleMastId);
+                $result['rawteasaleDtlData'] = $this->rawteasalemodel->GSTRawTeaSaleDtlData($rawteasaleMastId);
+                
+                $page = 'raw_tea_sale/gstadd_raw_tea_sale.php';
                 
             } else {
                 $headercontent['mode'] = "Add";
@@ -276,9 +285,9 @@ class gstrawteasale extends CI_Controller {
                      $updVoucherMaster['narration'] = "Sale against Invoice No " . $searcharray['invoice_no'] . " Date " . date("Y-m-d", strtotime($searcharray['saleDt']));
                      $updVoucherMaster['transaction_type'] = 'RS';
                 
-                //    $update=$this->rawteasalemodel->updateRawTeaSale($voucherMasterId,$updVoucherMaster,$searcharray);
+              
                      
-                $update = $this->rawteasalemodel->updateRawTeaSale($voucherMasterId, $updVoucherMaster, $searcharray);
+                $update = $this->rawteasalemodel->GSTupdateRawTeaSale($voucherMasterId, $updVoucherMaster, $searcharray);
                 if ($update) {
                     echo '1';
                 } else {
