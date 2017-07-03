@@ -333,23 +333,23 @@
     <td>
         <input type="text" id="txtTotalSaleBag" name="txtTotalSaleBag" 
                value="<?php echo $bodycontent['rawteasaleMastData']['total_sale_bag']?>" 
-               style="text-align:right;"/>
+               style="text-align:right;" readonly="readonly"/>
     </td>
     <td>CGST</td>
     <td>
-        <input type="text" id="txtTotalCGST" name="txtTotalCGST"  
+        <input type="text" id="txtTotalCGST" name="txtTotalCGST"  readonly="readonly"
                value="<?php echo $bodycontent['rawteasaleMastData']['totalCGST']?>" style="text-align:right;"/> 
     </td>
   </tr>
   <tr>
     <td>Total Sale(Kgs)</td>
     <td>
-        <input type="text" id="txtSaleOutKgs" name="txtSaleOutKgs" 
+        <input type="text" id="txtSaleOutKgs" name="txtSaleOutKgs" readonly="readonly"
                value="<?php echo $bodycontent['rawteasaleMastData']['total_sale_qty']?>" style="text-align:right;"/>
     </td>
     <td>SGST</td>
     <td>
-        <input type="text" id="txtTotalSGST" name="txtTotalSGST"  
+        <input type="text" id="txtTotalSGST" name="txtTotalSGST"  readonly="readonly"
                value="<?php echo $bodycontent['rawteasaleMastData']['totalSGST']?>" style="text-align:right;"/>
     </td>
   </tr>
@@ -357,19 +357,19 @@
   <tr>
     <td>Total Amount</td>
     <td>
-        <input type="text" id="txtTotalSalePrice" name="txtTotalSalePrice" 
+        <input type="text" id="txtTotalSalePrice" name="txtTotalSalePrice" readonly="readonly"
                value="<?php echo $bodycontent['rawteasaleMastData']['totalamount']?>" style="text-align:right;"/>
     </td>
     <td>IGST</td>
     <td>
-        <input type="text" id="txtTotalIGST" name="txtTotalIGST"  
+        <input type="text" id="txtTotalIGST" name="txtTotalIGST"  readonly="readonly"
                value="<?php echo $bodycontent['rawteasaleMastData']['totalIGST']?>" style="text-align:right;"/>
     </td>
   </tr>
   <tr>
     <td>Discount</td>
     <td>
-        <input type="text" id="txtDiscountAmount" name="txtDiscountAmount" 
+        <input type="text" id="txtDiscountAmount" name="txtDiscountAmount" readonly="readonly"
                value="<?php echo $bodycontent['rawteasaleMastData']['discountAmount']?>" style="text-align:right;"/>
     </td>
     <td>&nbsp;</td>
@@ -378,7 +378,7 @@
   <tr>
       <td>Taxable Amount</td>
       <td>
-          <input type="text" id="txtGstTaxableAmt" name="txtGstTaxableAmt" 
+          <input type="text" id="txtGstTaxableAmt" name="txtGstTaxableAmt" readonly="readonly"
                  value="<?php echo $bodycontent['rawteasaleMastData']['gstTaxableAmount']?>" style="text-align:right;"/>
       </td>
       <td>&nbsp;</td>
@@ -387,7 +387,7 @@
   <tr>
       <td>Tax(GST)Incl.</td>
       <td>
-          <input type="text" id="txtTotalIncldTaxAmt" name="txtTotalIncldTaxAmt" 
+          <input type="text" id="txtTotalIncldTaxAmt" name="txtTotalIncldTaxAmt" readonly="readonly"
                  value="<?php echo $bodycontent['rawteasaleMastData']['gstTaxincludedAmt']?>" style="text-align:right;"/>
       </td>
       <td>&nbsp;</td>
@@ -408,7 +408,7 @@
   
   <tr>
     <td>Total</td>
-    <td><input type="text" id="txtGrandTotal" name="txtGrandTotal" 
+    <td><input type="text" id="txtGrandTotal" name="txtGrandTotal" readonly="readonly"
                value="<?php echo $bodycontent['rawteasaleMastData']['grandtotal']?>" style="text-align:right;"/></td>
     <td></td>
     <td></td>
