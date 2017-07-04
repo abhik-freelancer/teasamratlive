@@ -503,7 +503,7 @@ public function getBlendedBag($bagDtlId){
             $rawTeaSaleInvoice = "";
             $session = sessiondata_method();
             $this->db->trans_begin();
-            $voucherMaster['voucher_number']= $this->getSerialNumber($session['company'], $session['yearid']);
+            $voucherMaster['voucher_number']= $this->getSerialNumber($session['company'], $session['yearid'],'SALE');
             $this->db->insert('voucher_master', $voucherMaster);
             $vMastId = $this->db->insert_id();
             $rawTeaSaleInvoice = $voucherMaster['voucher_number'];
@@ -541,7 +541,7 @@ public function getBlendedBag($bagDtlId){
             $rawTeaSaleInvoice = "";
             $session = sessiondata_method();
             $this->db->trans_begin();
-            $voucherMaster['voucher_number']= $this->getSerialNumber($session['company'], $session['yearid']);
+            $voucherMaster['voucher_number']= $this->getSerialNumber($session['company'], $session['yearid'],'SLGST');
             $this->db->insert('voucher_master', $voucherMaster);
             $vMastId = $this->db->insert_id();
             $rawTeaSaleInvoice = $voucherMaster['voucher_number'];
@@ -567,7 +567,7 @@ public function getBlendedBag($bagDtlId){
     }
     
     
-    private function getSerialNumber($company,$year){
+    private function getSerialNumber($company,$year,$module){
         $lastnumber = (int)(0);
         $tag = "";
         $noofpaddingdigit = (int)(0);
@@ -584,7 +584,7 @@ public function getBlendedBag($bagDtlId){
                 yearid,
                 yeartag
             FROM serialmaster
-            WHERE companyid=".$company." AND yearid=".$year." AND module='SLGST' LOCK IN SHARE MODE";
+            WHERE companyid=".$company." AND yearid=".$year." AND module='".$module."' LOCK IN SHARE MODE";
         
                   $query = $this->db->query($sql);
 		  if ($query->num_rows() > 0) {
