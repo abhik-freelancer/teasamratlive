@@ -46,9 +46,9 @@
                  <img src="<?php echo base_url(); ?>application/assets/images/print_sheet.png" id="prnSaleBill"  title="Print" alt="Print"/>
                  </a>-->
                  
-               <!--<a href="<?php echo base_url(); ?>rawteasale/getpdfRawTeaSale/rawteaSaleMastid/<?php echo($content['rawteaSaleMastId']); ?>" class="showtooltip" title="Print" target="_blank">
+               <a href="<?php echo base_url(); ?>gstrawteasale/getpdfRawTeaSale/rawteaSaleMastid/<?php echo($content['rawteaSaleMastId']); ?>" class="showtooltip" title="Print" target="_blank">
                  <img src="<?php echo base_url(); ?>application/assets/images/pdf.png" id="prnRwTeasale"  title="Print" alt="Print" width="20" height="20"/>
-               </a>-->
+               </a>
              </td>
          </tr>
     <?php endforeach; 

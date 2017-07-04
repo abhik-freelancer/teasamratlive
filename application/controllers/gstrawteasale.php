@@ -375,11 +375,18 @@ class gstrawteasale extends CI_Controller {
          ini_set('memory_limit', '256M'); 
          
          
-            $result['dtlview'] = $this->rawteasalemodel->RawteaSaleDtlData($masterId);
-            $result['headerview'] = $this->rawteasalemodel->RawTeaSalematerData($masterId);
+            $result['dtlview'] = $this->rawteasalemodel->RawteaSaleDtlDataGSTPdf($masterId);
+            $result['headerview'] = $this->rawteasalemodel->RawTeaSaleMaterDataGST($masterId);
+			
+			/*
+			echo "<pre>";
+			print_r($result['dtlview']);
+			echo "</pre>";
+			*/
+			
             $result['amountinword'] = strtoupper( $this->no_to_words($result['headerview']['GrandTotal']));
            
-            $page = 'raw_tea_sale/rawteasale_pdf.php';
+            $page = 'raw_tea_sale/rawteasale_pdf_GST.php';
             $html = $this->load->view($page, $result, TRUE);
 
             $pdf->WriteHTML($html);

@@ -1527,6 +1527,172 @@ public function RawTeaSalematerData($masterId){
             return $data;
         }
     }
+	
+	/*
+	@method  RawTeaSaleMaterDataGST
+	@BY MIthilesh
+	@Date 04.07.2017
+	*/
+	
+	public function RawTeaSaleMaterDataGST($masterId)
+	{
+		$data = array();
+		$sql = "SELECT 
+                rawteasale_master.id,
+				rawteasale_master.`invoice_no`, 
+				DATE_FORMAT(rawteasale_master.`sale_date`,'%d-%m-%Y') AS SaleDt,
+                rawteasale_master.`customer_id`,
+                rawteasale_master.`vehichleno`,
+                rawteasale_master.deliverychgs,
+                rawteasale_master.`total_sale_bag`,
+                rawteasale_master.`total_sale_qty`,
+                rawteasale_master.totalamount,
+                rawteasale_master.roundoff,
+                rawteasale_master.grandtotal,
+                rawteasale_master.year_id,
+                rawteasale_master.company_id,
+                customer.customer_name,
+                customer.`address`,
+                customer.`tin_number`,
+                customer.`pin_number`,
+                customer.`telephone`,
+			   `state_master`.`state_name`,
+                customer.`GST_Number` AS customerGSTNo,
+                company.`company_name`,
+                company.`location`,
+				company.`gst_number` AS companyGSTNo
+				
+              FROM
+                `rawteasale_master` 
+                INNER JOIN `customer` 
+                  ON `rawteasale_master`.`customer_id` = `customer`.`id` 
+                INNER JOIN `company` 
+                  ON rawteasale_master.company_id = `company`.`id` 
+				LEFT JOIN state_master
+				ON state_master.id = customer.`state_id`
+              WHERE `rawteasale_master`.`id`=".$masterId;
+			
+		  $query = $this->db->query($sql);
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data = array(
+                    "invoice_no" => $rows->invoice_no,
+                    "SaleDt" => $rows->SaleDt,
+                    "vehichleno"=>$rows->vehichleno,
+                    "Customer"=>$rows->customer_name,
+                    "CustomerAddress"=>$rows->address,
+                    "CustomerGSTNo"=>$rows->customerGSTNo,
+                    "state_name"=>$rows->state_name,
+                    "TotalSaleBag"=>$rows->total_sale_bag,
+                    "TotalSaleQty"=>$rows->total_sale_qty,
+                    "TotalAmount"=>$rows->totalamount,
+                    "DeliveryChgs"=>$rows->deliverychgs,
+                    "RoundOff"=>$rows->roundoff,
+                    "GrandTotal"=>$rows->grandtotal,
+                    "Company"=>$rows->company_name, 
+                    "CompanyLocation"=>$rows->location, 
+                    "compGSTNo"=>$rows->companyGSTNo
+                );
+            }
+
+
+            return $data;
+        } 
+		else{
+            return $data;
+        }
+		
+	}
+	
+	
+	/*
+	@method RawteaSaleDtlDataGSTPdf
+	*/
+	
+	public function RawteaSaleDtlDataGSTPdf($masterId){
+        $data = array();
+        $sql = "SELECT 
+				`rawteasale_detail`.`num_of_sale_bag`,
+				`rawteasale_detail`.`qty_of_sale_bag` AS net,
+				`rawteasale_detail`.rate,
+				`rawteasale_detail`.`cgstRateId`,
+				`rawteasale_detail`.`cgstamt`,
+				`rawteasale_detail`.`sgstRateId`,
+				`rawteasale_detail`.`sgstamt`,
+				`rawteasale_detail`.`igstRateId`,
+				`rawteasale_detail`.`igstamt`,
+				`rawteasale_detail`.`HSN`,
+				`rawteasale_detail`.`gstdiscount`,
+				`rawteasale_detail`.`gstTaxableamount`,
+				`purchase_invoice_detail`.`invoice_number`,
+				`purchase_invoice_detail`.`cost_of_tea`,
+				`teagroup_master`.group_code,
+				`grade_master`.`grade`,
+				`garden_master`.`garden_name`,
+				`purchase_bag_details`.`net`
+
+				FROM
+				`rawteasale_detail`
+				INNER JOIN purchase_invoice_detail
+				ON purchase_invoice_detail.id = rawteasale_detail.`purchase_detail_id`
+				INNER JOIN teagroup_master
+				ON teagroup_master.id=purchase_invoice_detail.`teagroup_master_id`
+				INNER JOIN grade_master
+				ON grade_master.`id` = purchase_invoice_detail.`grade_id`
+				INNER JOIN garden_master
+				ON garden_master.`id` = purchase_invoice_detail.`garden_id`
+				INNER JOIN `purchase_bag_details`
+				ON `purchase_bag_details`.`id`=`rawteasale_detail`.`purchase_bag_id`
+				WHERE `rawteasale_detail`.`rawteasale_master_id`=".$masterId;
+        
+        
+        $query = $this->db->query($sql);
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data[] = array(
+                    "invoice_number"=>$rows->invoice_number,
+                    "group_code"=> $rows->group_code,
+                    "grade"=>$rows->grade,
+                    "garden_name"=>$rows->garden_name,
+                    "net"=>$rows->net,
+                    "cost_of_tea"=>$rows->cost_of_tea,
+                    "num_of_sale_bag"=>$rows->num_of_sale_bag,
+                    "rate"=>$rows->rate,
+                    "amount"=>($rows->num_of_sale_bag * $rows->net * $rows->rate),
+                    "totalDtlkgs"=>($rows->net*$rows->num_of_sale_bag),
+					"hsn_no" =>$rows->HSN,
+					"gstdiscount" =>$rows->gstdiscount,
+					"gstTaxableamount" =>$rows->gstTaxableamount,
+					"cgstRate" =>$this->getGSTRate($rows->cgstRateId,'CGST'),
+					"cgstAmt" =>$rows->cgstamt,
+					"sgstRate" =>$this->getGSTRate($rows->sgstRateId,'SGST'),
+					"sgstAmt" =>$rows->sgstamt,
+					"igstRate" =>$this->getGSTRate($rows->igstRateId,'IGST'),
+					"igstAmt" =>$rows->igstamt
+				);
+            }
+
+
+            return $data;
+        } else {
+            return $data;
+        }
+    }
+	
+	/************************************/
+	
+	 public function getGSTRate($id,$type){
+         $rate=0;
+          $sql = "SELECT gstmaster.rate
+                FROM gstmaster WHERE gstmaster.id='".$id."' AND gstmaster.gstType='".$type."'";
+         $query = $this->db->query($sql);
+          if($query->num_rows()>0){
+              $rows=$query->row();
+              $rate =$rows->rate;
+          }
+          return $rate;
+     }
+	
     
     /*@method getExixtingInvoiceNo
      * @date 17-06-2016

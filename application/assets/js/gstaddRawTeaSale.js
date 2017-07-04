@@ -4,7 +4,7 @@
 $(document).ready(function() {
     
     $( ".legal-menu"+$('#transactionmenu').val() ).addClass( " collapse in " );
-    $( ".rawteasale").addClass( " active " );
+    $( ".gstrawteasale").addClass( " active " );
     
 
     var basepath = $("#basepath").val();
