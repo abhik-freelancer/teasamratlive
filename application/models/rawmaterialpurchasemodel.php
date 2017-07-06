@@ -43,7 +43,8 @@ class rawmaterialpurchasemodel extends CI_Model {
         FROM `rawmaterial_purchase_master`
         INNER JOIN `vendor`
         ON `rawmaterial_purchase_master`.`vendor_id`=`vendor`.`id`
-        WHERE `rawmaterial_purchase_master`.`companyid`=".$cmpny." AND  `rawmaterial_purchase_master`.`yearid`=".$year;
+        WHERE `rawmaterial_purchase_master`.`companyid`=".$cmpny." AND  `rawmaterial_purchase_master`.`yearid`=".$year.
+               " AND rawmaterial_purchase_master.IsGST='N'";
        $query = $this->db->query($sql);
        if($query->num_rows()>0){
            foreach($query->result() as $rows){
@@ -62,7 +63,36 @@ class rawmaterialpurchasemodel extends CI_Model {
        }
    }
    
-   
+   public function GSTRawPurchaseList($cmpny,$year){
+       $data=array();
+       $sql="SELECT 
+        `rawmaterial_purchase_master`.`id` AS rawMatPurchMastId,
+        `rawmaterial_purchase_master`.`invoice_no`,
+        DATE_FORMAT(`rawmaterial_purchase_master`.`invoice_date`,'%d-%m-%Y') AS InvoiceDate,
+        `rawmaterial_purchase_master`.`invoice_value`,
+        `vendor`.`vendor_name`
+        FROM `rawmaterial_purchase_master`
+        INNER JOIN `vendor`
+        ON `rawmaterial_purchase_master`.`vendor_id`=`vendor`.`id`
+        WHERE `rawmaterial_purchase_master`.`companyid`=".$cmpny." AND  `rawmaterial_purchase_master`.`yearid`=".$year.
+        " AND  rawmaterial_purchase_master.IsGST='Y'";
+       $query = $this->db->query($sql);
+       if($query->num_rows()>0){
+           foreach($query->result() as $rows){
+               $data[]=array(
+                   "rawMatPurchMastId"=>$rows->rawMatPurchMastId,
+                   "invoice_no"=>$rows->invoice_no,
+                   "InvoiceDate"=>$rows->InvoiceDate,
+                   "invoice_value"=>$rows->invoice_value,
+                   "vendor_name"=>$rows->vendor_name
+                   
+               );
+           }
+           return $data;
+       }else{
+           return $data;
+       }
+   }
    
    
    public function getRawMatpurchaseMastData($mastId){
@@ -119,6 +149,121 @@ class rawmaterialpurchasemodel extends CI_Model {
         }
    }
    
+   public function GSTgetRawMatpurchaseMastData($mastId){
+       $sql="SELECT 
+            `rawmaterial_purchase_master`.`id` AS rawpurchaseMastId,
+            `rawmaterial_purchase_master`.`invoice_no`,
+            DATE_FORMAT(`rawmaterial_purchase_master`.`invoice_date`,'%d-%m-%Y') AS Invoicedate,
+            `rawmaterial_purchase_master`.`challan_no`,
+            DATE_FORMAT(`rawmaterial_purchase_master`.`challan_date`,'%d-%m-%Y') AS ChalanDt,
+            `rawmaterial_purchase_master`.`order_no`,
+            DATE_FORMAT(`rawmaterial_purchase_master`.`order_date`,'%d-%m-%Y') AS OrderDt,
+            `rawmaterial_purchase_master`.`excise_invoice_no`,
+            DATE_FORMAT(`rawmaterial_purchase_master`.`excise_invoice_date`,'%d-%m-%Y') AS ExciseDt,
+            `rawmaterial_purchase_master`.`vendor_id`,
+            `rawmaterial_purchase_master`.`item_amount`,
+            `rawmaterial_purchase_master`.`round_off`,
+            `rawmaterial_purchase_master`.`taxamount`,
+            `rawmaterial_purchase_master`.`invoice_value`,
+            
+            rawmaterial_purchase_master.GST_Discountamount,
+            rawmaterial_purchase_master.GST_Taxableamount,
+            rawmaterial_purchase_master.GST_Totalgstincluded,
+            rawmaterial_purchase_master.totalCGST,
+            rawmaterial_purchase_master.totalSGST,
+            rawmaterial_purchase_master.totalIGST,
+            rawmaterial_purchase_master.IsGST
+
+
+            FROM `rawmaterial_purchase_master` WHERE `rawmaterial_purchase_master`.`id`=".$mastId."";
+       
+        $query = $this->db->query($sql);
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data = array(
+                   "rawpurchaseMastId"=>$rows->rawpurchaseMastId,
+                    "invoice_no"=>$rows->invoice_no,
+                    "Invoicedate"=>$rows->Invoicedate,
+                    "challan_no"=>$rows->challan_no,
+                    "ChalanDt"=>$rows->ChalanDt,
+                    "order_no"=>$rows->order_no,
+                    "OrderDt"=>$rows->OrderDt,
+                    "vendor_id"=>$rows->vendor_id,
+                    "item_amount"=>$rows->item_amount,
+                    "round_off"=>$rows->round_off,
+                    "taxamount"=>$rows->taxamount,
+                    "invoice_value"=>$rows->invoice_value,
+                    
+                    "GST_Discountamount"=>$rows->GST_Discountamount,
+                    "GST_Taxableamount"=>$rows->GST_Taxableamount,
+                    "GST_Totalgstincluded"=>$rows->GST_Totalgstincluded,
+                    "totalCGST"=>$rows->totalCGST,
+                    "totalSGST"=>$rows->totalSGST,
+                    "totalIGST"=>$rows->totalIGST
+                    
+                );
+            }
+
+
+            return $data;
+        } else {
+            return $data;
+        }
+   }
+   
+   public function GSTgetRawMaterialDtldata($mastId){
+       $sql="SELECT 
+            `rawmaterial_purchasedetail`.`id` AS rawPurDtlId,
+            `rawmaterial_purchasedetail`.`rawmat_purchase_masterId` AS rawPurchMastid,
+            `rawmaterial_purchasedetail`.`productid`,
+            `rawmaterial_purchasedetail`.`quantity`,
+            `rawmaterial_purchasedetail`.`rate`,
+            `rawmaterial_purchasedetail`.`amount`,
+            `rawmaterial_purchasedetail`.gstdiscount,
+            `rawmaterial_purchasedetail`.gstTaxableamount,
+            `rawmaterial_purchasedetail`.cgstRateId,
+            `rawmaterial_purchasedetail`.cgstamt,
+            `rawmaterial_purchasedetail`.sgstRateId,
+            `rawmaterial_purchasedetail`.sgstamt,
+             `rawmaterial_purchasedetail`.igstRateId,
+             `rawmaterial_purchasedetail`.igstamt,
+              `rawmaterial_purchasedetail`.HSN
+            FROM `rawmaterial_purchasedetail`
+            WHERE `rawmaterial_purchasedetail`.`rawmat_purchase_masterId`=".$mastId."";
+       $query = $this->db->query($sql);
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data[] = array(
+                    "rawPurchMastid"=>$rows->rawPurchMastid,
+                   "rawPurDtlId"=>$rows->rawPurDtlId,
+                    "productid"=>$rows->productid,
+                    "quantity"=>$rows->quantity,
+                    "rate"=>$rows->rate,
+                    "amount"=>$rows->amount,
+                    "gstdiscount"=>$rows->gstdiscount,
+                    "gstTaxableamount"=>$rows->gstTaxableamount,
+                    "cgstRateId"=>$rows->cgstRateId,
+                    "cgstamt"=>$rows->cgstamt,
+                    "sgstRateId"=>$rows->sgstRateId,
+                    "sgstamt"=>$rows->sgstamt,
+                    "igstRateId"=>$rows->igstRateId,
+                    "igstamt"=>$rows->igstamt,
+                    "HSN"=>$rows->HSN
+                );
+            }
+
+
+            return $data;
+        } else {
+            return $data;
+        }
+       
+   }
+   
+   
+   
+   
+   
    
    
    public function getRawMaterialDtldata($mastId){
@@ -151,6 +296,259 @@ class rawmaterialpurchasemodel extends CI_Model {
         }
        
    }
+  /**
+   * GSTUpdateData
+   * @param type $updRowmatPurchaseMast
+   * @param type $searcharray
+   * @return boolean
+   */
+   public function GSTUpdateData($updRowmatPurchaseMast,$searcharray){
+        $purRawmatId = $updRowmatPurchaseMast['id'];
+        $voucherIdForEdit = $this->getVoucherId($purRawmatId);
+       
+  
+        try {
+            
+             $this->db->trans_begin();
+            
+             $this->db->where('id',$purRawmatId );
+             $this->db->update('rawmaterial_purchase_master' ,$updRowmatPurchaseMast);
+             
+             $this->upDateVendorBillMaster($purRawmatId, $updRowmatPurchaseMast); //19-08-2016
+             $this->upDateVoucherMaster($voucherIdForEdit,$updRowmatPurchaseMast);
+           
+             $this->GSTinsertVoucherDetails($voucherIdForEdit, $searcharray);
+             
+             //$this->insertIntorawRawMaterialDtl($purRawmatId,$searcharray);
+             $this->GSTupdateRawmatPurchaseDetails($purRawmatId, $searcharray);
+             
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                return false;
+            } else {
+                $this->db->trans_commit();
+                return true;
+            }
+        } catch (Exception $exc) {
+            echo $exc->getTraceAsString();
+            return FALSE;
+        }
+    }
+   
+   
+   
+   
+   
+   
+   
+   
+   /**
+    * @method GSTinsertData
+    * @param type $rawMatPurchaseMaster
+    * @param type $searcharray
+    * @return boolean
+    * @date 05/07/2017
+    */
+   public function GSTinsertData($rawMatPurchaseMaster,$searcharray){
+         try {
+                $this->db->trans_begin();
+                //Voucher Insertion
+                $voucherId=$this->insertVoucherMaster($rawMatPurchaseMaster);
+                //echo ("VC: ".$voucherId);
+                $this->GSTinsertVoucherDetails($voucherId, $searcharray);
+                //Voucher Insertion
+               
+                
+            $rawMatPurchaseMaster['voucher_id']=$voucherId;
+            $this->db->insert('rawmaterial_purchase_master', $rawMatPurchaseMaster);
+            $newrawDtlId = $this->db->insert_id();
+            $vendorBillMasterSave = $this->insertVendorBillMaster($newrawDtlId,$rawMatPurchaseMaster);//vendor bill master 19-08-2016
+            $this->GSTupdateRawmatPurchaseDetails($newrawDtlId, $searcharray);
+           
+
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                return false;
+            } else {
+                $this->db->trans_commit();
+                return true;
+            }
+        } catch (Exception $exc) {
+            echo $exc->getTraceAsString();
+        }
+    }
+   private function GSTinsertVoucherDetails($voucherMasterId,$dataArr){
+       
+        $session = sessiondata_method();
+        //voucher_detail
+        $this->db->where ('voucher_master_id',$voucherMasterId);
+        $this->db->delete('voucher_detail');
+        
+        //vendor account Id Cr
+        $voucherDtl["voucher_master_id"] =$voucherMasterId; 
+        $voucherDtl["account_master_id"] = $this->getVendorAccountId($dataArr["vendor"]);
+        $voucherDtl["voucher_amount"] = $dataArr["txtInvoiceValue"];
+        $voucherDtl["is_debit"] = "N";
+        $voucherDtl["account_id_for_trial"] = NULL;
+        $voucherDtl["subledger_id"] = NULL;
+        $voucherDtl["is_master"] = NULL;
+        $this->db->insert("voucher_detail",$voucherDtl);
+       
+        //Purchase Account
+        $voucherDtl["voucher_master_id"] =$voucherMasterId; 
+        $voucherDtl["account_master_id"] = $this->getPurchaseAccId($session['company']);
+        $voucherDtl["voucher_amount"] = ($dataArr["txtTaxAmount"]+ $dataArr["txtRoundOff"]);
+        $voucherDtl["is_debit"] = "Y";
+        $voucherDtl["account_id_for_trial"] = NULL;
+        $voucherDtl["subledger_id"] = NULL;
+        $voucherDtl["is_master"] = NULL;
+        $this->db->insert("voucher_detail",$voucherDtl);
+        
+        
+        $vMastId=$voucherMasterId;
+        
+        // for GST(cgst+sgst+igst)
+       $numberofDetails = count($dataArr['txtDetailQuantity']);
+       $cgstarray=array();
+       $sgstarray =array();
+       $igstarray =array();
+       for ($i = 0; $i < $numberofDetails; $i++) {
+            $cgstarray[] =array("id"=>$dataArr['cgst'][$i],"cgstamount"=>$dataArr['cgstAmt'][$i]);
+            $sgstarray[] = array("id"=>$dataArr['sgst'][$i],"sgstamount"=>$dataArr['sgstAmt'][$i]);
+            $igstarray[] = array("id"=>$dataArr['igst'][$i],"igstamount"=>$dataArr['igstAmt'][$i]);
+       }
+       //*************************************//
+    $groups = array();
+    $key = 0;
+    foreach ($cgstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'cgstamount' => $item['cgstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['cgstamount'] = $groups[$key]['cgstamount'] + $item['cgstamount'];
+        }
+        $key++;
+    }
+    foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["cgstamount"], "CGST");
+    }
+    /*******************SGST******************************/
+     $groups = array();
+     $key = 0;
+    foreach ($sgstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'sgstamount' => $item['sgstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['sgstamount'] = $groups[$key]['sgstamount'] + $item['sgstamount'];
+        }
+        $key++;
+    }
+     foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["sgstamount"], "SGST");
+    }
+    /**************************IGST***********************/
+     $groups = array();
+     $key = 0;
+    foreach ($igstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'igstamount' => $item['igstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['igstamount'] = $groups[$key]['igstamount'] + $item['igstamount'];
+        }
+        $key++;
+    }
+     foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["igstamount"], "IGST");
+    }
+      // exit();
+     return TRUE;   
+    }
+    /**
+     * @author Abhik Ghosh <amiabhik@gmail.com>
+     * @param type $vouchermasterId
+     * @param type $gstId
+     * @param type $gstAmount
+     * @param type $gstType
+     * @Desc generic GST account insertion on voucher details
+     */
+    private function GSTinsertionOnVoucherDetails($vouchermasterId,$gstId,$gstAmount,$gstType){
+       $sql="SELECT gstmaster.accountId
+                FROM gstmaster
+             WHERE gstmaster.id =".$gstId." AND gstmaster.gstType ='".$gstType."'";
+       if($gstId!=0){
+        $accountId = $this->db->query($sql)->row()->accountId;
+       }
+       if($gstId!=0){
+                $vouchrDtlVat['voucher_master_id'] = $vouchermasterId;
+                $vouchrDtlVat['account_master_id'] = $accountId;
+                $vouchrDtlVat['voucher_amount'] = $gstAmount;
+                $vouchrDtlVat['is_debit'] ='Y' ;
+                $vouchrDtlVat['account_id_for_trial'] = NULL;
+                $vouchrDtlVat['subledger_id'] = NULL;
+                $vouchrDtlVat['is_master'] = NULL;
+                $this->db->insert('voucher_detail', $vouchrDtlVat);
+       }
+   }
+     public function GSTupdateRawmatPurchaseDetails($newrawDtlId,$dtlArr){
+        $rawMatpurchaseDetails = array();
+        
+        $this->db->where ('rawmat_purchase_masterId',$newrawDtlId);
+        $this->db->delete('rawmaterial_purchasedetail');
+        
+        
+             
+        $numberOfDtl = count($dtlArr['txtDetailQuantity']);
+        for ($i = 0; $i < $numberOfDtl; $i++) {
+            $rawMatpurchaseDetails['rawmat_purchase_masterId'] = $newrawDtlId;
+            $rawMatpurchaseDetails['productid'] = $dtlArr['productlist'][$i];
+            $rawMatpurchaseDetails['quantity'] = ($dtlArr['txtDetailQuantity'][$i] == "" ? 0 : $dtlArr['txtDetailQuantity'][$i]);
+            $rawMatpurchaseDetails['rate'] = ($dtlArr['txtDetailRate'][$i] == "" ? 0 : $dtlArr['txtDetailRate'][$i]);
+            $rawMatpurchaseDetails['amount'] = ($dtlArr['txtDetailAmount'][$i] == "" ? 0 : $dtlArr['txtDetailAmount'][$i]);
+            
+            #gst section
+            $rawMatpurchaseDetails['gstdiscount'] = ($dtlArr['txtDiscount'][$i] == "" ? 0 : $dtlArr['txtDiscount'][$i]);
+            $rawMatpurchaseDetails['gstTaxableamount'] = ($dtlArr['txtTaxableAmt'][$i] == "" ? 0 : $dtlArr['txtTaxableAmt'][$i]);
+            
+            $rawMatpurchaseDetails['cgstRateId'] = ($dtlArr['cgst'][$i] == 0 ? NULL : $dtlArr['cgst'][$i]);
+            $rawMatpurchaseDetails['cgstamt'] = ($dtlArr['cgstAmt'][$i] == "" ? NULL : $dtlArr['cgstAmt'][$i]);
+            
+            $rawMatpurchaseDetails['sgstRateId'] = ($dtlArr['sgst'][$i] == 0 ? NULL : $dtlArr['sgst'][$i]);
+            $rawMatpurchaseDetails['sgstamt'] = ($dtlArr['sgstAmt'][$i] == "" ? NULL : $dtlArr['sgstAmt'][$i]);
+            
+            $rawMatpurchaseDetails['igstRateId'] = ($dtlArr['igst'][$i] == 0 ? NULL : $dtlArr['igst'][$i]);
+            $rawMatpurchaseDetails['igstamt'] = ($dtlArr['igstAmt'][$i] == "" ? NULL : $dtlArr['igstAmt'][$i]);
+            //HSN
+            $rawMatpurchaseDetails['HSN'] = ($dtlArr['txtHSNNumber'][$i] == "" ? NULL : $dtlArr['txtHSNNumber'][$i]);
+            
+
+           
+            $this->db->insert('rawmaterial_purchasedetail',$rawMatpurchaseDetails);
+          
+        }
+    }
+   
+   
+   
    
      /**
      * 
