@@ -14,7 +14,7 @@ class rawmaterialregistermodel extends CI_Model {
         }
     }
     
-   public function getRawMaterialRegisterList($value){
+   public function getRawMaterialRegisterList($value,$cid,$yid){
        
        if($value['vendorId']=="0"){
       
@@ -31,7 +31,7 @@ class rawmaterialregistermodel extends CI_Model {
                FROM `rawmaterial_purchase_master`
                INNER JOIN `vendor`
                ON `vendor`.`id`=`rawmaterial_purchase_master`.`vendor_id` 
-               WHERE (`rawmaterial_purchase_master`.`invoice_date` BETWEEN '" . date("Y-m-d", strtotime($value['startDate'])) . "' AND '" . date("Y-m-d", strtotime($value['endDate'])) . "')"; 
+               WHERE rawmaterial_purchase_master.companyid=".$cid." AND rawmaterial_purchase_master.yearid=".$yid." AND (`rawmaterial_purchase_master`.`invoice_date` BETWEEN '" . date("Y-m-d", strtotime($value['startDate'])) . "' AND '" . date("Y-m-d", strtotime($value['endDate'])) . "')"; 
         
        }
        else{
@@ -48,11 +48,11 @@ class rawmaterialregistermodel extends CI_Model {
                FROM `rawmaterial_purchase_master`
                INNER JOIN `vendor`
                ON `vendor`.`id`=`rawmaterial_purchase_master`.`vendor_id` 
-               WHERE `rawmaterial_purchase_master`.`vendor_id`=".$value['vendorId']." AND
+               WHERE rawmaterial_purchase_master.companyid=".$cid." AND rawmaterial_purchase_master.yearid=".$yid." AND  `rawmaterial_purchase_master`.`vendor_id`=".$value['vendorId']." AND
                 (`rawmaterial_purchase_master`.`invoice_date` BETWEEN '" . date("Y-m-d", strtotime($value['startDate'])) . "' AND '" . date("Y-m-d", strtotime($value['endDate'])) . "')"; 
            
        }
-       
+      
          $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
             foreach ($query->result() as $rows) {
