@@ -1,6 +1,79 @@
 <?php
 
 class purchaseinvoicemastermodel extends CI_Model {
+    
+    /**
+     * @name getGSTPurchaseMasterData
+     * @author Abhik<amiabhik@gmail.com>
+     * @param type $purchaseInvId
+     * @return boolean
+     */
+     public function getGSTPurchaseMasterData($purchaseInvId = "") {
+        $data = array(); 
+         
+        $sql = "SELECT 
+                    purchase_invoice_master.`id`,
+                    purchase_invoice_master.`from_where`,
+                    purchase_invoice_master.`vendor_id`,
+                    purchase_invoice_master.`voucher_master_id`,
+                    purchase_invoice_master.`auctionareaid`,
+                    purchase_invoice_master.`purchase_invoice_number`,
+                    purchase_invoice_master.`challan_no`,
+                    purchase_invoice_master.totalTbCharges,
+                    DATE_FORMAT(purchase_invoice_master.`challan_date`,'%d-%m-%Y')AS challanDate,
+                    DATE_FORMAT(purchase_invoice_master.`purchase_invoice_date`,'%d-%m-%Y')AS invoicedate,
+                    DATE_FORMAT(purchase_invoice_master.`sale_date`,'%d-%m-%Y') AS saledate,
+                    `purchase_invoice_master`.`sale_number`,
+                    DATE_FORMAT(purchase_invoice_master.`promt_date`,'%d-%m-%Y')as promptDate,
+                    purchase_invoice_master.cn_no,
+                    purchase_invoice_master.transporter_id,
+                    purchase_invoice_master.tea_value,
+                    purchase_invoice_master.brokerage,
+                    
+                    purchase_invoice_master.stamp,
+                    purchase_invoice_master.other_charges,
+                    purchase_invoice_master.round_off,
+                    purchase_invoice_master.total
+                     FROM purchase_invoice_master WHERE purchase_invoice_master.id='" . $purchaseInvId . "'";
+        $query = $this->db->query($sql);
+
+        if ($query->num_rows() > 0) {
+            $rows = $query->row();
+            $data=array(
+                "id"=>$rows->id,
+                "from_where"=>$rows->from_where,
+                "vendor_id"=>$rows->vendor_id,
+                "voucher_master_id"=>$rows->voucher_master_id,
+                "auctionareaid"=>$rows->auctionareaid,
+                "purchase_invoice_number"=>$rows->purchase_invoice_number,
+                "challan_no"=>$rows->challan_no,
+                "totalTbCharges"=>$rows->totalTbCharges,
+                "challanDate"=>$rows->challanDate,
+                "invoicedate"=>$rows->invoicedate,
+                "saledate"=>$rows->saledate,
+                "sale_number"=>$rows->sale_number,
+                "promptDate"=>$rows->promptDate,
+                "cn_no"=>$rows->cn_no,
+                "transporter_id"=>$rows->transporter_id,
+                "tea_value"=>$rows->tea_value,
+                "brokerage"=>$rows->brokerage,
+                "stamp"=>$rows->stamp,
+                "other_charges"=>$rows->other_charges,
+                "round_off"=>$rows->round_off,
+                "total"=>$rows->total
+            );
+            
+            return $data;
+        } else {
+            return $data;
+        }
+    }
+    
+    
+    
+    
+    
+  /********************************************GST************************************/  
 
     /**
      * @method getPurchaseMasterData
