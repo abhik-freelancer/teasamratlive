@@ -20,6 +20,7 @@
       
             $page = 'rawmaterial_register/header_view';
             $header = "";
+			$result="";
             createbody_method($result,$page, $header, $session, $headercontent);
         } else {
             redirect('login', 'refresh');
@@ -27,21 +28,30 @@
     }
     
      public function getRawMaterialRegister() {
-        $startdate = date('Y-m-d',  strtotime($this->input->post('startdate')));
-        $enddate = date('Y-m-d',  strtotime($this->input->post('enddate')));
-        $vendor =  $this->input->post('vendor');
-        
-        $value = array(
-            'startDate'=>$startdate,
-            'endDate'=>$enddate,
-            'vendorId'=>$vendor
-        );
-        
-        $data['rawmaterialpurchase_register'] = $this->rawmaterialregistermodel->getRawMaterialRegisterList($value);
-       
-        $page = 'rawmaterial_register/list_view';
-        $view = $this->load->view($page, $data , TRUE );
-        echo($view);
+		if ($this->session->userdata('logged_in')){
+			$session = sessiondata_method();
+			$companyId = $session['company'];
+			$yearId = $session['yearid'];
+			$startdate = date('Y-m-d',  strtotime($this->input->post('startdate')));
+			$enddate = date('Y-m-d',  strtotime($this->input->post('enddate')));
+			$vendor =  $this->input->post('vendor');
+			
+			$value = array(
+				'startDate'=>$startdate,
+				'endDate'=>$enddate,
+				'vendorId'=>$vendor
+			);
+			
+			$data['rawmaterialpurchase_register'] = $this->rawmaterialregistermodel->getRawMaterialRegisterList($value,$companyId,$yearId);
+		   
+			$page = 'rawmaterial_register/list_view';
+			$view = $this->load->view($page, $data , TRUE );
+			echo($view);
+		}
+		else
+		{
+			redirect('login', 'refresh');
+		}
     }
     
     
