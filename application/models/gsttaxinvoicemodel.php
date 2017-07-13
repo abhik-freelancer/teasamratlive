@@ -193,6 +193,7 @@ class gsttaxinvoicemodel extends CI_Model {
 				  sale_bill_master.companyid,
 				  sale_bill_master.creationdate,
 				  sale_bill_master.userid,
+				  sale_bill_master.GST_placeofsupply,
 				  customer.customer_name,
 				  customer.`address`,
 				  customer.`GST_Number` as customerGSTNo,
@@ -202,7 +203,9 @@ class gsttaxinvoicemodel extends CI_Model {
 				  `company`.`company_name`,
 				  `company`.`location`,
 				   company.`gst_number` AS GSTNumber,
-				   state_master.`state_name`
+				   state_master.`state_name`,
+				   transport.`name` AS transporterName,
+				   transport.`address` AS transporterAddrs
 				 FROM
 					`sale_bill_master` 
 					INNER JOIN `customer` 
@@ -211,6 +214,8 @@ class gsttaxinvoicemodel extends CI_Model {
 					ON `sale_bill_master`.`companyid` = `company`.`id` 
 					LEFT JOIN state_master
 					ON customer.`state_id` = state_master.`id`
+					LEFT JOIN transport
+					ON transport.`id`=sale_bill_master.`transporterId`
 				WHERE `sale_bill_master`.`id`=".$masterId;
      
         $query = $this->db->query($sql);
@@ -225,7 +230,7 @@ class gsttaxinvoicemodel extends CI_Model {
                     "vehichleno"=>$rows->vehichleno,
                     "Customer"=>$rows->customer_name,
                     "CustomerAddress"=>$rows->address,
-                   "TotalPacket"=>$rows->totalpacket,
+                    "TotalPacket"=>$rows->totalpacket,
                     "TotalQty"=>$rows->totalquantity,
                     "TotalAmount"=>$rows->totalamount,
                     "GrandTotal"=>$rows->grandtotal,
@@ -236,7 +241,10 @@ class gsttaxinvoicemodel extends CI_Model {
                     "PinNumber"=>$rows->pin_number,
                     "telephone"=>$rows->telephone,
                     "customerGSTNo"=>$rows->customerGSTNo,
-					"custStatename" => $rows->state_name
+					"custStatename" => $rows->state_name,
+					"transporterName" => $rows->transporterName,
+					"transporterAddrs" => $rows->transporterAddrs,
+					"GST_placeofsupply" => $rows->GST_placeofsupply
                 );
             }
 
@@ -469,11 +477,11 @@ class gsttaxinvoicemodel extends CI_Model {
     public function getSaleBillMasterData($saleBillId){
      
  $sql= "SELECT
-            id,  srl_no,  salebillno,GST_placeofsupply, 
+            id,  srl_no,  salebillno,GST_placeofsupply,
             DATE_FORMAT(salebilldate,'%d-%m-%Y') as salebilldate,
             customerId,  taxinvoiceno,  
             DATE_FORMAT(taxinvoicedate,'%d-%m-%Y') AS taxinvoicedate,
-            voucher_master_id,  vehichleno,  
+            voucher_master_id,  vehichleno,transporterId,
             DATE_FORMAT(duedate,'%d-%m-%Y') AS duedate,
             taxrateType,  taxrateTypeId,  taxamount,
             discountRate,  discountAmount,  deliverychgs,
@@ -502,6 +510,7 @@ class gsttaxinvoicemodel extends CI_Model {
                     "taxinvoicedate"=>$rows->taxinvoicedate,
                     "duedate"=>$rows->duedate,
                     "vehichleno"=>$rows->vehichleno,
+					"transporterId" => $rows->transporterId,
                     "GST_placeofsupply" =>$rows->GST_placeofsupply,
                     "totalpacket"=>$rows->totalpacket,
                     "totalquantity"=>$rows->totalquantity,
@@ -711,11 +720,10 @@ class gsttaxinvoicemodel extends CI_Model {
             $saleBillMaster['taxinvoicedate'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
             $saleBillMaster['duedate'] = date("Y-m-d", strtotime($searcharray['txtDueDate']));
             $saleBillMaster['vehichleno'] = $searcharray['vehichleno'];
+            $saleBillMaster['transporterId'] = $searcharray['transporter'];
             
             
-
-
-            $saleBillMaster['GST_Taxableamount'] = $searcharray['txtTaxableAmount'];
+			$saleBillMaster['GST_Taxableamount'] = $searcharray['txtTaxableAmount'];
             $saleBillMaster['GST_Discountamount'] = $searcharray['txtDiscountAmount'];
             $saleBillMaster['totalpacket'] = $searcharray['txtTotalPacket'];
             $saleBillMaster['totalquantity'] = $searcharray['txtTotalQty'];
@@ -1097,6 +1105,7 @@ function getCustomerAccId($cus_id,$compny){
          $saleBillMaster['taxinvoicedate'] = date("Y-m-d", strtotime($searcharray['saleBillDate']));
          $saleBillMaster['duedate'] = date("Y-m-d", strtotime($searcharray['txtDueDate']));
          $saleBillMaster['vehichleno'] = $searcharray['vehichleno'];
+         $saleBillMaster['transporterId'] = $searcharray['transporter'];
          
          
         

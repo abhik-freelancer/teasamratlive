@@ -90,6 +90,22 @@
 			<td width="20%">Date of Invoice</td>
 			<td><?php echo($headerview['SaleBillDate']); ?></td>
 		</tr>
+		<tr>
+			<td width="20%">Place Of Supply</td>
+			<td><?php echo($headerview['GST_placeofsupply']); ?></td>
+		</tr>
+		<tr>
+			<td width="20%">Vehichle No</td>
+			<td><?php echo($headerview['vehichleno']); ?></td>
+		</tr>
+		<tr>
+			<td width="20%">Transporter</td>
+			<td><?php echo($headerview['transporterName']); ?></td>
+		</tr>
+		<tr>
+			<td width="20%">Transporter Address</td>
+			<td><?php echo($headerview['transporterAddrs']); ?></td>
+		</tr>
 	</table>
    
   
@@ -425,17 +441,17 @@
             <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td align="right"><?php echo round($headerview['TotalPacket']); ?></td>
-        <td align="right"><?php echo(number_format($headerview['TotalQty'],2)); ?></td>
+        <td align="right"><b><?php echo round($headerview['TotalPacket']); ?></b></td>
+        <td align="right"><b><?php echo(number_format($headerview['TotalQty'],2)); ?></b></td>
         <td>&nbsp;</td>
-        <td align="right"><?php echo(number_format($headerview['TotalAmount'],2)); ?></td>
-        <td align="right"><?php echo(number_format($totalDiscount,2)); ?></td>
-        <td align="right"><?php echo(number_format($totalTaxable,2)); ?></td>
+        <td align="right"><b><?php echo(number_format($headerview['TotalAmount'],2)); ?></b></td>
+        <td align="right"><b><?php echo(number_format($totalDiscount,2)); ?></b></td>
+        <td align="right"><b><?php echo(number_format($totalTaxable,2)); ?></b></td>
 		<td>
 			<table width="100%" cellspacing="0" cellpadding="0">
 				<tr>
 					<td style="border:none;">&nbsp;</td>
-					 <td align="right" style="border:none;"><?php echo(number_format($totalCGST,2)); ?></td>
+					 <td align="right" style="border:none;"><b><?php echo(number_format($totalCGST,2)); ?></b></td>
 				</tr>
 			</table>
 		</td>
@@ -443,7 +459,7 @@
 			<table width="100%" cellspacing="0" cellpadding="0">
 				<tr>
 					<td style="border:none;">&nbsp;</td>
-					 <td style="border:none;" align="right"><?php echo(number_format($totalSGST,2)); ?></td>
+					 <td style="border:none;" align="right"><b><?php echo(number_format($totalSGST,2)); ?></b></td>
 				</tr>
 			</table>
 		</td>
@@ -451,7 +467,7 @@
 			<table width="100%" cellspacing="0" cellpadding="0">
 				<tr>
 					<td style="border:none;">&nbsp;</td>
-					 <td style="border:none;" align="right"><?php echo(number_format($totalIGST,2)); ?></td>
+					 <td style="border:none;" align="right"><b><?php echo(number_format($totalIGST,2)); ?></b></td>
 				</tr>
 			</table>
 		</td>

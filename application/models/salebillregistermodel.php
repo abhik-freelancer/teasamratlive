@@ -21,7 +21,7 @@ class salebillregistermodel extends CI_Model {
 							 account_opening_master.opening_balance');
 	   $this -> db -> from('customer');
 	   $this->db->join('account_master', 'customer.account_master_id = account_master.id','INNER');
-	   $this->db->join('account_opening_master', 'account_master.id = account_opening_master.account_master_id','INNER');
+	   $this->db->join('account_opening_master', 'account_master.id = account_opening_master.account_master_id','LEFT');
 	   $this->db->join('state_master', 'customer.state_id = state_master.id','LEFT');
            $this->db->where('account_master.company_id', $session_data['company']);
            $this->db->order_by('customer_name','asc');
@@ -29,6 +29,8 @@ class salebillregistermodel extends CI_Model {
 	
 	   
 	   $query = $this -> db -> get();
+	   
+	    $this->db->last_query();
 	
 	   if($query -> num_rows() > 0)
 	   {

@@ -73,7 +73,7 @@
 <?php } ?>
 
 <form id="frmSaleBill" name="frmSaleBill" method="post">
-    <section id="loginBox" style="height: 300px;">
+    <section id="loginBox" style="height: 400px;">
         <table width="100%" border="0" align="center" class="gridtable">
 
             <tr>
@@ -129,17 +129,25 @@
 
             </tr>
 
-
-
-
-            <tr>
+			<tr>
                 <td><label>Vehichle No:</label>&nbsp;</td>
                 <td><input type="text"  id="vehichleno" name="vehichleno" value="<?php echo($bodycontent['taxInvoiceMaster']['vehichleno']); ?>"  style="width:300px;"/></td>
-
-            </tr>
+			</tr>
+			<?php 
 			
-
-            <tr>
+			?>
+			<tr>
+				<td><label>Transporter Name :</label>&nbsp;</td>
+                <td>
+					<select name="transporter" id="transporter" style="width:300px;">
+						<option value="0">Select</option>
+						<?php foreach($header['transporterlist'] as $transporter){?>
+							<option value="<?php echo $transporter->id ; ?>" <?php if ($bodycontent['taxInvoiceMaster']['transporterId']==$transporter->id){echo "selected";}else{echo "";} ?> ><?php echo $transporter->name; ?></option>
+						<?php } ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
                 
                 <td colspan="2" style="text-align: center">
                     <button type="button" class="btn btn-primary save" id="addnewDtlDiv">Add Details</button>
