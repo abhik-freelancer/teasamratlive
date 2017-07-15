@@ -93,7 +93,7 @@
 					$grandTotalAmt = $grandTotalAmt+$row['grandTotalAmt'];
                     ?>
                     <tr>
-						<td style="font-size:11px;"><input type="hidden" name="salebillMastrId" value="<?php echo "salebillmasterId--" . $row['salebillID']."--".$row['saleType'];; ?>" /><?php echo $row['customerName']; ?></td>
+						<td style="font-size:11px;"><input type="hidden" name="salebillMastrId" value="<?php echo "salebillmasterId--" . $row['salebillID']."--".$row['saleType']; ?>" /><?php echo $row['customerName']; ?></td>
                         <td style="font-size:11px;"><?php echo $row['saleBillNo']; ?></td>
                         <td style="font-size:11px;"><?php echo date('d-m-Y',strtotime($row['saleBillDate'])); ?></td>
                         <td style="font-size:11px;" align="right"><?php echo $row['totalQty']; ?></td>
@@ -102,6 +102,7 @@
                                 if ($taxType == 'V') {
                                     echo "VAT : <br>" . $row['taxAmount'];
                                 }
+								
                                 if ($taxType == 'C') {
                                     echo "CST : <br>" . $row['taxAmount'];
                                 }
@@ -112,7 +113,7 @@
                         <td style="font-size:11px;" align="right"><?php echo $row['grandTotalAmt']; ?></td>
                     </tr>
                     <?php $lnCount = $lnCount+1;?>
-                    <?php if($lnCount>20){?>
+                    <?php if($lnCount>24){?>
                     </table>
                         
                         <div class="break"></div>
@@ -145,8 +146,7 @@
                                     <table  class="demo" width="100%">
 
                                         <tr>
-
-                                            <th style="font-size:12px;">Customer Name</th>
+											<th style="font-size:12px;">Customer Name</th>
                                             <th style="font-size:12px;">Salebill No</th>
                                             <th style="font-size:12px;">Salebill Dt</th>
                                             <th style="font-size:12px;">Quantity</th>
@@ -154,10 +154,7 @@
                                             <th style="font-size:12px;">Discount Amount</th>
                                             <th style="font-size:12px;">Total Amount</th>
                                             <th style="font-size:12px;">Grand Total</th>
-
-
-
-                                        </tr>
+										</tr>
 
                        <?php }?>
                     

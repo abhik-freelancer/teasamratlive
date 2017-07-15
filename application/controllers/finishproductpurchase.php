@@ -67,6 +67,7 @@ class finishproductpurchase extends CI_Controller {
 
 
             $header = '';
+			$result='';
 
             /* load helper class to create view */
 
