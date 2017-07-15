@@ -293,7 +293,7 @@
 	</table>
 	
 	<table width="100%" class="headerdemo" border="0" align="" style="font-family:Verdana, Geneva, sans-serif; font-size:11px;">
-			<tr>
+		<tr>
 			<td width="20%">GSTIN</td>
 			<td><?php echo $companyinfo->gst_number; ?></td>
 		</tr>
@@ -312,22 +312,6 @@
 		<tr>
 			<td width="20%">Date of Invoice</td>
 			<td><?php echo($headerview['SaleBillDate']); ?></td>
-		</tr>
-		<tr>
-			<td width="20%">Place Of Supply</td>
-			<td><?php echo($headerview['GST_placeofsupply']); ?></td>
-		</tr>
-		<tr>
-			<td width="20%">Vehichle No</td>
-			<td><?php echo($headerview['vehichleno']); ?></td>
-		</tr>
-		<tr>
-			<td width="20%">Transporter</td>
-			<td><?php echo($headerview['transporterName']); ?></td>
-		</tr>
-		<tr>
-			<td width="20%">Transporter Address</td>
-			<td><?php echo($headerview['transporterAddrs']); ?></td>
 		</tr>
 	</table>
    

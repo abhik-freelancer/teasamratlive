@@ -9,7 +9,8 @@ class GSTtaxinvoice extends CI_Controller {
         $this->load->model('packetmodel', '', TRUE);
         $this->load->model('gsttaxinvoicemodel', '', TRUE);
         $this->load->model('customermastermodel', '', TRUE);
-	$this->load->model('companymodel', '', TRUE);
+		$this->load->model('companymodel', '', TRUE);
+		$this->load->model('transportmastermodel', '', TRUE);
     }
 
     public function index() {
@@ -61,12 +62,11 @@ class GSTtaxinvoice extends CI_Controller {
             $headercontent['sgstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='SGST',$usedfor='O');
             $headercontent['igstrate'] = $this->gsttaxinvoicemodel->getGSTrate($companyId,$yearId,$type='IGST',$usedfor='O');
             
-            
-            
-            
             $headercontent['lastSalebillNo'] = $this->gsttaxinvoicemodel->getlastSaleBillNo($session['company'],$session['yearid']);
+			
+			$headercontent['transporterlist'] = $this->transportmastermodel->transportlist();
             
-        
+			
 
             if ($salebillno != 0) {
                 $headercontent['mode'] = "Edit";

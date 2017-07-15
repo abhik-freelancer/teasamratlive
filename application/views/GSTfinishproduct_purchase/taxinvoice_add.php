@@ -1,4 +1,4 @@
-<script src="<?php echo base_url(); ?>application/assets/js/GSTtaxInvoiceAdd.js"></script>
+<script src="<?php echo base_url(); ?>application/assets/js/GSTfinishproductpurchase.js"></script>
 <script src="<?php echo base_url(); ?>application/assets/js/jquery-customselect.js"></script> 
 <link rel="stylesheet" href="<?php echo base_url(); ?>application/assets/css/jquery-customselect.css" />
 
@@ -56,34 +56,48 @@
         font-family: "Open Sans",helvetica,arial,sans-serif;
         font-size: 9px;
     }
+	
+	.custom-btn {
+		background-color: #4abb0f !important;
+		border: 1px solid #FFF;
+		font-weight: normal;
+		color: #FFF;
+		box-shadow: 2px 2px 2px  #323232;
+		padding:8px 15px;
+		border-radius:4px;
+		font-size:14px;
+	}
+	
+	
 
 </style>
 <div class="stats">
 
-    <p class="stat"><a href="<?php echo base_url(); ?>GSTtaxinvoice/addTaxInvoice" class="showtooltip" title="add">
-            <img src="<?php echo base_url(); ?>application/assets/images/add.jpg" hieght="38" width="38" /></a></p>
-    <p class="stat"><a href="<?php echo base_url(); ?>GSTtaxinvoice"><img src="<?php echo base_url(); ?>application/assets/images/home.jpg" hieght="30" width="30"/></a></p>
+    <p class="stat"><a href="<?php echo base_url(); ?>GSTfinishproductpurchase/addTaxInvoice" class="showtooltip" title="add">
+            <img src="<?php echo base_url(); ?>application/assets/images/add.jpg" hieght="38" width="38" /></a>
+	</p>
+    <p class="stat"><a href="<?php echo base_url(); ?>GSTfinishproductpurchase"><img src="<?php echo base_url(); ?>application/assets/images/home.jpg" hieght="30" width="30"/></a>
+	</p>
 
 </div>
 
 <?php if ($header['mode'] == "Add") { ?>
-    <h2><font color="#5cb85c">Add Sale Bill [GST]</font></h2>
+    <h2><font color="#5cb85c">Add Finish Product Purchase Bill [GST]</font></h2>
 <?php } else { ?>
-    <h2><font color="#5cb85c">Edit Sale Bill[GST]</font></h2>
+    <h2><font color="#5cb85c">Edit Finish Product Purchase Bill[GST]</font></h2>
 <?php } ?>
 
 <form id="frmSaleBill" name="frmSaleBill" method="post">
-    <section id="loginBox" style="height: 400px;">
+    <section id="loginBox" style="height: 250px;">
         <table width="100%" border="0" align="center" class="gridtable">
 
             <tr>
-                <td><label>Sale Bill No.</label>&nbsp;</td>
+                <td><label>Bill No.</label>&nbsp;</td>
                 <td>
                     <input type="hidden" id="txtModeOfoperation" name="txtModeOfoperation" value="<?php echo($header['mode']); ?>"/>
                     <input type="hidden" id="hdSalebillid" name="hdSalebillid" value="<?php echo($header['salebillno']); ?>"/>
                     <input type="hidden" id="hdvoucherMastid" name="hdvoucherMastid" value="<?php echo($bodycontent['taxInvoiceMaster']['voucher_master_id']); ?>"/>
-                    <input type="text"  id="txtSaleBillNo" name="txtSaleBillNo" class="salebillNo" readonly="readonly" 
-                           value="<?php echo($bodycontent['taxInvoiceMaster']['saleBillNo']); ?>" style="width:300px;"/>
+                    <input type="text"  id="txtSaleBillNo" name="txtSaleBillNo" class="salebillNo" style="width:300px;" value="<?php echo $bodycontent['taxInvoiceMaster']['purchasebillno']; ?>" />
                 </td>
             </tr>
             <tr>
@@ -101,56 +115,27 @@
                     }
                     ?>"  style="width:300px;"/></td>
             </tr>
-
-
-
-
-
-            <tr>
-                <td><label>Customer</label>&nbsp;</td>
-                <td>
-                    <input type="hidden" name="creditdays" id="creditdays" value="" />
-                    <select id="customer" name="customer" class="customer custom-select" style="width:300px;">
-                        <option value="0">Select</option>
-<?php foreach ($header['customer'] as $rows) { ?>
-                            <option value="<?php echo($rows['customerId']); ?>" <?php if ($bodycontent['taxInvoiceMaster']['customerid'] == $rows['customerId']) {
-        echo('selected');
-    } else {
-        echo('');
-    } ?>><?php echo($rows['name']); ?></option>
-<?php } ?>
-                    </select>
-                </td>
-            </tr>
-        <tr>
-                <td><label>Due Date</label>&nbsp;</td>
-                <td><input type="text"  id="txtDueDate" name="txtDueDate" value="<?php echo($bodycontent['taxInvoiceMaster']['duedate']); ?>" class="datepicker"  style="width:300px;"/></td>
-
-
-            </tr>
-
+		
 			<tr>
-                <td><label>Vehichle No:</label>&nbsp;</td>
-                <td><input type="text"  id="vehichleno" name="vehichleno" value="<?php echo($bodycontent['taxInvoiceMaster']['vehichleno']); ?>"  style="width:300px;"/></td>
-			</tr>
-			<?php 
-			
-			?>
-			<tr>
-				<td><label>Transporter Name :</label>&nbsp;</td>
+                <td><label>Vendor</label>&nbsp;</td>
                 <td>
-					<select name="transporter" id="transporter" style="width:300px;">
+                    
+					<select id="vendor" name="vendor" class="vendor custom-select" style="width:300px;">
 						<option value="0">Select</option>
-						<?php foreach($header['transporterlist'] as $transporter){?>
-							<option value="<?php echo $transporter->id ; ?>" <?php if ($bodycontent['taxInvoiceMaster']['transporterId']==$transporter->id){echo "selected";}else{echo "";} ?> ><?php echo $transporter->name; ?></option>
+						<?php foreach($header['vendor'] as $rows){?>
+							<option value="<?php echo($rows['vendorId']); ?>" <?php if($bodycontent['taxInvoiceMaster']['vendorId']){echo "selected"; }else{echo "";}?>>
+								<?php echo($rows['name']); ?>
+							</option>
 						<?php } ?>
 					</select>
 				</td>
-			</tr>
+            </tr>
+		
+			
 			<tr>
                 
-                <td colspan="2" style="text-align: center">
-                    <button type="button" class="btn btn-primary save" id="addnewDtlDiv">Add Details</button>
+                <td colspan="2" align="center">
+                    <button type="button" class="custom-btn" id="addnewDtlDiv">Add Details</button>
                 </td>
 
             </tr>
@@ -166,16 +151,16 @@ if ($bodycontent['taxInvoiceDetail']) {
     foreach ($bodycontent['taxInvoiceDetail'] as $content) {
         ?>
 
-                <div id="salebillDetails_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" class="taxinvoicedetails">
+                <div id="salebillDetails_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" class="taxinvoicedetails">
                     <table width="100%" class="gridtable">
                         <tr>
                             <td>
                                 <input type="text" name="txtHSNNumber[]" 
-                                       id="txtHSNNumber_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
+                                       id="txtHSNNumber_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" 
                                        class="hsn" placeholder="HSN"  value="<?php echo($content['HSN']); ?>" style="width:50px;"/>
                             </td>    
                             <td width="30%">
-                                <select name="finalproduct[]" id="finalproduct_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" style="width:250px;"> 
+                                <select name="finalproduct[]" id="finalproduct_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" style="width:250px;"> 
                                     <option value="0">Select Product</option>
         <?php foreach ($header['finalproduct'] as $rows) { ?>
                                         <option value="<?php echo($rows['productPacketId']); ?>" <?php if ($content['productpacketid'] == $rows['productPacketId']) {
@@ -189,32 +174,32 @@ if ($bodycontent['taxInvoiceDetail']) {
                                 </select>
                             </td>
                             <td width="10%">
-                                <input type="text" class="packet" style="width:50px;" id="txtDetailPacket_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" name="txtDetailPacket[]" value="<?php echo($content['packingbox']); ?>" placeholder="Packet"/></td>
+                                <input type="text" class="packet" style="width:50px;" id="txtDetailPacket_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" name="txtDetailPacket[]" value="<?php echo($content['packingbox']); ?>" placeholder="Packet"/></td>
                             <td width="10%">
-                                <input type="text" class="net" style="width:50px;" id="txtDetailNet_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" name="txtDetailNet[]" value="<?php echo($content['packingnet']); ?>" placeholder="Net(Kg)"/>
+                                <input type="text" class="net" style="width:50px;" id="txtDetailNet_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" name="txtDetailNet[]" value="<?php echo($content['packingnet']); ?>" placeholder="Net(Kg)"/>
                             </td>
                             <td width="10%">
-                                <input type="text" style="width:100px;" class="pacQty" id="txtDetailQuantity_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" name="txtDetailQuantity[]" value="<?php echo($content['quantity']); ?>" placeholder="Quantity(Kg)" readonly/>
+                                <input type="text" style="width:100px;" class="pacQty" id="txtDetailQuantity_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" name="txtDetailQuantity[]" value="<?php echo($content['quantity']); ?>" placeholder="Quantity(Kg)" readonly/>
                             </td>
                             <td width="10%">
-                                <input type="text" style="width:50px;" class="rate" id="txtDetailRate_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" name="txtDetailRate[]" value="<?php echo($content['rate']); ?>" placeholder="Rate"/>
+                                <input type="text" style="width:50px;" class="rate" id="txtDetailRate_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" name="txtDetailRate[]" value="<?php echo($content['rate']); ?>" placeholder="Rate"/>
                             </td>
                             <td width="10%">
-                                <input type="text" style="width:140px;" class="amount" id="txtDetailAmount_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" name="txtDetailAmount[]" value="<?php echo($content['amount']); ?>" placeholder="Amount" readonly/>
+                                <input type="text" style="width:140px;" class="amount" id="txtDetailAmount_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" name="txtDetailAmount[]" value="<?php echo($content['amount']); ?>" placeholder="Amount" readonly/>
                             </td>
 
 
 
                             <!--GST SECTION added -->
                             <td width="5%">
-                                <input type="text" class="discount" id="txtDiscount_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
+                                <input type="text" class="discount" id="txtDiscount_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" 
                                        name="txtDiscount[]" 
                                        value="<?php echo($content['discount']); ?>"
                                        placeholder="Discount"  style="width:100px;"/>
                             </td>
                             <td width="5%">
                                 <input type="text" class="taxableamount"
-                                       id="txtTaxableAmt_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
+                                       id="txtTaxableAmt_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" 
                                        name="txtTaxableAmt[]"
                                        value="<?php echo($content['taxableamount']); ?>"
                                        placeholder="Taxable" readonly="" style="width:100px;"/>
@@ -224,7 +209,7 @@ if ($bodycontent['taxInvoiceDetail']) {
 
                             <td width="20%">
                                 <img class="del" src="<?php echo base_url(); ?>application/assets/images/delete-ab.png" title="Delete" style="cursor: pointer; cursor: hand;" 
-                                     id="del_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" />
+                                     id="del_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" />
                             </td>
                         </tr>
                         <tr>
@@ -233,7 +218,7 @@ if ($bodycontent['taxInvoiceDetail']) {
 
                             <td>
                                 <!--cgstrate-->
-                                <select name="cgst[]" id="cgst_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" style="width:100px;" class="cgst"> 
+                                <select name="cgst[]" id="cgst_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" style="width:100px;" class="cgst"> 
                                     <option value="0">CGST</option>
                                     <?php foreach ($header["cgstrate"] as $rows) { ?>
                                         <option value="<?php echo($rows['id']); ?>" <?php if ($content['cgstrateid'] == $rows['id']) {
@@ -245,13 +230,13 @@ if ($bodycontent['taxInvoiceDetail']) {
                                         </option>
         <?php } ?>
                                 </select>
-                                <input type="text" id="cgstAmt_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
+                                <input type="text" id="cgstAmt_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" 
                                        name="cgstAmt[]" style="width: 90px;" class="cgstAmt"
                                        value="<?php echo($content['cgstamount']); ?>" readonly />
 
                             </td>
                             <td colspan="3">
-                                <select name="sgst[]" id="sgst_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" style="width:100px;" class="sgst"> 
+                                <select name="sgst[]" id="sgst_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" style="width:100px;" class="sgst"> 
                                     <option value="0">SGST</option>
                                     <?php foreach ($header["sgstrate"] as $rows) { ?>
                                         <option value="<?php echo($rows['id']); ?>" <?php if ($content['sgstrateid'] == $rows['id']) {
@@ -263,12 +248,12 @@ if ($bodycontent['taxInvoiceDetail']) {
                                         </option>
         <?php } ?>
                                 </select>
-                                <input type="text" id="sgstAmt_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
+                                <input type="text" id="sgstAmt_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" 
                                        name="sgstAmt[]" style="width: 90px;" class="sgstAmt" value="<?php echo($content['sgstamount']); ?>" readonly />
                             </td>
 
                             <td colspan="2">
-                                <select name="igst[]" id="igst_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" style="width:100px;" class="igst"> 
+                                <select name="igst[]" id="igst_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" style="width:100px;" class="igst"> 
                                     <option value="0">IGST</option>
         <?php foreach ($header["igstrate"] as $rows) { ?>
                                         <option value="<?php echo($rows['id']); ?>" 
@@ -281,7 +266,7 @@ if ($bodycontent['taxInvoiceDetail']) {
                                         </option>
         <?php } ?>
                                 </select>
-                                <input type="text" id="igstAmt_<?php echo($content['salebillmasterid']); ?>_<?php echo($content['saleBillDetailId']); ?>" 
+                                <input type="text" id="igstAmt_<?php echo($content['purchase_finishmasterId']); ?>_<?php echo($content['id']); ?>" 
                                        name="igstAmt[]" style="width: 90px;" value="<?php echo($content['igstamount']); ?>" class="igstAmt" readonly >
                             </td>
 

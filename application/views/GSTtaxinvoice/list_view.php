@@ -44,9 +44,10 @@
                  </a>
                  <!--<img src="<?php echo base_url(); ?>application/assets/images/short.png" id="viewfinishpacket_<?php echo($content['finishProdId']); ?>"  class="viewfinishpacket" title="Detail" style="cursor: pointer; cursor: hand;"/>
                  <img src="<?php echo base_url(); ?>application/assets/images/delete-ab.png" id="delBlend" title="Delete" alt="Delete"/>-->
+				 <!--
                  <a href="<?php echo base_url(); ?>GSTtaxinvoice/printSaleBill/taxInvId/<?php echo($content['saleBillMasterId']); ?>" class="showtooltip" title="Print" target="_blank">
                  <img src="<?php echo base_url(); ?>application/assets/images/print_sheet.png" id="prnSaleBill"  title="Print" alt="Print"/>
-                 </a>
+                 </a>-->
                  <a href="<?php echo base_url(); ?>GSTtaxinvoice/print_item/taxInvId/<?php echo($content['saleBillMasterId']); ?>" class="showtooltip" title="Pdf" target="_blank">
                  <img src="<?php echo base_url(); ?>application/assets/images/pdf.png" id="prnSaleBill"  title="Pdf" alt="Pdf" width="20" height="20"/>
                  </a>
