@@ -488,7 +488,7 @@ $(document).ready(function() {
                         {
                             type: 'POST',
                             dataType : 'json',
-                            url: basepath + "purchaseinvoice/insertNewPurchaseInvoice",
+                            url: basepath + "gstpurchaseinvoice/insertNewPurchaseInvoice",
                             data: {formDatas:formData},
                             success: function(data) {
                                 
@@ -499,7 +499,7 @@ $(document).ready(function() {
                                             modal: true,
                                             buttons: {
                                               "Ok": function() {
-                                               window.location.href = basepath+'purchaseinvoice';
+                                               window.location.href = basepath+'gstpurchaseinvoice';
                                                 $( this ).dialog( "close" );
                                               }
                                             }
@@ -651,9 +651,11 @@ function DtlGlobalFunction(ctlID){
     DetailTeaCost(ctlID);
     gstTaxableAmount(ctlID);
     getNetamount(ctlID);
-    
     allTotalOfCost();
     totalCGSTValue();
+    totalSGSTValue();
+    totalIGSTValue();
+    totalGSTincludedAmount();
     getGrandWeight();
     totalBagNo();
     return false;
@@ -988,21 +990,6 @@ function getTeaCostPerKg(prdtlId){
  * @description totalWeight * totalprice [#tea_value:database] 
  */
 function totalTeaValues() {
-    
-   /* var totalTeaCost = 0;
-    var totalTeaCost=0;
-   
-    
-     $(".dtlTotalWght").each(function() {
-        var totalWeightID = $(this).attr('id');
-        var purDtlId = totalWeightID.split('_');
-        var id = purDtlId[1];
-        var total_val = ($("#DtltotalWeight_" + id).val() == '' ? 0 : $("#DtltotalWeight_" + id).val());
-        var total_price = ($("#txtPrice_" + id).val() == "" ? 0 : $("#txtPrice_" + id).val());
-        totalTeaCost =parseFloat(totalTeaCost+ parseFloat(total_val*total_price));
-
-    });*/
-    
     var totalTaxableAmt = 0;
     $(".txtTaxableAmt").each(function(){
         totalTaxableAmt = totalTaxableAmt + parseFloat($(this).val()||0);
@@ -1017,163 +1004,63 @@ function totalCGSTValue() {
 
     $(".cgstAmt").each(function() {
         totalcgstamt = totalcgstamt + parseFloat($(this).val()||0);
-        
-
     });
      $("#txtCGSTTotal").val(totalcgstamt.toFixed(2));
     return totalcgstamt.toFixed(2);
-
-
 }
-
-
-/*@method totalNoOfBags
- * @date 14-01-2016
- *@author Mithilesh
- */
-
-
-
-
-
-
-
-function totalSeviceTaxes() {
-
-    var totalService = 0;
+function totalSGSTValue(){
+    var totalSGSTamt = 0 ;
+    $(".sgstAmt").each(function(){
+        totalSGSTamt = totalSGSTamt + parseFloat($(this).val()||0);
+    });
+    $("#txtSGSTTotal").val(totalSGSTamt.toFixed(2));
+    return totalSGSTamt.toFixed(2);
+ }
+ function totalIGSTValue(){
+     var totalIGSTamt = 0;
+     $(".igstAmt").each(function(){
+         totalIGSTamt = totalIGSTamt + parseFloat($(this).val()||0);
+     });
+     $("#txtIGSTTotal").val(totalIGSTamt.toFixed(2));
+     return totalIGSTamt;
+ } 
+function totalGSTincludedAmount(){
+    var taxableAmount = 0;
+    var cgstamount=0;
+    var sgstsmount=0;
+    var igstamount=0;
+    var totalGSTincludedAmount=0;
     
+    taxableAmount = totalTeaValues();
+    cgstamount = totalCGSTValue();
+    sgstsmount = totalSGSTValue();
+    igstamount = totalIGSTValue();
     
-    $(".serviceTax").each(function() {
-        var totalID = $(this).attr('id');
-        var purDtlId = totalID.split('_');
-        var id = purDtlId[1];
-        var total = ($("#serviceTax_" + id).val() == '' ? 0 : $("#serviceTax_" + id).val());
-        totalService = parseFloat(totalService + parseFloat(total));
-        
-        /*if(totalService!=0)
-        {
-            $("#txtServiceTax").val(totalService);
-            $("#txtServiceTax").attr("disabled", "disabled");
-        }
-        else
-        {
-            $("#txtServiceTax").removeAttr("disabled"); 
-        }*/
-    });
-    $("#txtServiceTax").val(totalService.toFixed(2));
-    return totalService.toFixed(2);
-
-}
-
-function totalVATTaxes() {
-
-    var totalVat = 0;
-
-    $(".clsvat").each(function() {
-        var totalID = $(this).attr('id');
-        var purDtlId = totalID.split('_');
-        var id = purDtlId[1];
-        var total = ($("#txtVatAmount_" + id).val() == '' ? 0 : $("#txtVatAmount_" + id).val());
-        totalVat = parseFloat(totalVat + parseFloat(total));
-        $("#txtVatTotal").val(totalVat.toFixed(2));
-
-    });
-    return totalVat.toFixed(2);
-
-}
-
-function totalCSTAmt() {
-    var totalCST = 0;
-
-    $(".clsCst").each(function() {
-        var totalID = $(this).attr('id');
-        var purDtlId = totalID.split('_');
-        var id = purDtlId[1];
-        var total = ($("#txtCstAmount_" + id).val() == '' ? 0 : $("#txtCstAmount_" + id).val());
-        totalCST = parseFloat(totalCST + parseFloat(total));
-        $("#txtCstTotal").val(totalCST.toFixed(2));
-
-    });
-    return totalCST.toFixed(2);
-
-}
-
-function totalStampAmt() {
-    var totalStamp = 0;
-
-    $(".clsstamp").each(function() {
-        var totalID = $(this).attr('id');
-        var purDtlId = totalID.split('_');
-        var id = purDtlId[1];
-        var total = ($("#txtStamp_" + id).val() == "" ? 0 : $("#txtStamp_" + id).val());
-        totalStamp = parseFloat(totalStamp + parseFloat(total));
-        $("#txtStampTotal").val(totalStamp.toFixed(2));
-
-    });
-    return totalStamp.toFixed(2);
-
-}
-function totalTbCharges(){
-    var totalTbCharges = 0;
+    totalGSTincludedAmount = parseFloat(taxableAmount)+parseFloat(cgstamount)+parseFloat(sgstsmount)+parseFloat(igstamount);
     
-    $(".txtTbCharges").each(function() {
-        var totalID = $(this).attr('id');
-        var purDtlId = totalID.split('_');
-        var id = purDtlId[1];
-        var total = ($("#txtTbCharges_" + id).val() == "" ? 0 : $("#txtTbCharges_" + id).val());
-        totalTbCharges = parseFloat(totalTbCharges + parseFloat(total));
-        $("#txtTotalTBchargrs").val(totalTbCharges.toFixed(2));
-
-    });
-    return totalTbCharges.toFixed(2);
-
+    $("#txtGSTIncludedAmount").val(totalGSTincludedAmount.toFixed(2));
+    return totalGSTincludedAmount.toFixed(2);
+    
 }
+
+
 
 function allTotalOfCost() {
     var finalCostofAllCost=0;
+    //var gstincludedamt=0;
     var teaValuesTotal = 0;
-    var finalBrokerage = 0;
-    var finalServiceTax = 0;
-    var finalVatAmount = 0;
-    var finalCstAmount = 0;
-    var finalStamp = 0;
-    var otherCharges =0;
-    var roundOff = 0;
-    var TbChargesTotal=0; // Total TB charges added 26-09-2016
-    ///
+    var roundoffs=0;
+    
      teaValuesTotal = totalTeaValues();
-     /*if(totalBrokeragesValue()==0 || totalBrokeragesValue()=='')
-     {
-        finalBrokerage =$("#txtBrokerageTotal").val()==""?0:parseFloat($("#txtBrokerageTotal").val());
-     }
-     else
-     {*/
-       // finalBrokerage = totalBrokeragesValue();
-     /*}*/
-     /*if(totalSeviceTaxes()!=0)
-     {
-        finalServiceTax =$("#txtServiceTax").val()==""?0:parseFloat($("#txtServiceTax").val());
-     }
-     else
-     {*/
-         
-         //finalServiceTax = totalSeviceTaxes();
-     /*}*/
-     /*finalVatAmount = (totalVATTaxes() == 0 ? 0 : totalVATTaxes());
-     finalCstAmount = (totalCSTAmt() == 0 ? 0 : totalCSTAmt());
-     finalStamp = totalStampAmt();
-     TbChargesTotal = totalTbCharges();
-     otherCharges = ($("#txtOtherCharges").val()==""?0:parseFloat($("#txtOtherCharges").val()));
-     roundOff =($("#txtRoundOff").val()==""?0:parseFloat($("#txtRoundOff").val()));*/
-     
-     //console.log("otherCharges :"+otherCharges);
-    ///
-    finalCostofAllCost =0; //parseFloat(teaValuesTotal) + parseFloat(finalBrokerage)+ parseFloat(TbChargesTotal) + parseFloat(finalServiceTax) + parseFloat(finalVatAmount) + parseFloat(finalCstAmount) + parseFloat(finalStamp)+parseFloat(otherCharges)+parseFloat(roundOff);
+     //gstincludedamt = $("#txtGSTIncludedAmount").val()||0;
+     //console.log("gstincludedamt :"+gstincludedamt);
+     roundoffs = $("#txtRoundOff").val()||0;
+     finalCostofAllCost = parseFloat(totalGSTincludedAmount()) + parseFloat(roundoffs); 
     $("#txtTotalPurchase").val(finalCostofAllCost.toFixed(2));
     
   //alert(finalVatAmount);
     
-    return finalCostofAllCost;
+    return finalCostofAllCost.toFixed(2);
 }
 
 ///////////////////////////////Summation End////////////////////////////

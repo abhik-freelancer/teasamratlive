@@ -63,8 +63,21 @@ table.gridtable td {
 }
 </style>
 <!-- Table goes in the document BODY -->
-
-<h2><font color="#5cb85c">Add Purchase Invoice</font></h2>
+<h2><font color="#5cb85c">Purchase(GST) add</font></h2>
+ <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-2"></div>
+    <div class="col-md-2"></div>
+    <div class="col-md-2"></div>
+    <div class="col-md-2">
+       
+    </div>
+    <div class="col-md-2">
+         <a href="<?php echo base_url(); ?>gstpurchaseinvoice/addPurchaseInvoice" class="btn btn-info" role="button">Add new</a>
+        <a href="<?php echo base_url(); ?>gstpurchaseinvoice" class="btn btn-info" role="button">List</a>
+    </div>
+    
+ </div>
 
 <form action="" method="post" id="frmPurchase" enctype="multipart/form-data">
 <div id="purchaseMaster" align="center" class="ui-widget">
@@ -135,7 +148,7 @@ table.gridtable td {
     <td>CN No.</td>
     <td><input type="text"  id="cnNo" name="cnNo" value="<?php echo($bodycontent['purchaseMaster']["promptDate"]);?>"/></td>
    
-    <td ><span id="transp_label">Transporter Name</span></td>
+    <td><span id="transp_label">Transporter Name</span></td>
     <td> 
     		    <select name="transporterid" id="transporterid" style="width:200px;">
                         <option value="0">Select</option>
@@ -146,9 +159,8 @@ table.gridtable td {
 
                     </select>
     </td>
+   </tr>
    
-    
-  </tr>
   
   <!--added on 13.6.2016 -- Mithilesh -->
   <tr id="challan_block">
@@ -162,10 +174,17 @@ table.gridtable td {
   <td colspan="4">
      <div id="dialog-new-save" title="Purchase Detail" style="display:none;">
             <p>Data successfully saved.</p>
-           
      </div>
   </td>
   </tr>
+  <tr>
+       <td>
+           HSN .
+       </td>
+       <td><input type="text" name="txtHSN" id="txtHSN"  style="width:200px;" placeholder="Harmonized System Nomenclature"></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+   </tr>
   <tr>
   <td colspan="4">
       <span class="buttondiv">
@@ -253,18 +272,8 @@ table.gridtable td {
         
         
         <tr>
-            <td>Stamp</td>
-            <td> <input type="text" name="txtStampTotal" id="txtStampTotal" value="" style="text-align: right;" readonly=""/></td>
-        </tr>
-        <tr>
-            <td>Other Charges</td>
-            <td> <input type="text" name="txtOtherCharges" id="txtOtherCharges" value="" style="text-align: right;" /></td>
-        </tr>
-        
-        <!--Tb Charges Total 26/09/2016--->
-         <tr>
-            <td>Tb Charges</td>
-            <td> <input type="text" name="txtTotalTBchargrs" id="txtTotalTBchargrs" value="" style="text-align: right;" readonly=""/></td>
+            <td>Total(GST Incl.)</td>
+            <td> <input type="text" name="txtGSTIncludedAmount" id="txtGSTIncludedAmount" value="" style="text-align: right;" readonly=""/></td>
         </tr>
         
         

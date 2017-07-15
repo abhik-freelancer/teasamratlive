@@ -869,23 +869,95 @@ class purchaseinvoicemastermodel extends CI_Model {
 
       
   }
-    
-    
- /**
-  * @method insertNewPurchaseData
-  * @param type $pMaster
-  * @param type $searcharray
-  * @date 02/09/2015
-  */   
-/* public function insertNewPurchaseData($pMaster,$searcharray){
+  /**********************************************GST section***********************************/
+  /**
+   * @name purchaseInvoiceList
+   * @param type $companyId
+   * @param type $yearId
+   */
+  
+  public function purchaseInvoiceList($companyId=null,$yearId=null){
+      $data=array();
+      $sql="SELECT
+            purchase_invoice_master.id,
+            purchase_invoice_master.purchase_invoice_number,
+            DATE_FORMAT(purchase_invoice_master.purchase_invoice_date,'%d/%m/%Y')AS purchase_invoice_date,
+            purchase_invoice_master.vendor_id,
+            vendor.vendor_name,
+            purchase_invoice_master.sale_number,
+            purchase_invoice_master.tea_value,
+            purchase_invoice_master.total,
+            purchase_invoice_master.company_id,
+            purchase_invoice_master.year_id,
+        (CASE  
+               WHEN  purchase_invoice_master.from_where='AS' THEN 'Auction'
+               WHEN  purchase_invoice_master.from_where='PS' THEN 'Auction Private'
+               WHEN  purchase_invoice_master.from_where='SB' THEN 'Private Purchase'
+        END) AS purchaseType,
+        purchase_invoice_master.isGST,
+        purchase_invoice_master.GST_totalcgst,
+        purchase_invoice_master.GST_totalsgst,
+        purchase_invoice_master.GST_totaligst,
+        purchase_invoice_master.GST_gstincldamt,
+        purchase_invoice_master.GST_HSN,
+        purchase_invoice_master.total_bags,
+        purchase_invoice_master.total_kgs
+        FROM purchase_invoice_master
+        INNER JOIN
+        vendor ON purchase_invoice_master.vendor_id = vendor.id
+        WHERE purchase_invoice_master.isGST ='Y' AND purchase_invoice_master.from_where<>'OP'
+        AND purchase_invoice_master.from_where<>'STI' AND purchase_invoice_master.company_id='".$companyId."'
+        AND purchase_invoice_master.year_id='".$yearId."'
+        ORDER BY purchase_invoice_master.id";
+      
+       $query = $this->db->query($sql);
+
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data[] = array(
+                    "id" => $rows->id,
+                    "purchase_invoice_number" => $rows->purchase_invoice_number,
+                    "purchase_invoice_date" => $rows->purchase_invoice_date,
+                    "vendor_name" => $rows->vendor_name,
+                    "sale_number" => $rows->sale_number,
+                    "purchaseType" => $rows->purchaseType,
+                    "total_bags" => $rows->total_bags,
+                    "total_kgs" => $rows->total_kgs,
+                    "tea_value"=>$rows->tea_value,
+                    "total"=>$rows->total
+                    
+                );
+            }
+            return $data;
+        }  else {
+            return $data;
+        }
+      
+      
+  }
+  
+  
+  
+  /**
+   * @author Abhik<amiabhik@gmail.com>
+   * @date 17/07/2017
+   * @desc GST integrated purchase insertion
+   */
+   public function GSTPurchaseDataInsert($voucherMaster,$searcharray){
      
      try {
           $this->db->trans_begin();
-          $this->db->insert('purchase_invoice_master', $pMaster);
+          $this->db->insert('voucher_master', $voucherMaster);
+          
           $insertId = $this->db->insert_id();
-       //  echo  $this->db->last_query();
-         // print_r($pMaster);
-          $this->pDetailsInsert($insertId,$searcharray);
+          $this->GSTvoucherMasterDtlInsert($insertId,$searcharray); //voucher details
+          $insertPId = $this->GSTinsertintoPurchaseMaster($searcharray,$insertId); //purchase master
+          $this->GSTpDetailsInsert($insertPId,$searcharray);
+          $this->InsertVendorBillMaster($insertPId, $searcharray);
+         
+
+            //  echo  $this->db->last_query();
+          
           if ($this->db->trans_status() === FALSE) {
                 $this->db->trans_rollback();
                 return false;
@@ -899,9 +971,264 @@ class purchaseinvoicemastermodel extends CI_Model {
      catch (Exception $exc) {
          echo $exc->getTraceAsString();
      }
- }*/
-  
-  
+ }
+  /**
+   * @author Abhik<amiabhik@gmail.com>
+   * @name  GSTvoucherMasterDtlInsert
+   * @param type $insertId
+   * @param type $searcharray
+   * @date  14/07/2016
+   */
+  public function GSTvoucherMasterDtlInsert($insertId,$searcharray){
+       $session = sessiondata_method();
+       
+       $voucherDtlPurchase=array();
+       $voucherDtlVendor=array();
+       $voucherDtlVat=array();
+       
+   
+        $VendorAccId = $this->getVendoraccId($searcharray['vendor'],$session['company']);
+        $purchAccId = $this->getPurchaseAccId($session['company']);
+        //$vatAccId = $this->getVatAccId($session['company']);
+        
+        
+        
+        
+         // For Vendor Account Id
+            $voucherDtlVendor['voucher_master_id']= $insertId;
+            $voucherDtlVendor['account_master_id']= $VendorAccId;
+            $voucherDtlVendor['voucher_amount']= $searcharray['txtTotalPurchase'];
+            $voucherDtlVendor['is_debit']= 'N';
+            $voucherDtlVendor['account_id_for_trial']= NULL;
+            $voucherDtlVendor['subledger_id']= NULL;
+            $voucherDtlVendor['is_master']= NULL;
+            $this->db->insert('voucher_detail', $voucherDtlVendor);
+      
+      // For purchase Account Id
+           $purchaseAmt = $searcharray['txtTeaValue'] + $searcharray['txtRoundOff'];
+           $voucherDtlPurchase['voucher_master_id']= $insertId;
+           $voucherDtlPurchase['account_master_id']= $purchAccId;
+           $voucherDtlPurchase['voucher_amount']= $purchaseAmt;
+           $voucherDtlPurchase['is_debit']= 'Y';
+           $voucherDtlPurchase['account_id_for_trial']= NULL;
+           $voucherDtlPurchase['subledger_id']= NULL;
+           $voucherDtlPurchase['is_master']= NULL;
+           $this->db->insert('voucher_detail', $voucherDtlPurchase);
+           
+       //For GST AccountId
+        $vMastId=$insertId;
+        
+        // for GST(cgst+sgst+igst)
+       $numberofDetails = count($searcharray['txtLot']);//to do
+       $cgstarray=array();
+       $sgstarray =array();
+       $igstarray =array();
+       for ($i = 0; $i < $numberofDetails; $i++) {
+            $cgstarray[] =array("id"=>$searcharray['cgst'][$i],"cgstamount"=>$searcharray['cgstAmt'][$i]);
+            $sgstarray[] = array("id"=>$searcharray['sgst'][$i],"sgstamount"=>$searcharray['sgstAmt'][$i]);
+            $igstarray[] = array("id"=>$searcharray['igst'][$i],"igstamount"=>$searcharray['igstAmt'][$i]);
+       }
+       //*************************************//
+    $groups = array();
+    $key = 0;
+    foreach ($cgstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'cgstamount' => $item['cgstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['cgstamount'] = $groups[$key]['cgstamount'] + $item['cgstamount'];
+        }
+        $key++;
+    }
+    foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["cgstamount"], "CGST");
+    }
+    /*******************SGST******************************/
+     $groups = array();
+     $key = 0;
+    foreach ($sgstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'sgstamount' => $item['sgstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['sgstamount'] = $groups[$key]['sgstamount'] + $item['sgstamount'];
+        }
+        $key++;
+    }
+     foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["sgstamount"], "SGST");
+    }
+    /**************************IGST***********************/
+     $groups = array();
+     $key = 0;
+    foreach ($igstarray as $item) {
+        $key = $item['id'];
+        if (!array_key_exists($key, $groups)) {
+            $groups[$key] = array(
+                'id' => $item['id'],
+                'igstamount' => $item['igstamount']
+                
+            );
+        } else {
+           
+            $groups[$key]['igstamount'] = $groups[$key]['igstamount'] + $item['igstamount'];
+        }
+        $key++;
+    }
+     foreach ($groups as $value) {
+       // echo ($value["id"]."||".$value["cgstamount"] );
+        $this->GSTinsertionOnVoucherDetails($vMastId, $value["id"], $value["igstamount"], "IGST");
+    }   
+           
+   }
+ /**
+     * @author Abhik Ghosh <amiabhik@gmail.com>
+     * @param type $vouchermasterId
+     * @param type $gstId
+     * @param type $gstAmount
+     * @param type $gstType
+     * @Desc generic GST account insertion on voucher details
+     */
+    private function GSTinsertionOnVoucherDetails($vouchermasterId,$gstId,$gstAmount,$gstType){
+       $sql="SELECT gstmaster.accountId
+                FROM gstmaster
+             WHERE gstmaster.id =".$gstId." AND gstmaster.gstType ='".$gstType."'";
+       if($gstId!=0){
+        $accountId = $this->db->query($sql)->row()->accountId;
+       }
+       if($gstId!=0){
+                $vouchrDtlVat['voucher_master_id'] = $vouchermasterId;
+                $vouchrDtlVat['account_master_id'] = $accountId;
+                $vouchrDtlVat['voucher_amount'] = $gstAmount;
+                $vouchrDtlVat['is_debit'] ='Y' ;
+                $vouchrDtlVat['account_id_for_trial'] = NULL;
+                $vouchrDtlVat['subledger_id'] = NULL;
+                $vouchrDtlVat['is_master'] = NULL;
+                $this->db->insert('voucher_detail', $vouchrDtlVat);
+       }
+   }
+   /**
+    * @author Abhik<amiabhik@gmail.com>
+    * @name GSTinsertintoPurchaseMaster
+    * @param type $searcharray
+    * @param type $Vouchrmastid
+    * @return type
+    */
+   public function GSTinsertintoPurchaseMaster($searcharray,$Vouchrmastid){
+      $session = sessiondata_method();
+      $pMaster=array();
+      
+       if($searcharray['purchasetype']!='AS'){
+            $pMaster['challan_date']=($searcharray['challanDate'] == "" ? NULL : date("Y-m-d", strtotime($searcharray['challanDate']))); 
+            $pMaster['challan_no']= $searcharray['challanNo'];
+            $pMaster['transporter_id']=$searcharray['transporterid'];
+        }
+        else{
+            $pMaster['challan_date']=NULL; 
+            $pMaster['challan_no']= NULL;
+            $pMaster['transporter_id']=0;
+        }
+        $pMaster['purchase_invoice_number']=$searcharray['taxinvoice'];
+        $pMaster['purchase_invoice_date']=date('Y-m-d',  strtotime($searcharray['taxinvoicedate']));
+        $pMaster['transfer_date']= NULL;
+        $pMaster['auctionareaid']=$searcharray['auctionArea'];
+        $pMaster['vendor_id']=$searcharray['vendor'];
+        $pMaster['voucher_master_id']=$Vouchrmastid;
+        $pMaster['sale_number']=$searcharray['salenumber'];
+        $pMaster['sale_date']=date('Y-m-d',  strtotime($searcharray['saledate']));
+        $pMaster['promt_date']=date('Y-m-d',  strtotime($searcharray['promtdate']));
+        $pMaster['cn_no']=$searcharray['cnNo'];
+        
+        $pMaster['tea_value']=$searcharray['txtTeaValue'];
+        
+        
+        $pMaster["GST_totalcgst"]=$searcharray["txtCGSTTotal"];
+        $pMaster["GST_totalsgst"]=$searcharray["txtSGSTTotal"];
+        $pMaster["GST_totaligst"]=$searcharray["txtIGSTTotal"];
+        $pMaster["GST_gstincldamt"]=$searcharray["txtGSTIncludedAmount"];
+        $pMaster["GST_HSN"]=$searcharray["txtHSN"];
+        $pMaster["isGST"]='Y';
+        $pMaster["total_bags"]=$searcharray["txtTotalBags"];
+        $pMaster["total_kgs"]=$searcharray["txtGrandWeight"];
+        
+
+        
+        
+        $pMaster['round_off'] = $searcharray['txtRoundOff'];
+        $pMaster['total']=$searcharray['txtTotalPurchase'];//total purchase value
+        $pMaster['company_id']=$session['company'];
+        $pMaster['year_id']=$session['yearid'];
+        $pMaster['from_where']=$searcharray['purchasetype'];
+        $this->db->insert('purchase_invoice_master', $pMaster);
+        $pMasterInsertedId = $this->db->insert_id();
+        
+        return $pMasterInsertedId;
+      
+  }
+  public function GSTpDetailsInsert($insertPId,$searcharray){
+      $countDtl = count($searcharray['txtLot']);
+      $detailsData=array();
+      //echo('DTL :'.$countDtl);
+      for($i=0;$i<$countDtl;$i++){
+            
+            $purchaseDetailsSerialNumber = $searcharray['txtSampleBagPurID'][$i]; //div serial number for bag details
+            
+            $rateSeletedTypeIndex = "rdRateType_".$purchaseDetailsSerialNumber;
+            
+            $detailsData['purchase_master_id'] = $insertPId;
+            $detailsData['lot'] = $searcharray['txtLot'][$i];
+            $detailsData['doRealisationDate'] =($searcharray['txtDoDate'][$i]==""?NULL:date('Y-m-d',strtotime($searcharray['txtDoDate'][$i])));
+            $detailsData['do'] = $searcharray['txtDo'][$i];
+            $detailsData['invoice_number'] = $searcharray['txtInvoice'][$i];
+            $detailsData['garden_id'] = $searcharray['drpGarden'][$i];
+            $detailsData['grade_id'] = $searcharray['drpGrade'][$i];
+            $detailsData['location_id'] = $searcharray['drplocation'][$i];
+            $detailsData['warehouse_id'] = $searcharray['drpWarehouse'][$i];
+            $detailsData['gp_number'] = $searcharray['txtGpnumber'][$i];
+            $detailsData['date'] = ($searcharray['txtGpDate'][$i]==""?NULL:date('Y-m-d',  strtotime($searcharray['txtGpDate'][$i])));
+            $detailsData['package'] = NULL;
+            $detailsData['gross'] = $searcharray['txtGross'][$i];
+            $detailsData['total_weight'] = $searcharray['DtltotalWeight'][$i];
+            $detailsData['price'] = $searcharray['txtPrice'][$i];
+            $detailsData['total_value'] = $searcharray['DtltotalValue'][$i];
+            $detailsData['gst_teavalue'] = $searcharray['DtltotalValue'][$i];
+            $detailsData['gst_discount'] = $searcharray['DtlDiscountValue'][$i];
+            $detailsData['gst_taxable'] = $searcharray['DtlTaxableValue'][$i];
+            $detailsData['cgst_id'] = $searcharray['cgst'][$i];
+            $detailsData['cgst_amt'] = $searcharray['cgstAmt'][$i];
+            $detailsData['sgst_id'] = $searcharray['sgst'][$i];
+            $detailsData['sgst_amt'] = $searcharray['sgstAmt'][$i];
+            $detailsData['igst_id'] = $searcharray['igst'][$i];
+            $detailsData['igst_amt'] = $searcharray['igstAmt'][$i];
+            $detailsData['gst_netamount'] = $searcharray['txtdtlnetamount'][$i];
+            $detailsData['chest_from'] = NULL;
+            $detailsData['chest_to'] = null;
+            $detailsData['value_cost'] = ($searcharray['DtltotalWeight'][$i] * $searcharray['txtPrice'][$i] );//total weight * price==>value_cost//
+            $detailsData['net'] = 0;
+            $detailsData['teagroup_master_id']= $searcharray['drpgroup'][$i];
+            $detailsData['cost_of_tea']= $searcharray['DtlteaCost'][$i];
+            $this->db->insert('purchase_invoice_detail', $detailsData);
+            $insertdtlId = $this->db->insert_id();
+            $this->pBagInsert($insertdtlId,$purchaseDetailsSerialNumber,$searcharray,$i); //bag insert
+          
+      }
+      
+  }
+   
+   
+/**************************************GST Section End************************************************/  
   
   /*@date 30-05-2016
    * By Mithilesh

@@ -19,8 +19,33 @@ class gstpurchaseinvoice extends CI_Controller{
         $this->load->model('gsttaxinvoicemodel','',TRUE);
     }
     /**
-     * 
+     * index
      */
+    
+    public function index(){
+          if ($this->session->userdata('logged_in')) {
+              $session = sessiondata_method();
+              $companyId = $session['company'];
+              $yearId=$session["yearid"];
+              $result = $this->purchaseinvoicemastermodel->purchaseInvoiceList($companyId,$yearId);
+              $page = 'purchase_invoice/gstlist_view';
+              $header = '';
+              $headercontent="";
+              createbody_method($result, $page, $header, $session, $headercontent);
+              
+          }  else {
+              redirect('login', 'refresh');
+              
+          }
+    }
+
+     /**
+     * @name addPurchaseInvoice
+     * @param void 
+     * @author Abhik<amiabhik@gmail.com>
+     * @date 15/07/2017
+     */
+    
     public function addPurchaseInvoice() {
 
         $session = sessiondata_method();
@@ -142,6 +167,69 @@ class gstpurchaseinvoice extends CI_Controller{
          }  else {
              redirect('login', 'refresh');
          }
+    }
+    
+    
+    /**
+ * @method insertNewPurchaseInvoice
+ * @param formData $name Description
+ * @return boolean Description
+ */
+    
+    public function insertNewPurchaseInvoice(){
+        
+        ini_set('max_input_vars', 5000);
+        ini_set('post_max_size', '500M');
+        
+       
+         if ($this->session->userdata('logged_in')) {
+        $session = sessiondata_method();
+        $formData = $this->input->post('formDatas');
+        parse_str($formData, $searcharray);
+        
+        
+        /*Voucher master*/
+        $lastserial = $this->purchaseinvoicemastermodel->getserialnumber($session['company'], $session['yearid']);
+        
+        $voucherMaster = array();
+        $voucherMaster['voucher_number']=$searcharray['taxinvoice'];
+        $voucherMaster['voucher_date']=date('Y-m-d',  strtotime($searcharray['taxinvoicedate']));
+        $voucherMaster['narration']='Purchase against invoice No '.$searcharray['taxinvoice'].' Date'.date('Y-m-d',  strtotime($searcharray['taxinvoicedate']));
+        $voucherMaster['cheque_number']=NULL;
+        $voucherMaster['cheque_date']=NULL;
+        $voucherMaster['transaction_type']='PR';
+        $voucherMaster['created_by']=$session['user_id'];
+        $voucherMaster['company_id']=$session['company'];
+        $voucherMaster['year_id']=$session['yearid'];
+         if (count($lastserial) > 0) {
+            $voucherMaster['serial_number'] = ($lastserial[0]->serial_number) + 1;
+        } else {
+            $voucherMaster['serial_number'] = 1;
+        }
+        
+        $voucherMaster['vouchertype']='PR';
+        $voucherMaster['branchid']=0;
+        $voucherMaster['paid_to']=NULL;
+        $totalDetails =count($searcharray['txtLot']);
+        
+         if($totalDetails>0){
+             $STATUS=$this->purchaseinvoicemastermodel->GSTPurchaseDataInsert($voucherMaster,$searcharray);
+         }else{
+             $STATUS=FALSE;
+         }
+        
+        if($STATUS){
+            echo 1;
+        }else{
+            echo 0;
+        }
+        } else {
+            redirect('login', 'refresh');
+        }
+        
+       
+        
+        
     }
     
 }

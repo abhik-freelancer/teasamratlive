@@ -35,9 +35,6 @@
 }
     
 </style>
-
-
-
 <div id='purchaseDtl_<?php echo($divnumber); ?>' class="box effect6">
   <img src="<?php echo base_url(); ?>application/assets/images/Actionsarrowicon.png" id="img_<?php echo($divnumber);?>" class="plus"/>
   <img src="<?php echo base_url(); ?>application/assets/images/delete-ab.png" id="img_<?php echo($divnumber);?>" class="divdel" alt="remove" title="remove"/>
