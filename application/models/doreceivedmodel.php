@@ -40,7 +40,7 @@ class doreceivedmodel extends CI_Model{
                             LEFT JOIN `location` 
                               ON do_to_transporter.`locationId` = `location`.`id` 
                             WHERE `do_to_transporter`.`transporterId` =".$transporterId." AND `do_to_transporter`.`is_sent` ='Y'
-							AND do_to_transporter.`typeofpurchase` NOT IN ('STI','OP','SB')
+							AND do_to_transporter.`typeofpurchase` NOT IN ('STI','OP')
                             AND purchase_invoice_master.`company_id`=".$company ;/*." AND purchase_invoice_master.`year_id`=".$yearid;*/
 
         

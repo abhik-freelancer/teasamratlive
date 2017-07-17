@@ -14,13 +14,15 @@ class unreleaseddomodel extends CI_Model {
             //$whereClause = " WHERE ((`purchase_invoice_detail`.`doRealisationDate` IS NULL) OR (`purchase_invoice_detail`.`do` IS NULL OR `purchase_invoice_detail`.`do` ='')) AND purchase_invoice_master.`company_id`=".$cmpy;//." AND purchase_invoice_master.year_id=".$yearid;
         
         $whereClause = " WHERE (purchase_invoice_detail.doRealisationDate IS NULL OR purchase_invoice_detail.doRealisationDate='')"
-                       ."  AND (purchase_invoice_detail.do IS NULL OR purchase_invoice_detail.do='') AND purchase_invoice_master.`company_id`=".$cmpy;
+                       ."  AND (purchase_invoice_detail.do IS NULL OR purchase_invoice_detail.do='')  
+					     AND purchase_invoice_detail.`id` NOT IN (SELECT do_to_transporter.`purchase_inv_dtlid` FROM do_to_transporter) AND
+					   purchase_invoice_master.`company_id`=".$cmpy;
     
         } else {
             $whereClause = " WHERE purchase_invoice_master.`company_id`=".$cmpy ;//." AND purchase_invoice_master.year_id=".$yearid;
         }
 
-         $sql = "SELECT 
+      $sql = "SELECT 
                     `purchase_invoice_detail`.`id` as pDtlId,
                     `purchase_invoice_master`.`id` as pMstId,
                     `purchase_invoice_master`.`purchase_invoice_number`,
@@ -41,8 +43,9 @@ class unreleaseddomodel extends CI_Model {
                     INNER JOIN
                     `purchase_invoice_detail` 
                     ON `purchase_invoice_master`.`id`=`purchase_invoice_detail`.`purchase_master_id` 
-                    AND (`purchase_invoice_master`.`from_where`<>'SB' 
-                    AND `purchase_invoice_master`.`from_where`<>'OP' 
+                    AND (
+				/*	`purchase_invoice_master`.`from_where`<>'SB'  AND */
+					`purchase_invoice_master`.`from_where`<>'OP' 
                     AND `purchase_invoice_master`.`from_where`<>'STI' )
                     INNER JOIN `grade_master` ON `grade_master`.`id` = `purchase_invoice_detail`.`grade_id` 
                     INNER JOIN `garden_master` ON `purchase_invoice_detail`.`garden_id`=`garden_master`.`id` 

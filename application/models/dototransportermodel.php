@@ -109,7 +109,9 @@ class dototransportermodel extends CI_Model{
                     `purchase_invoice_master`
                     INNER JOIN
                     `purchase_invoice_detail` 
-                    ON `purchase_invoice_master`.`id`=`purchase_invoice_detail`.`purchase_master_id` AND `purchase_invoice_master`.`from_where`<>'SB' AND `purchase_invoice_master`.`from_where`<>'OP' AND `purchase_invoice_master`.`from_where`<>'STI'
+                    ON `purchase_invoice_master`.`id`=`purchase_invoice_detail`.`purchase_master_id`
+				/*	AND `purchase_invoice_master`.`from_where`<>'SB' */
+					AND `purchase_invoice_master`.`from_where`<>'OP' AND `purchase_invoice_master`.`from_where`<>'STI'
                     LEFT JOIN   `warehouse` ON purchase_invoice_detail.`warehouse_id` = warehouse.`id`
                     INNER JOIN  `garden_master` ON purchase_invoice_detail.`garden_id` = garden_master.`id`
                     INNER JOIN `grade_master` ON `grade_master`.`id` = `purchase_invoice_detail`.`grade_id`
