@@ -1,78 +1,7 @@
 <?php
 
 class purchaseinvoicemastermodel extends CI_Model {
-    
-    /**
-     * @name getGSTPurchaseMasterData
-     * @author Abhik<amiabhik@gmail.com>
-     * @param type $purchaseInvId
-     * @return boolean
-     */
-     public function getGSTPurchaseMasterData($purchaseInvId = "") {
-        $data = array(); 
-         
-        $sql = "SELECT 
-                    purchase_invoice_master.`id`,
-                    purchase_invoice_master.`from_where`,
-                    purchase_invoice_master.`vendor_id`,
-                    purchase_invoice_master.`voucher_master_id`,
-                    purchase_invoice_master.`auctionareaid`,
-                    purchase_invoice_master.`purchase_invoice_number`,
-                    purchase_invoice_master.`challan_no`,
-                    purchase_invoice_master.totalTbCharges,
-                    DATE_FORMAT(purchase_invoice_master.`challan_date`,'%d-%m-%Y')AS challanDate,
-                    DATE_FORMAT(purchase_invoice_master.`purchase_invoice_date`,'%d-%m-%Y')AS invoicedate,
-                    DATE_FORMAT(purchase_invoice_master.`sale_date`,'%d-%m-%Y') AS saledate,
-                    `purchase_invoice_master`.`sale_number`,
-                    DATE_FORMAT(purchase_invoice_master.`promt_date`,'%d-%m-%Y')as promptDate,
-                    purchase_invoice_master.cn_no,
-                    purchase_invoice_master.transporter_id,
-                    purchase_invoice_master.tea_value,
-                    purchase_invoice_master.brokerage,
-                    
-                    purchase_invoice_master.stamp,
-                    purchase_invoice_master.other_charges,
-                    purchase_invoice_master.round_off,
-                    purchase_invoice_master.total
-                     FROM purchase_invoice_master WHERE purchase_invoice_master.id='" . $purchaseInvId . "'";
-        $query = $this->db->query($sql);
-
-        if ($query->num_rows() > 0) {
-            $rows = $query->row();
-            $data=array(
-                "id"=>$rows->id,
-                "from_where"=>$rows->from_where,
-                "vendor_id"=>$rows->vendor_id,
-                "voucher_master_id"=>$rows->voucher_master_id,
-                "auctionareaid"=>$rows->auctionareaid,
-                "purchase_invoice_number"=>$rows->purchase_invoice_number,
-                "challan_no"=>$rows->challan_no,
-                "totalTbCharges"=>$rows->totalTbCharges,
-                "challanDate"=>$rows->challanDate,
-                "invoicedate"=>$rows->invoicedate,
-                "saledate"=>$rows->saledate,
-                "sale_number"=>$rows->sale_number,
-                "promptDate"=>$rows->promptDate,
-                "cn_no"=>$rows->cn_no,
-                "transporter_id"=>$rows->transporter_id,
-                "tea_value"=>$rows->tea_value,
-                "brokerage"=>$rows->brokerage,
-                "stamp"=>$rows->stamp,
-                "other_charges"=>$rows->other_charges,
-                "round_off"=>$rows->round_off,
-                "total"=>$rows->total
-            );
-            
-            return $data;
-        } else {
-            return $data;
-        }
-    }
-    
-    
-    
-    
-    
+   
   /********************************************GST************************************/  
 
     /**
@@ -155,53 +84,10 @@ class purchaseinvoicemastermodel extends CI_Model {
             INNER JOIN garden_master ON  purchase_invoice_detail.garden_id=garden_master.id
                 WHERE purchase_invoice_detail.purchase_master_id = '".$masterId."'" ;
 				
-		/*		
-		$where = array(
-			"purchase_invoice_detail.purchase_master_id" => $masterId
-		);
-		$this->db->_protect_identifiers=false;
-		$this->db->select("purchase_invoice_detail.id,
-						   purchase_invoice_detail.purchase_master_id,
-						   IF((ISNULL(do_to_transporter.is_sent) OR do_to_transporter.is_sent='N'),'Y','N')AS editable, 
-						   purchase_invoice_detail.lot,
-						   DATE_FORMAT(purchase_invoice_detail.doRealisationDate, '%d-%m-%Y') AS doRealisationDate,
-						   purchase_invoice_detail.do,
-						   purchase_invoice_detail.invoice_number,
-						   purchase_invoice_detail.garden_id,
-						   purchase_invoice_detail.location_id,
-						   purchase_invoice_detail.grade_id,
-						   purchase_invoice_detail.warehouse_id,
-						   purchase_invoice_detail.cost_of_tea,
-						   purchase_invoice_detail.transportation_cost,
-						   purchase_invoice_detail.gp_number,
-						   DATE_FORMAT(purchase_invoice_detail.date, '%d-%m-%Y') AS gpDate,
-						   purchase_invoice_detail.stamp,	
-						   purchase_invoice_detail.gross,
-						   purchase_invoice_detail.brokerage,
-						   purchase_invoice_detail.tb_charges,
-						   purchase_invoice_detail.total_weight,
-						   purchase_invoice_detail.rate_type_value, 
-						   purchase_invoice_detail.price,
-						   purchase_invoice_detail.service_tax,
-						   purchase_invoice_detail.total_value,
-						   purchase_invoice_detail.value_cost,
-						   purchase_invoice_detail.rate_type,
-						   purchase_invoice_detail.rate_type_id,
-						   purchase_invoice_detail.service_tax_id,
-						   purchase_invoice_detail.teagroup_master_id,
-						   garden_master.garden_name
-						  ")
-						->from("purchase_invoice_detail")
-						->join("do_to_transporter","purchase_invoice_detail.id = do_to_transporter.purchase_inv_dtlid","LEFT")
-						->join("garden_master","purchase_invoice_detail.garden_id=garden_master.id","INNER")
-						->where($where);
-            $query = $this->db->get();   */
+		
 			  
         $query = $this->db->query($sql);
-		//echo $this->db->last_query();
-		//echo $norows = $query->num_rows();
-		//echo "<br>";
-		//echo "All Count ".$this->db->count_all_results();
+		
 		
         if ($query->num_rows() > 0) {
             foreach ($query->result() as $rows) {
@@ -427,21 +313,7 @@ class purchaseinvoicemastermodel extends CI_Model {
      * @date 31-05-2016
      */
     public function getVchrDataDtl($mastid){
-      /*  $voucher_masterId = $vdata['id'];
-        $vendorId = $vdata['vendor_id'];*/
-        
          $data = array();
-     /*   $sql = "SELECT 
-            SUM(`purchase_invoice_detail`.value_cost) AS total_tea_value,
-            SUM(`purchase_invoice_detail`.`brokerage`) AS total_brokerage,
-            SUM(`purchase_invoice_detail`.`service_tax`) AS total_service_tax,
-            SUM(`purchase_invoice_detail`.`rate_type_value`)AS tota_rType_value,
-            SUM(`purchase_invoice_detail`.`stamp`) AS total_stamp,
-            SUM(`purchase_invoice_detail`.`total_value`) AS total_cost
-            FROM `purchase_invoice_detail` 
-            GROUP BY purchase_invoice_detail.`purchase_master_id`
-            HAVING purchase_invoice_detail.`purchase_master_id`='" . $mastid . "'";*/
-         
          $sql="SELECT `purchase_invoice_master`.`tea_value`,`purchase_invoice_master`.`brokerage`,`purchase_invoice_master`.`service_tax`,
             `purchase_invoice_master`.`total_cst`,`purchase_invoice_master`.`stamp`,`purchase_invoice_master`.`other_charges`,
             `purchase_invoice_master`.`totalTbCharges`,
@@ -871,6 +743,180 @@ class purchaseinvoicemastermodel extends CI_Model {
   }
   /**********************************************GST section***********************************/
   /**
+     * @name getGSTPurchaseMasterData
+     * @author Abhik<amiabhik@gmail.com>
+     * @param type $purchaseInvId
+     * @return boolean
+     */
+     public function GSTPurchaseMasterData($purchaseInvId = "") {
+        $data = array(); 
+         
+        $sql = "SELECT 
+                    purchase_invoice_master.`id`,
+                    purchase_invoice_master.`from_where`,
+                    purchase_invoice_master.`vendor_id`,
+                    purchase_invoice_master.`voucher_master_id`,
+                    purchase_invoice_master.`auctionareaid`,
+                    purchase_invoice_master.`purchase_invoice_number`,
+                    purchase_invoice_master.`challan_no`,
+                    DATE_FORMAT(purchase_invoice_master.`challan_date`,'%d-%m-%Y')AS challanDate,
+                    DATE_FORMAT(purchase_invoice_master.`purchase_invoice_date`,'%d-%m-%Y')AS invoicedate,
+                    DATE_FORMAT(purchase_invoice_master.`sale_date`,'%d-%m-%Y') AS saledate,
+                    `purchase_invoice_master`.`sale_number`,
+                    DATE_FORMAT(purchase_invoice_master.`promt_date`,'%d-%m-%Y')as promptDate,
+                    purchase_invoice_master.cn_no,
+                    purchase_invoice_master.transporter_id,
+                    purchase_invoice_master.tea_value,
+                    purchase_invoice_master.GST_HSN,
+                    purchase_invoice_master.GST_totalcgst,
+                    purchase_invoice_master.GST_totalsgst,
+                    purchase_invoice_master.GST_totaligst,
+                    purchase_invoice_master.GST_gstincldamt,
+                    purchase_invoice_master.total_bags,
+                    purchase_invoice_master.total_kgs,
+                    
+                    purchase_invoice_master.round_off,
+                    purchase_invoice_master.total
+                     FROM purchase_invoice_master WHERE purchase_invoice_master.id='" . $purchaseInvId . "'";
+        $query = $this->db->query($sql);
+
+        if ($query->num_rows() > 0) {
+            $rows = $query->row();
+            $data=array(
+                "id"=>$rows->id,
+                "from_where"=>$rows->from_where,
+                "vendor_id"=>$rows->vendor_id,
+                "voucher_master_id"=>$rows->voucher_master_id,
+                "auctionareaid"=>$rows->auctionareaid,
+                "purchase_invoice_number"=>$rows->purchase_invoice_number,
+                "challan_no"=>$rows->challan_no,
+                "challanDate"=>$rows->challanDate,
+                "invoicedate"=>$rows->invoicedate,
+                "saledate"=>$rows->saledate,
+                "sale_number"=>$rows->sale_number,
+                "promptDate"=>$rows->promptDate,
+                "cn_no"=>$rows->cn_no,
+                "transporter_id"=>$rows->transporter_id,
+                "tea_value"=>$rows->tea_value,
+                "GST_HSN"=>$rows->GST_HSN,
+                "GST_totalcgst"=>$rows->GST_totalcgst,
+                "GST_totalsgst"=>$rows->GST_totalsgst,
+                "GST_totaligst"=>$rows->GST_totaligst,
+                "GST_gstincldamt"=>$rows->GST_gstincldamt,
+                "total_bags"=>$rows->total_bags,
+                "total_kgs"=>$rows->total_kgs,
+                "round_off"=>$rows->round_off,
+                "total"=>$rows->total
+            );
+            
+            return $data;
+        } else {
+            return $data;
+        }
+    }
+    
+    /**
+     * @name GSTPurchaseDetails
+     * @param type $masterId
+     * @return type
+     * @author abhik<amiabhik@gmail.com>
+     */
+  public function GSTPurchaseDetails($masterId = '') {
+      
+       $sql ="SELECT 
+                purchase_invoice_detail.id,
+                purchase_invoice_detail.purchase_master_id,
+                IF((ISNULL(do_to_transporter.is_sent) OR do_to_transporter.is_sent='N'),'Y','N')AS editable, 
+                purchase_invoice_detail.lot,
+                DATE_FORMAT(purchase_invoice_detail.doRealisationDate, '%d-%m-%Y') AS doRealisationDate,
+                purchase_invoice_detail.do,
+                purchase_invoice_detail.invoice_number,
+                purchase_invoice_detail.garden_id,
+                purchase_invoice_detail.location_id,
+                purchase_invoice_detail.grade_id,
+                purchase_invoice_detail.warehouse_id,
+                purchase_invoice_detail.cost_of_tea,
+                purchase_invoice_detail.gp_number,  
+                DATE_FORMAT(purchase_invoice_detail.date, '%d-%m-%Y') AS gpDate,
+                purchase_invoice_detail.gross,
+                purchase_invoice_detail.total_weight,
+                purchase_invoice_detail.price,
+                purchase_invoice_detail.total_value, 
+                purchase_invoice_detail.value_cost, 
+                purchase_invoice_detail.teagroup_master_id,
+                garden_master.garden_name,
+                
+                
+                purchase_invoice_detail.gst_teavalue,
+                purchase_invoice_detail.gst_discount,
+                purchase_invoice_detail.gst_taxable,
+                purchase_invoice_detail.cgst_id,
+                purchase_invoice_detail.cgst_amt,
+                purchase_invoice_detail.sgst_id,purchase_invoice_detail.sgst_amt,
+                purchase_invoice_detail.igst_id,purchase_invoice_detail.igst_amt,
+                purchase_invoice_detail.gst_netamount
+
+                
+            FROM
+                purchase_invoice_detail 
+            LEFT JOIN 
+                 do_to_transporter ON purchase_invoice_detail.id = do_to_transporter.purchase_inv_dtlid
+            INNER JOIN garden_master ON  purchase_invoice_detail.garden_id=garden_master.id
+                WHERE purchase_invoice_detail.purchase_master_id = '".$masterId."'" ;
+				
+		
+			  
+        $query = $this->db->query($sql);
+		
+		
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data[] = array("id" => $rows->id,
+                    "purchase_master_id" => $rows->purchase_master_id,
+                    "lot" => $rows->lot,
+                    "doRealisationDate" => $rows->doRealisationDate,
+                    "do" => $rows->do,
+                    "invoice_number" => $rows->invoice_number,
+                    "garden_id" => $rows->garden_id,
+                    "grade_id" => $rows->grade_id,
+                    "location_id"=>$rows->location_id,
+                    "warehouse_id" => $rows->warehouse_id,
+                    "gp_number" => $rows->gp_number,
+                    "gpDate" => $rows->gpDate,
+                    "price" => $rows->price,
+                    "gross" => $rows->gross,
+                    "total_weight" => $rows->total_weight,
+                    "total_bag"=>  $this->getTotalNumberOfBagInDetails($rows->id),
+                    "teagroup_master_id" => $rows->teagroup_master_id,
+                    "normalBag" => $this->getNormalBag($rows->id),
+                    "sampleBag" => $this->getSampleBag($rows->id),
+                    "gst_teavalue" => $rows->gst_teavalue,
+                    "gst_discount"=>$rows->gst_discount,
+                    "gst_taxable"=>$rows->gst_taxable,
+                    "cgst_id"=>$rows->cgst_id,
+                    "cgst_amt"=>$rows->cgst_amt,
+                    "sgst_id"=>$rows->sgst_id,
+                    "sgst_amt"=>$rows->sgst_amt,
+                    "igst_id"=>$rows->igst_id,
+                    "igst_amt"=>$rows->igst_amt,
+                    "gst_netamount"=>$rows->gst_netamount,
+                    "editable"=>$rows->editable,
+                    "garden"=>$rows->garden_name,
+                    "cost_of_tea"=>$rows->cost_of_tea,
+                   
+                    
+                );
+            }
+			
+            return $data;
+        } else {
+            return $data = array();
+        }
+    }
+  
+  
+  
+  /**
    * @name purchaseInvoiceList
    * @param type $companyId
    * @param type $yearId
@@ -1227,6 +1273,197 @@ class purchaseinvoicemastermodel extends CI_Model {
       
   }
    
+   /**
+     * 
+     * @param type $pDtl
+     * @param type $bagDtl
+     * @return boolean
+     * @description Update Purchase details(save).
+     */
+    public function GSTupdatePurchaseDetailData($pDtl, $bagDtl, $normalBagData,$voucherdata) {
+
+     $purchaseDetailId = $pDtl['id'];
+      
+        $masterDataforupdt = array();
+        $BagData = array();
+        try {
+            $this->db->trans_begin();
+            //detail
+            $this->db->where('id', $purchaseDetailId);
+            $this->db->update('purchase_invoice_detail', $pDtl);
+            //master
+            $masterDataforupdt = $this->GSTgetPurchaseDataDtls($pDtl['purchase_master_id']);
+            $this->db->where('id', $pDtl['purchase_master_id']);
+            $this->db->update('purchase_invoice_master', $masterDataforupdt);
+            
+            /**to do 18/07/2017 ****/
+            $this->getGSTVchrDataDtl($pDtl['purchase_master_id']);
+            /**************/
+            
+            $vendorBill = $this->upadateVendorBill($pDtl['purchase_master_id'], $masterDataforupdt['total']);  
+
+            //bagDetail
+            //delete
+            $this->db->where('purchasedtlid', $purchaseDetailId);
+            $this->db->delete('purchase_bag_details');
+            //delete
+            $this->db->insert('purchase_bag_details', $normalBagData);
+
+            $i = 0;
+            $noOfBags = count($bagDtl['sampleBag']['numberofSampleBag']);
+
+            for ($i = 0; $i < $noOfBags; $i++) {
+
+                $BagData['purchasedtlid'] = $purchaseDetailId;
+                $BagData['bagtypeid'] = 2;
+                $BagData['no_of_bags'] = $bagDtl['sampleBag']['numberofSampleBag'][$i];
+                $BagData['net'] = $bagDtl['sampleBag']['QtyInSampleBag'][$i];
+                $BagData['chestSerial'] = $bagDtl['sampleBag']['sampleBagChest'][$i];
+                $BagData['actual_bags'] = $bagDtl['sampleBag']['numberofSampleBag'][$i];
+                if ($bagDtl['sampleBag']['numberofSampleBag'][$i] != 0) {
+                    $this->db->insert('purchase_bag_details', $BagData);
+                }
+            }
+
+
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                return false;
+            } else {
+                $this->db->trans_commit();
+                return true;
+            }
+        } catch (Exception $e) {
+            echo ($e->getMessage());
+        }
+    }
+   /**
+     * 
+     * @param type $masterId
+     * @param type $rateType
+     * @return type
+     * @description getting summation of purchase details.
+     */
+    public function GSTgetPurchaseDataDtls($masterId) {
+        $data = array();
+        $sql = "SELECT 
+            SUM(`purchase_invoice_detail`.`total_weight`) AS total_kgs,
+            SUM(`purchase_invoice_detail`.`gst_taxable`) AS tea_value,
+            SUM(`purchase_invoice_detail`.`cgst_amt`) AS GST_totalcgst,
+            SUM(`purchase_invoice_detail`.`sgst_amt`) AS GST_totalsgst,
+            SUM(`purchase_invoice_detail`.`igst_amt`) AS GST_totaligst,
+            SUM(`purchase_invoice_detail`.`gst_netamount`) AS GST_gstincldamt,
+            SUM(`purchase_invoice_detail`.`gst_netamount`) AS total
+            FROM `purchase_invoice_detail` 
+            GROUP BY purchase_invoice_detail.`purchase_master_id`
+            HAVING purchase_invoice_detail.`purchase_master_id`='".$masterId."'";
+
+        $query = $this->db->query($sql);
+
+        if ($query->num_rows() > 0) {
+            $rows = $query->row();
+
+            $data['total_bags']=$this->getTotalBags($masterId);
+            $data['total_kgs'] =$rows->total_kgs;
+            $data['tea_value'] = $rows->tea_value;
+            $data['GST_totalcgst'] = $rows->GST_totalcgst;
+            $data['GST_totalsgst'] = $rows->GST_totalsgst; //27-09-2016
+            $data['GST_totaligst'] = $rows->GST_totaligst;
+            $data['GST_gstincldamt'] = $rows->GST_gstincldamt;
+            $data['total'] = $rows->GST_gstincldamt;
+             
+        }
+        return $data;
+    }
+  
+     public function getGSTVchrDataDtl($mastid){
+         $data = array();
+         $session = sessiondata_method();
+         $sql="SELECT `purchase_invoice_master`.`tea_value`,
+               `purchase_invoice_master`.`round_off`,
+                `purchase_invoice_master`.`total`,purchase_invoice_master.voucher_master_id,purchase_invoice_master.vendor_id
+            FROM `purchase_invoice_master` WHERE `purchase_invoice_master`.id=".$mastid;
+        
+         $query = $this->db->query($sql);
+
+        if ($query->num_rows() > 0) {
+            $rows = $query->row();
+  
+                $data['purchaseAmt'] = $rows->tea_value + $rows->round_off;
+                $data['total'] =  $rows->total;
+                $data['voucher_master_id']=$rows->voucher_master_id;
+                $data['vendor_id']=$rows->vendor_id;
+            }
+        $this->db->where("voucher_master_id",$data['voucher_master_id']);
+        $this->db->delete("voucher_detail");
+        
+        $VendorAccId = $this->getVendoraccId($data['vendor_id'],$session['company']);
+        $purchAccId = $this->getPurchaseAccId($session['company']);
+        
+         // For Vendor Account Id
+            $voucherDtlVendor['voucher_master_id']= $data['voucher_master_id'];
+            $voucherDtlVendor['account_master_id']= $VendorAccId;
+            $voucherDtlVendor['voucher_amount']= $data['total'];
+            $voucherDtlVendor['is_debit']= 'N';
+            $voucherDtlVendor['account_id_for_trial']= NULL;
+            $voucherDtlVendor['subledger_id']= NULL;
+            $voucherDtlVendor['is_master']= NULL;
+            $this->db->insert('voucher_detail', $voucherDtlVendor);
+      
+      // For purchase Account Id
+           $purchaseAmt = $data['purchaseAmt'];
+           $voucherDtlPurchase['voucher_master_id']= $data['voucher_master_id'];
+           $voucherDtlPurchase['account_master_id']= $purchAccId;
+           $voucherDtlPurchase['voucher_amount']= $purchaseAmt;
+           $voucherDtlPurchase['is_debit']= 'Y';
+           $voucherDtlPurchase['account_id_for_trial']= NULL;
+           $voucherDtlPurchase['subledger_id']= NULL;
+           $voucherDtlPurchase['is_master']= NULL;
+           $this->db->insert('voucher_detail', $voucherDtlPurchase);
+       
+       $sqlgst ="SELECT purchase_invoice_detail.cgst_id,
+                SUM(purchase_invoice_detail.cgst_amt) AS cgst_amt,
+                purchase_invoice_detail.sgst_id,
+                SUM(purchase_invoice_detail.sgst_amt) AS sgst_amt,
+                purchase_invoice_detail.igst_id,
+                SUM(purchase_invoice_detail.igst_amt) AS igst_amt
+                FROM purchase_invoice_detail 
+                WHERE purchase_invoice_detail.purchase_master_id =".$mastid."
+                GROUP BY purchase_invoice_detail.cgst_id,
+                purchase_invoice_detail.sgst_id,
+                purchase_invoice_detail.igst_id" ;
+       
+        $query = $this->db->query($sqlgst);
+
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                
+                $this->GSTinsertionOnVoucherDetails($data['voucher_master_id'],$rows->cgst_id,$rows->cgst_amt,"CGST");
+                $this->GSTinsertionOnVoucherDetails($data['voucher_master_id'],$rows->sgst_id,$rows->sgst_amt,"SGST");
+                $this->GSTinsertionOnVoucherDetails($data['voucher_master_id'],$rows->igst_id,$rows->igst_amt,"IGST");
+            }
+            
+        }
+        
+    }
+    public function getTotalBags($masterId){
+        $totalBags = 0;
+        $sql = "SELECT SUM(purchase_bag_details.actual_bags) AS total_bags FROM 
+                purchase_bag_details
+                INNER JOIN
+                purchase_invoice_detail 
+                ON purchase_bag_details.purchasedtlid = purchase_invoice_detail.id
+                WHERE purchase_invoice_detail.purchase_master_id = ".$masterId;
+          $query = $this->db->query($sql);
+
+        if ($query->num_rows() > 0) {
+            $rows = $query->row();
+            $totalBags = $rows->total_bags;
+        }
+        return $totalBags;
+    }
+  
+  
    
 /**************************************GST Section End************************************************/  
   

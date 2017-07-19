@@ -170,13 +170,7 @@ table.gridtable td {
       <td><input type="text" name="challanDate" id="challanDate" class="datepicker" style="width:200px;"></td>
   </tr>
   
-  <tr>
-  <td colspan="4">
-     <div id="dialog-new-save" title="Purchase Detail" style="display:none;">
-            <p>Data successfully saved.</p>
-     </div>
-  </td>
-  </tr>
+ 
   <tr>
        <td>
            HSN .
@@ -190,6 +184,13 @@ table.gridtable td {
       <span class="buttondiv">
           <div class="save" id="addnewDtlDiv" align="center">Add Details</div>
       </span>
+  </td>
+  </tr>
+   <tr>
+  <td colspan="4">
+     <div id="dialog-new-save" title="Purchase Detail" style="display:none;">
+            <p>Data successfully saved.</p>
+     </div>
   </td>
   </tr>
 </table>

@@ -53,7 +53,7 @@
              <td><?php echo($row['tea_value']);?></td>
              <td><?php echo($row['total']);?></td>
              <td>
-                 <a href="#" class="btn btn-info btn-xs" role="button">Edit</a>
+                 <a href="<?php echo base_url(); ?>gstpurchaseinvoice/addPurchaseInvoice/id/<?php echo($row['id'])?>" class="btn btn-info btn-xs" role="button">Edit</a>
                  <a href="#" class="btn btn-danger  btn-xs" role="button">Del</a>
                  
              </td>
