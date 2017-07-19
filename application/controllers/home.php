@@ -6,6 +6,7 @@ class Home extends CI_Controller {
  {
    parent::__construct();
     $this->load->model('usermodel','',TRUE);
+	$this->load->model('leftmenumodel','',TRUE);
 	
  }
 	
@@ -21,9 +22,18 @@ class Home extends CI_Controller {
 	 //$result = null;
          
         $result['companyname'] = $this->usermodel->getCompanyName($companyid);
+		
+        $result['sitemapGetReady'] = $this->leftmenumodel->getSiteMapMenuByTitle('GETREADY');
+        $result['sitemapPurchase'] = $this->leftmenumodel->getSiteMapMenuByTitle('PURCHASE');
+        $result['sitemapBlenAndOthr'] = $this->leftmenumodel->getSiteMapMenuByTitle('BLENDOTH');
+        $result['sitemapSale'] = $this->leftmenumodel->getSiteMapMenuByTitle('SALE');
+        $result['sitemapAccount'] = $this->leftmenumodel->getSiteMapMenuByTitle('ACCOUNT');
+        $result['sitemapStock'] = $this->leftmenumodel->getSiteMapMenuByTitle('STOCK');
+        $result['sitemapMIS'] = $this->leftmenumodel->getSiteMapMenuByTitle('MIS');
+        $result['sitemapUtility'] = $this->leftmenumodel->getSiteMapMenuByTitle('UTILITY');
          
         $page = 'welcome_view';
-	 $header = '';
+		$header = '';
 	 
 	/*load helper class to create view*/
 	//$this->load->helper('createbody_helper');

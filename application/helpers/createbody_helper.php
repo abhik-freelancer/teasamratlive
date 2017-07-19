@@ -12,15 +12,22 @@ if ( ! function_exists('createbody_method'))
 	 $CI->load->model('leftmenumodel','',TRUE);
 	 $CI->load->library('template');
 	 /* leftmenu */
-	 $left_menu = $CI->leftmenumodel->getLeftmenu($data['user_id'],$data['role_id']);
-		 
+	// $left_menu = $CI->leftmenumodel->getLeftmenu($data['user_id'],$data['role_id']);
+	 $left_menu = $CI->leftmenumodel->getAllMenu();
+	
+	 
+	 
+		
 	 $data['bodyview'] = $body_content_page;
 	 $data['leftmenusidebar'] = 'leftmenu_view';
+	 $data['topmenunav'] = 'top_menu';
 	 $data['headermenu'] = $body_content_header;
 	
 	 $CI->template->setHeader($heared_menu_content);
 	 $CI->template->setBody($body_content_data);
 	 $CI->template->setLeftmenu($left_menu);
+	
+	
 	
 	 
 	// $CI->template->view('default_view', array('body'=>$body_content_page,'leftmenu'=>'leftmenu_view'), $data);

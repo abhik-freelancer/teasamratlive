@@ -7,6 +7,7 @@
 		private $body = null;
 		private $search = null;
 		private $menu = null;
+		
          
         public function __construct()
         {
@@ -33,6 +34,12 @@
 		{
 			$this->search = $search_value;
 		}
+		
+		public function setSiteMap($sitemap_view)
+		{
+			$this->sitemap = $sitemap_view;
+		}
+		
 		public function view($view_name, $layouts = array(), $param = array(), $default = true)
 		{
 			 if(is_array($layouts) && count($layouts) >= 1)
@@ -47,6 +54,7 @@
 				$body_param['bodycontent'] =   $this->body;
 				$body_param['leftmenu'] =   $this->menu;
 				$body_param['header'] =   $this->headerpart;
+				
 				
 			  }
 			 $this->ci->load->view($view_name, $body_param);

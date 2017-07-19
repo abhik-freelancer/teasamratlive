@@ -22,10 +22,10 @@
     <script src="<?php echo base_url(); ?>application/assets/js/jquery1.11.2-ui.js"></script>
     <link href="<?php echo base_url(); ?>application/assets/css/theme.css" rel="stylesheet" type="text/css"  />
     <link href="<?php echo base_url(); ?>application/assets/css/premium.css" rel="stylesheet" type="text/css"  />
-
+	<link rel="stylesheet" href="<?php echo base_url(); ?>application/assets/css/topnavmenu.css">
+	
     <!--code goes for multiseletc-->
     <link href="<?php echo base_url(); ?>application/assets/css/multiple-select.css" rel="stylesheet"/>
-    
     <script src="<?php echo base_url(); ?>application/assets/lib/jquery.multiple.select.js"></script>
 
  <!--code goes for multiseletc-->
@@ -33,7 +33,7 @@
 <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js" ></script>
 <script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js" ></script>
 <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.print.min.js" ></script>
-  
+
 
 </head>
 <body class=" theme-blue" >
@@ -100,7 +100,7 @@
   <!--[if (gt IE 9)|!(IE)]><!--> 
    
   <!--<![endif]-->
-
+<!--
     <div class="navbar navbar-default" role="navigation">
         <div >
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
@@ -123,40 +123,33 @@
             <li class="dropdown hidden-xs">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <span class="glyphicon glyphicon-user padding-right-small" style="position:relative;top: 3px;"></span> <?php echo  $username; ?>
-                    
-                   
-                    
                     <i class="fa fa-caret-down"></i>
                 </a>
-
-              <ul class="dropdown-menu">
-              <!--  <li><a href="./useraccount">My Account</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Admin Panel</li>
-                <li><a href="./">Users</a></li>
-                <li><a href="./">Security</a></li>
-                <li><a tabindex="-1" href="./">Payments</a></li>
-                <li class="divider"></li>-->
-                <li><a tabindex="-1" href="<?php echo base_url();?>home/logout">Logout</a></li>
+			 <ul class="dropdown-menu">
+				<li><a tabindex="-1" href="<?php echo base_url();?>home/logout">Logout</a></li>
               </ul>
             </li>
           </ul>
 
         </div>
       </div>
-    </div>
+    </div> -->
+	
+
+	<div id="top-menu">
+		<?php $this->load->view($topmenunav); ?>
+	</div><!-- END OF top MENU-->
+	<!-------------------------->
     
-
+	<!--
     <div class="sidebar-nav">
-    <ul>
-		<?php $this->load->view($leftmenusidebar); ?>
-
-   
-
-       
-    </div>
+		<ul>
+			<?php //$this->load->view($leftmenusidebar); ?>
+		</ul>
+	</div> -->
 
     <div class="content">
+	
       <?php if($headermenu != '')  : ?>   
         <div class="header">
          
@@ -189,14 +182,14 @@
 	
 	</script>
         	<?php $this->load->view($bodyview); ?>
- <input type="hidden" name="startyear" id="startyear" value="<?php echo $startyear; ?>"/>
-  <input type="hidden" name="endyear" id="endyear" value="<?php echo $endyear; ?>"/>
+	<input type="hidden" name="startyear" id="startyear" value="<?php echo $startyear; ?>"/>
+    <input type="hidden" name="endyear" id="endyear" value="<?php echo $endyear; ?>"/>
      <?php
     endif; 
     ?>
-         <footer>
-               
-            </footer>
+        <footer style="">
+        
+        </footer>
         </div>
     </div>
 

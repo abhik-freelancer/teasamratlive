@@ -1,0 +1,145 @@
+#home-container
+{
+	margin:10px 0;
+	background:#FFF;
+	
+	box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+#site-map-overview
+{
+	background:FFF;
+	padding:0px 0px 20px 0;
+}
+#site-map-overview>p
+{
+	padding: 10px 20px;
+	background: #AED2B6;
+	font-weight: 700;
+	color: #105534;
+	font-size:18px;
+}
+
+#site-map-overview ul 
+{
+	list-style:none;
+	padding:0;
+}
+
+.sitemapMenuBlock > ul
+{
+	padding:10px 0;
+	margin: 0 ;
+	font-size:13px;
+	font-family:verdana;
+
+	
+}
+
+.sitemapMenuBlock  ul li
+{
+	padding: 3px 0px;
+}
+
+.sitemapMenuBlock .parent-li
+{
+	font-size:17px;
+	font-weight:700;
+}
+
+.sitemapMenuBlock li.child-li
+{
+	font-size:13px;
+	font-weight:700;
+}
+
+
+/*------------1-------------*/
+#siteMapPanel1 ul
+{
+	background: #fcfcfc;
+	margin-left: 3%;
+}
+#siteMapPanel1 ul .glyphicon
+{
+	color:#2b8d41;
+}
+
+#siteMapPanel1 ul li
+{
+	color: #2b8d41;
+	border-bottom: 1px dashed #c9e4d0;
+}
+
+
+#siteMapPanel1 ul li a
+{
+	color : #2b8d41;
+	margin-left: 3%;
+}
+
+/*------------2-------------*/
+
+#siteMapPanel2 ul
+{
+	background: #fcfcfc;
+	margin-left: 3%;
+}
+#siteMapPanel2 ul .glyphicon
+{
+	color:#0a969f;
+}
+
+#siteMapPanel2 ul li
+{
+	color: #2b8d41;
+	border-bottom: 1px dashed #b9dae0;
+}
+
+
+#siteMapPanel2 ul li a
+{
+	color : #0a969f;
+	margin-left: 3%;
+}
+
+
+/*-----------3------------*/
+
+#siteMapPanel3 ul
+{
+	background: #fcfcfc;
+	margin-left: 3%;
+}
+#siteMapPanel3 ul .glyphicon
+{
+	color:#129e8e;
+}
+
+#siteMapPanel3 ul li
+{
+	color: #2b8d41;
+	border-bottom: 1px dashed #c7e0d9;
+}
+
+
+#siteMapPanel3 ul li a
+{
+	color : #129e8e;
+	margin-left: 3%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

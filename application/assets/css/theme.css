@@ -92,6 +92,26 @@ label {
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
 }
+
+/*----Company Heading-----*/
+#icon-img
+{
+	width:5%;
+	position:absolute;
+	left:0;
+	top:0;
+	vertical-align:middle;
+	transform: rotate(-7deg);
+	z-index:999;
+}
+#compnyHeading
+{
+	font-size: 14px;
+	text-shadow: 2px 2px 2px #323232;
+	margin-left:35px;
+	
+}
+
 /*Navbar*/
 .navbar-collapse {
   position: relative;
@@ -181,11 +201,15 @@ label {
 }
 .content {
   position: relative;
-  min-height: 800px;
+  min-height: 800px; 
   background: #fff;
-  margin-left: 200px;
-  border-left: 1px solid #cccccc;
+ // margin-left: 200px;
+ // border-left: 1px solid #cccccc;
   padding: 15px 15px 0px 15px;
+  
+  /*-----on 17.07.2017-------*/
+  margin-left: 0px;
+  border-left: 0px solid #cccccc;
 }
 .header {
   background: #fff;
@@ -384,12 +408,14 @@ a.panel-heading:hover,
 }
 /*Navigation*/
 .sidebar-nav {
-  width: 200px;
+//  width: 200px;
   position: absolute;
   float: left;
   border-top: none;
   border-left: none;
   margin: 0em;
+  width: 0px;
+  display:none; /*----hide on 17.07.2017 ---*/
 }
 .sidebar-nav ul {
   list-style: none;
@@ -855,13 +881,15 @@ table.table.list tr:first-child td {
   }
 }
 .theme-blue .navbar {
-  background: #61B055;
-  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #61B055), color-stop(1, #6f80a1));
+ // background: #61B055;
+  background: #4DAD3E;
+  
+ /* background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #61B055), color-stop(1, #6f80a1));
   background: -ms-linear-gradient(bottom, #4d5b76, #6f80a1);
   background: -moz-linear-gradient(center bottom, #00000 0%, #6f80a1 100%);
   background: -o-linear-gradient(bottom, #4d5b76, #6f80a1);
   filter: progid:dximagetransform.microsoft.gradient(startColorStr='#e3e3e3', EndColorStr='#ffffff');
-  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#6f80a1',EndColorStr='#4d5b76')";
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#6f80a1',EndColorStr='#4d5b76')";*/
 }
 /* Side notes for calling out things
 -------------------------------------------------- */

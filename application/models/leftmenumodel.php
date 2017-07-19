@@ -79,5 +79,189 @@ class leftmenumodel extends CI_Model{
 	   }
 		
 	}
+	
+	/*
+	public function getAllMenu()
+	{
+		$data = array();
+		$sql = "SELECT * FROM menu WHERE menu.`is_parent`='P'";
+		 $query = $this->db->query($sql);
+		   if ($query->num_rows() > 0) 
+		   {
+			  foreach($query->result() as $rows){
+				
+						$data[] = array(
+							"first_menu_id" => $rows->id,
+							"menu_name" => $rows->menu_name,
+							"menu_link" => $rows->menu_link,
+							"is_parent" => $rows->is_parent,
+							"parent_id" => $rows->parent_id,
+							"menu_code" => $rows->menu_code,
+							"secondLevelMenu" => $this->getSecondLevelMenu($rows->id) 
+						 );
+					
+                
+				}
+		   }
+		   return $data;
+	}
+	
+	public function getSecondLevelMenu($parentID)
+	{
+		$data = array();
+		$sql = "SELECT * FROM menu WHERE menu.`parent_id`=".$parentID." ORDER BY menu.`menu_name` ASC";
+		 $query = $this->db->query($sql);
+		   if ($query->num_rows() > 0) 
+		   {
+			  foreach($query->result() as $rows){
+				
+						$data[] = array(
+							"second_menu_id" => $rows->id,
+							"second_menu_name" => $rows->menu_name,
+							"second_menu_link" => $rows->menu_link,
+							"second_is_parent" => $rows->is_parent,
+							"second_parent_id" => $rows->parent_id,
+							"second_menu_code" => $rows->menu_code,
+							"thirdLevelMenu" => $this->getThirdLevelMenu($rows->id) 
+						 );
+					
+                
+				}
+		   }
+		   return $data;
+	}
+	
+	public function getThirdLevelMenu($parentID)
+	{
+		$data = array();
+		$sql = "SELECT * FROM menu WHERE menu.`parent_id`=".$parentID." ORDER BY menu.`menu_name` ASC";
+		 $query = $this->db->query($sql);
+		   if ($query->num_rows() > 0) 
+		   {
+			  foreach($query->result() as $rows){
+				
+						$data[] = array(
+							"third_menu_id" => $rows->id,
+							"third_menu_name" => $rows->menu_name,
+							"third_menu_link" => $rows->menu_link,
+							"third_is_parent" => $rows->is_parent,
+							"third_parent_id" => $rows->parent_id,
+							"third_menu_code" => $rows->menu_code
+						);
+					
+                
+				}
+		   }
+		   return $data;
+	}
+	
+	*/
+	
+	
+	/*******************************************************/
+	
+	public function getAllMenu()
+	{
+		$data = array();
+		$sql = "SELECT * FROM menu_design WHERE menu_design.`is_parent`='P' ORDER BY menu_design.`menu_srl` ASC";
+		 $query = $this->db->query($sql);
+		   if ($query->num_rows() > 0) 
+		   {
+			  foreach($query->result() as $rows){
+				
+						$data[] = array(
+							"first_menu_id" => $rows->id,
+							"menu_name" => $rows->menu_name,
+							"menu_link" => $rows->menu_link,
+							"is_parent" => $rows->is_parent,
+							"parent_id" => $rows->parent_id,
+							"secondLevelMenu" => $this->getSecondLevelMenu($rows->id) 
+						 );
+					
+                
+				}
+		   }
+		   return $data;
+	}
+	
+	public function getSecondLevelMenu($parentID)
+	{
+		$data = array();
+		$sql = "SELECT * FROM menu_design WHERE menu_design.`parent_id`=".$parentID." ORDER BY menu_design.`menu_srl` ASC";
+		 $query = $this->db->query($sql);
+		   if ($query->num_rows() > 0) 
+		   {
+			  foreach($query->result() as $rows){
+				
+						$data[] = array(
+							"second_menu_id" => $rows->id,
+							"second_menu_name" => $rows->menu_name,
+							"second_menu_link" => $rows->menu_link,
+							"second_is_parent" => $rows->is_parent,
+							"second_parent_id" => $rows->parent_id,
+							"thirdLevelMenu" => $this->getThirdLevelMenu($rows->id) 
+						 );
+					
+                
+				}
+		   }
+		   return $data;
+	}
+	
+	public function getThirdLevelMenu($parentID)
+	{
+		$data = array();
+		$sql = "SELECT * FROM menu_design WHERE menu_design.`parent_id`=".$parentID." ORDER BY menu_design.`menu_srl` ASC";
+		 $query = $this->db->query($sql);
+		   if ($query->num_rows() > 0) 
+		   {
+			  foreach($query->result() as $rows){
+				
+						$data[] = array(
+							"third_menu_id" => $rows->id,
+							"third_menu_name" => $rows->menu_name,
+							"third_menu_link" => $rows->menu_link,
+							"third_is_parent" => $rows->is_parent,
+							"third_parent_id" => $rows->parent_id,
+							
+						);
+					
+                
+				}
+		   }
+		   return $data;
+	}
+	
+	
+	public function getSiteMapMenuByTitle($menuTitle)
+	{
+		$data = array();
+		$sql = "SELECT * FROM menu_design WHERE menu_design.`menu_title`='".$menuTitle."' AND menu_design.`is_parent`='P'";
+		
+		$query = $this->db->query($sql);
+		   if ($query->num_rows() > 0) 
+		   {
+			  foreach($query->result() as $rows)
+			  {
+						$data[] = array(
+							"first_menu_id" => $rows->id,
+							"menu_name" => $rows->menu_name,
+							"menu_link" => $rows->menu_link,
+							"is_parent" => $rows->is_parent,
+							"parent_id" => $rows->parent_id,
+							"secondLevelMenu" => $this->getSecondLevelMenu($rows->id) 
+						 );
+					
+                
+				}
+		   }
+		   return $data;
+	}
+	
+	
+	
+	
+	
+	
 }
 ?>
