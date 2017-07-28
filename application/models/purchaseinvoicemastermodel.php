@@ -2247,7 +2247,7 @@ public function getVoucherDtldataFromPMast($pMasterId){
             $vendorClause = " AND purchase_invoice_master.vendor_id='" . $session['vendor'] . "'";
         }
 
-      $sql = "SELECT purchase_invoice_master.`id`,
+       $sql = "SELECT purchase_invoice_master.`id`,
 					purchase_invoice_master.`purchase_invoice_number`,purchase_invoice_master.`purchase_invoice_date`,
 					DATE_FORMAT(purchase_invoice_master.`purchase_invoice_date`,'%d-%m-%Y') AS invoicedate,
 										purchase_invoice_master.`sale_number`,
@@ -2276,14 +2276,14 @@ public function getVoucherDtldataFromPMast($pMasterId){
                                         INNER JOIN `purchase_invoice_detail` ON `purchase_invoice_detail`.`purchase_master_id`= `purchase_invoice_master`.`id`
                                         INNER JOIN `purchase_bag_details` ON `purchase_bag_details`.`purchasedtlid`=`purchase_invoice_detail`.`id`
                                         LEFT JOIN `transport` ON `transport`.`id`=`purchase_invoice_master`.`transporter_id`
-                                        GROUP BY `purchase_invoice_master`.`id`
+                                        GROUP BY `purchase_invoice_master`.`id`,purchase_invoice_master.isGST 
 
                                         HAVING  (purchase_invoice_master.`purchase_invoice_date` BETWEEN '" . date("Y-m-d", strtotime($session['startdate'])) . "' AND '" . date("Y-m-d", strtotime($session['enddate'])) . "') 
 					" . $vendorClause . " 
 					AND `purchase_invoice_master`.`from_where`<>'OP'
                                         AND `purchase_invoice_master`.`from_where`<>'STI'
                                         AND `purchase_invoice_master`.`year_id` = " . $session['pryear'] . " 
-					AND `purchase_invoice_master`.`company_id` = " . $session['prcom'];
+					AND `purchase_invoice_master`.`company_id` = " . $session['prcom']." AND purchase_invoice_master.isGST='N'";
 
 
         $query = $this->db->query($sql);
