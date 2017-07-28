@@ -91,6 +91,10 @@
 			<td width="20%">Date of Invoice</td>
 			<td><?php echo($headerview['SaleDt']); ?></td>
 		</tr>
+		<tr>
+			<td width="20%">Vehichle No</td>
+			<td><?php echo($headerview['vehichleno']); ?></td>
+		</tr>
 	</table>
 	
 	    <table width="100%" class="headerdemo" style="border-top:0;border-bottom:0;font-family:Verdana, Geneva, sans-serif; font-size:10px !important;">
