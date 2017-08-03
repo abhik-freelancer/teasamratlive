@@ -42,6 +42,8 @@ $(function() {
        
         var enddate = $('#enddate').val();
         var product = $('#product').val()||0;
+		
+		var taxtype = $("#taxtype").val();
         
          if(startdate==""){
            $('#startdate').addClass("glowing-border");
@@ -62,7 +64,7 @@ $(function() {
             type: "POST",
             url: basepath + "salebillregister/getSalebillRegister",
             data: { startdate: startdate, enddate: enddate,
-             customer: customer,product:product},
+             customer: customer,product:product,taxtype:taxtype},
             dataType: 'html',
             success: function(data) {
                 $('#details').html(data);

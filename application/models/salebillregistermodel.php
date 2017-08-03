@@ -232,17 +232,17 @@ class salebillregistermodel extends CI_Model {
     }
     
 	
-	public function getSaleBillRegisterData($fdate,$tdate,$cusid,$compnyId,$yid)
+	public function getSaleBillRegisterData($fdate,$tdate,$cusid,$compnyId,$yid,$isGST)
 	{
 		$data = array();
-		$sql = "CALL sp_SaleBillRegister('".$fdate."','".$tdate."',".$cusid.",".$compnyId.",".$yid.")";
+		$sql = "CALL sp_SaleBillRegister('".$fdate."','".$tdate."',".$cusid.",".$compnyId.",".$yid.",'".$isGST."')";
 		//echo $sql;
 		$query = $this->db->query($sql);
 		
 		if ($query->num_rows() > 0) {
             foreach ($query->result() as $rows) {
                 $data[] = array(
-                    "salebillID" => $rows->salebillID,
+				    "salebillID" => $rows->salebillID,
                     "saleType" => $rows->saleType,
                     "customerName" =>$rows->customerName,
                     "saleBillNo" =>$rows->saleBillNo,
@@ -252,15 +252,18 @@ class salebillregistermodel extends CI_Model {
                     "taxAmount"=>$rows->taxAmount,
                     "discountAmount"=>$rows->discountAmount,
                     "totalAmount"=>$rows->totalAmount,
-                    "grandTotalAmt"=>$rows->grandTotalAmt
-                );
+                    "grandTotalAmt"=>$rows->grandTotalAmt,
+					"gstDiscountAmt"=>$rows->gstDiscountAmt,
+					"gstTaxableAmt"=>$rows->gstTaxableAmt,
+					"totalIncludedgstAmt"=>$rows->totalIncludedgstAmt,
+					"totalCGST"=>$rows->totalCGST,
+					"totalSGST"=>$rows->totalSGST,
+					"totalIGST"=>$rows->totalIGST,
+					"isGST"=>$rows->isGST
+				);
             }
 		}
-		//print_r($data);
 		return $data;
-			
-          
-		
 	}
     
 

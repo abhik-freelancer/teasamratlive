@@ -17,7 +17,7 @@
             $session = sessiondata_method();
             $headercontent['customer'] = $this->salebillregistermodel->getCustomerList($session);
 			$headercontent['product'] = $this->taxinvoicemodel->getPacketProduct();
-			
+			$headercontent['taxtype'] = "VAT";
             $page = 'salebill_register/header_view';
             $header = "";
 			$result="";
@@ -26,6 +26,28 @@
             redirect('login', 'refresh');
         }
     }
+	
+	
+	public function getsalebillregistergst()
+	{
+		if ($this->session->userdata('logged_in')) {
+			
+			$session = sessiondata_method();
+            $headercontent['customer'] = $this->salebillregistermodel->getCustomerList($session);
+			$headercontent['product'] = $this->taxinvoicemodel->getPacketProduct();
+			$headercontent['taxtype'] = "GST";
+			
+            $page = 'salebill_register/header_view';
+            $header = "";
+			$result="";
+            createbody_method($result,$page, $header, $session, $headercontent);
+        } else {
+            redirect('login', 'refresh');
+        }
+	}
+	
+	
+	
     
       public function getSalebillRegister() {
           
@@ -33,17 +55,26 @@
          $company = $session['company'];
 		 $yearId = $session['yearid'];
          
-        if ($this->session->userdata('logged_in')) {
+        if($this->session->userdata('logged_in')) {
        $startdate = date('Y-m-d',  strtotime($this->input->post('startdate')));
         $enddate = date('Y-m-d',  strtotime($this->input->post('enddate')));
         $customer =  $this->input->post('customer');
 		$product = $this->input->post("product");
-        
+		$taxtype = $this->input->post("taxtype");
+		if($taxtype=="VAT")
+        {
+			$isGST = "N";
+		}
+		if($taxtype=="GST")
+		{
+			$isGST = "Y";
+		}
         $value = array(
             'startDate'=>$startdate,
             'endDate'=>$enddate,
             'customerId'=>$customer,
-			'product'=>$product
+			'product'=>$product,
+			"isGST" => $isGST
         );
 		
 		$fdate = date('Y-m-d',strtotime($startdate));
@@ -51,15 +82,17 @@
 		$cid = $customer;
         
       //  $data['get_salebill_register'] = $this->salebillregistermodel->getSaleBillRegisterList($value,$company);
-	  $data['get_salebill_register'] = $this->salebillregistermodel->getSaleBillRegisterData($fdate,$tdate,$cid,$company,$yearId);
+	  $data['get_salebill_register'] = $this->salebillregistermodel->getSaleBillRegisterData($fdate,$tdate,$cid,$company,$yearId,$isGST);
 	  $this->db->freeDBResource($this->db->conn_id); 
-	/*
-	echo "<pre>";
-		print_r($data['get_salebill_register']);
-		echo "</pre>";
-	exit;*/
-        $page = 'salebill_register/list_view';
-        $view = $this->load->view($page, $data , TRUE );
+		if($isGST=="N")
+		{
+			$page = 'salebill_register/list_view';
+        }
+		if($isGST=="Y")
+		{
+			$page = 'salebill_register/list_view_gst';
+		}
+		$view = $this->load->view($page, $data , TRUE );
         echo($view);
          } else {
             redirect('login', 'refresh');
@@ -76,6 +109,15 @@
         $endDate = $this->input->post('enddate');
         $customerId = $this->input->post('customer');
 		$product = $this->input->post("product");
+		$taxtype = $this->input->post("taxtype");
+		if($taxtype=="VAT")
+        {
+			$isGST = "N";
+		}
+		if($taxtype=="GST")
+		{
+			$isGST = "Y";
+		}
         
         $value = array(
             'startDate'=>$startDate,
@@ -90,14 +132,23 @@
         $result['company'] = $this->companymodel->getCompanyNameById($companyId);
         $result['companylocation']= $this->companymodel->getCompanyAddressById($companyId);
         $result['printDate'] = date('d-m-Y');
-		$result['resultSalebill'] = $this->salebillregistermodel->getSaleBillRegisterData($fdate,$tdate,$cid,$companyId,$yearId);
+		$result['resultSalebill'] = $this->salebillregistermodel->getSaleBillRegisterData($fdate,$tdate,$cid,$companyId,$yearId,$isGST);
 		$this->db->freeDBResource($this->db->conn_id); 
 	
 		$this->load->library('pdf');
         $pdf = $this->pdf->load();
         ini_set('memory_limit', '256M'); 
+		
+		if($isGST=="N")
+		{
+			$page = 'salebill_register/salebill_register_pdf.php';
+        }
+		if($isGST=="Y")
+		{
+			$page = 'salebill_register/salebill_register_gst_pdf.php';
+		}
         
-          $page = 'salebill_register/salebill_register_pdf.php';
+          
                 
           $html = $this->load->view($page, $result, TRUE);
                 $pdf->WriteHTML($html); 
