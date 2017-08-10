@@ -475,6 +475,18 @@ function detailvalidation (){
                        }); 
         return false;
      }
+     if(!getServiceAccountValidation()){
+         
+          $( "#rawmaterial_save_dialg_detail" ).dialog({
+                            modal: true,
+                               buttons: {
+                           Ok: function() {
+                             $( this ).dialog( "close" );
+                           }
+                         }
+                       }); 
+            return false;           
+     }
      if(!getQtyValidation()){
         $( "#rawmaterial_save_dialg_detail" ).dialog({
                             modal: true,
@@ -620,6 +632,31 @@ function getProductValidation (){
             return true;  
     }
  }
+ 
+ function getServiceAccountValidation(){
+     
+    var selectedproduct;
+    var flag=0;
+     $('select[name^="account"]').each(function() {
+         
+        selectedproduct = parseFloat(($(this).val() == 0 ? 0 : $(this).val()));
+       //console.log(selectedproduct);
+        if(selectedproduct==0){
+            flag=1;
+        }
+        
+    });
+    if(flag==1){
+        return false;
+    }else{
+            return true;  
+    }
+     
+     
+ }
+ 
+ 
+ 
  function getQtyValidation(){
       var flag=0;
       $('input[name^="txtDetailQuantity"]').each(function() {
