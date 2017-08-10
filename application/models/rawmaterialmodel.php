@@ -13,28 +13,20 @@ class rawmaterialmodel extends CI_Model{
              $masterData=array(
                  "unitid"=>$data["unitid"],
                  "purchase_rate"=>$data["purchase_rate"],
-                 "product_description"=>$data["product_description"]
+                 "product_description"=>$data["product_description"],
+                 "type"=>$data["type"]
              );
              
             $this->db->trans_begin();
-            
-               /* echo('<pre>');
-                print_r($data);
-                echo('</pre>');*/
-                
-            
-                $this->db->insert('raw_material_master',$masterData);
-               // echo($this->db->last_query());
-                $lastInsertId = $this->db->insert_id();
-                $opening=array(
+            $this->db->insert('raw_material_master',$masterData);
+            $lastInsertId = $this->db->insert_id();
+             $opening=array(
                     "opening"=>$data["opening"],
                     "rawmaterialId"=>$lastInsertId,
                     "yearid"=>$data["yearid"],
                     "companyid"=>$data["companyid"]
                 );
-                $this->InsertRawMaterialOpening($opening,$lastInsertId);
-             // echo($this->db->last_query());exit;
-
+             $this->InsertRawMaterialOpening($opening,$lastInsertId);
             if ($this->db->trans_status() === FALSE) {
                 $this->db->trans_rollback();
                 return false;
@@ -104,8 +96,8 @@ class rawmaterialmodel extends CI_Model{
             `raw_material_master`.`purchase_rate`,
             `raw_material_master`.`product_description`,
             `unitmaster`.`unitName`
-            FROM `raw_material_master`
-            INNER JOIN `unitmaster`
+             FROM `raw_material_master`
+            LEFT JOIN `unitmaster`
             ON `raw_material_master`.`unitid`=`unitmaster`.`unitid`";
         
         $query =$this->db->query($sql);
@@ -195,7 +187,8 @@ class rawmaterialmodel extends CI_Model{
                     raw_material_master. `product_description`,
                      raw_material_master.`purchase_rate`,
                      raw_material_master.`unitid`,
-                     raw_material_opening.`opening`
+                     raw_material_opening.`opening`,
+                     raw_material_master.type
                 FROM `raw_material_master`
                 LEFT JOIN `raw_material_opening` 
                 ON `raw_material_opening`.`rawmaterialId` = `raw_material_master`.`id`
@@ -208,7 +201,8 @@ class rawmaterialmodel extends CI_Model{
                             "product_description"=>$ret->product_description,
                             "purchase_rate"=>$ret->purchase_rate,
                             "unitid"=>$ret->unitid,
-                            "opening"=>$ret->opening
+                            "opening"=>$ret->opening,
+                            "type"=>$ret->type
                             
              );
              

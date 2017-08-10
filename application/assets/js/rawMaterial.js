@@ -2,8 +2,16 @@ $(document).ready(function(){
  $(".legal-menu" + $('#mastermenu').val()).addClass(" collapse in ");
     $(".rawmaterial ").addClass(" active ");
         
-         var basepath = $("#basepath").val();
+    var basepath = $("#basepath").val();
 
+    $("#type").change(function(){
+        var typeId=$("#type").val();
+        toggleControle(typeId);
+        
+    });
+    
+    
+    
     $("#saveRawmaterial").click(function(){
        // var UnitName = $("#unitmaster").val();
        // var formData = $("#UnitMaster").serialize();
@@ -64,10 +72,13 @@ $(document).ready(function(){
  function validation(){
        var UnitId = $("#unitid").val();
        var rate=$("#rate").val();
-       if(UnitId=="0"){
-         $("#unitid").addClass("glowing-border");
-        return false;
-       }
+       var typeId=$("#type").val()||"";
+       if(typeId=="R"){
+        if(UnitId=="0"){
+          $("#unitid").addClass("glowing-border");
+         return false;
+        }
+    }
       /* if(rate==""){
             $("#rate").addClass("glowing-border");
         return false;
@@ -76,4 +87,15 @@ $(document).ready(function(){
       
            return true;
       
+   }
+   function toggleControle(type){
+       console.log(type);
+       if(type=="R"){
+           $("#unitid").removeAttr("disabled");
+           $("#opening").removeAttr("disabled");
+       }
+       else{
+           $("#unitid").attr("disabled", "disabled");
+           $("#opening").attr("disabled", "disabled");
+       }
    }

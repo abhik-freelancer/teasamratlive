@@ -76,6 +76,26 @@
       
         <table width="100%">
             <tr>
+                <td>Type</td>
+                <td>&nbsp;</td>
+                <td>
+                    <select id="type" class="selectStyle" name="type">
+                        <option value="R" <?php if($bodycontent['rawmaterial']['type']== "R"){echo('selected');}else{echo('');} ?>>Rawmaterial</option>
+                        <option value="S" <?php if($bodycontent['rawmaterial']['type']== "S"){echo('selected');}else{echo('');} ?>>Service</option>
+                        
+                    </select>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            
+            
+            
+            <tr>
                 <td>Rawmaterial </td>
                  <td>:&nbsp;&nbsp;</td>
                 <td>
@@ -95,7 +115,7 @@
                 <td>Unit  </td>
                 <td>:&nbsp;&nbsp;</td>
                 <td>
-                    <select name="unitid" id="unitid" style="width:180px;" class="selectStyle">
+                    <select name="unitid" id="unitid" style="width:180px;" class="selectStyle" <?php if($bodycontent['rawmaterial']['type']== "S"){echo('disabled');}else{echo('');} ?>>
                         <option value="0">Select</option>
                         <?php foreach($header['unitlist'] as $rows){?>
                 <option value="<?php echo($rows['unitid'])?>" <?php if($bodycontent['rawmaterial']['unitid']== $rows['unitid']){echo('selected');}else{echo('');} ?>><?php echo($rows['unitName']); ?></option>
@@ -114,7 +134,9 @@
                 <td>Opening Stock:</td>
                 <td>:&nbsp;&nbsp;</td>
                 <td> 
-                    <input type="text" id="opening" name="opening" class="textStylesmall" value="<?php echo $bodycontent['rawmaterial']['opening'];?>" />
+                    <input type="text" id="opening" name="opening" class="textStylesmall"
+                           value="<?php echo $bodycontent['rawmaterial']['opening'];?>" 
+                           <?php if($bodycontent['rawmaterial']['type']== "S"){echo('disabled');}else{echo('');} ?>/>
                     <input type="hidden" id="rate" name="rate" value="0.00<?php //echo $bodycontent['rawmaterial']['purchase_rate'];?>" />
                 </td>
             </tr>

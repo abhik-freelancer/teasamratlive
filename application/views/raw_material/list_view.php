@@ -9,7 +9,7 @@
 </div>
 
  
- <table id="example" class="display" cellspacing="0" width="100%">
+ <table class="table table-bordered table-condensed" id="example">
      <thead>
      <th>Unit Name</th>
      <th>Product Description</th>

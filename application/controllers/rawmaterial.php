@@ -37,6 +37,7 @@ class rawmaterial extends CI_Controller {
      public function addRawMaterial() {
         $session = sessiondata_method();
         if ($this->session->userdata('logged_in')) {
+            $rawMaterialId=0;
 
             if ($this->uri->segment(4) === FALSE) {
                     $rawMaterialId = 0;
@@ -47,26 +48,21 @@ class rawmaterial extends CI_Controller {
              $company = $session["company"];
              $year = $session["yearid"];
                      
-                     /*
-                      * $rawmaterial['yearid']=$session['yearid'];
-             $rawmaterial['companyid']=$session['company'];
-                      */
+                    
              if ($rawMaterialId != 0) {
                 $headercontent['mode'] = "Edit";
                 $headercontent['rawMaterialId'] = $rawMaterialId;
                 $result['rawmaterial'] = $this->rawmaterialmodel->getRawmaterial($company,$year,$rawMaterialId);
-           
-                
-              $page = 'raw_material/header_view';
+                $header=NULL;
+                $page = 'raw_material/header_view';
                 
             } else {
                 $headercontent['mode'] = "Add";
+                $headercontent['rawMaterialId']=0;
                 $page = 'raw_material/header_view';
+                $header=NULL;
+                $result=NULL;
             }
-
-
-            $header = '';
-
             /* load helper class to create view */
 
             createbody_method($result, $page, $header, $session, $headercontent);
@@ -85,12 +81,12 @@ class rawmaterial extends CI_Controller {
         $formData = $this->input->post('formDatas');
 
         parse_str($formData, $searcharray);
-    /* echo "<pre>";
+    /*echo "<pre>";
            print_r($searcharray);
-        echo "</pre>";*/
-        
+        echo "</pre>";
+        */
 
-   if ($modeOfOpeartion == "Add" && $rawmaterialId == "") {
+   if ($modeOfOpeartion == "Add" && $rawmaterialId == 0) {
             $this->insertData($searcharray);
         } else {
             $this->updateData($rawmaterialId, $searcharray);
@@ -108,12 +104,15 @@ class rawmaterial extends CI_Controller {
         $session = sessiondata_method();
 
         if ($this->session->userdata('logged_in')) {
-             $rawmaterial['unitid'] = $searcharray['unitid'];
-             $rawmaterial['purchase_rate']=$searcharray['rate'];
+             $rawmaterial["type"]=$searcharray["type"];
+             $rawmaterial['unitid'] = ($searcharray['unitid']==NULL?NULL:$searcharray['unitid']);
+             $rawmaterial['purchase_rate']=($searcharray['rate']==NULL?NULL:$searcharray['rate']);
              $rawmaterial['product_description']=$searcharray['product_descript'];
-             $rawmaterial['opening']=$searcharray['opening'];
+             $rawmaterial['opening']=($searcharray['opening']==NULL?0:$searcharray['opening']);
              $rawmaterial['yearid']=$session['yearid'];
              $rawmaterial['companyid']=$session['company'];
+             
+        
            
            $insrt = $this->rawmaterialmodel->insertRawmaterialMaster($rawmaterial);
 
@@ -143,12 +142,13 @@ class rawmaterial extends CI_Controller {
          if ($this->session->userdata('logged_in')) {
             
              $rawmaterialUpdate['id'] = $raWmaterialId;
-             $rawmaterialUpdate['purchase_rate']=$searcharray['rate'];
+             $rawmaterialUpdate['purchase_rate']=($searcharray['rate']==NULL?NULL:$searcharray['rate']);
              $rawmaterialUpdate['product_description']=$searcharray['product_descript'];
-             $rawmaterialUpdate['unitid'] = $searcharray['unitid'];
+             $rawmaterialUpdate['unitid'] = ($searcharray['unitid']==NULL?NULL:$searcharray['unitid']);;
+             $rawmaterialUpdate["type"]=$searcharray["type"];
              
              /*********Opening Data************/
-             $rawmaterialOpening['opening']=$searcharray['opening'];
+             $rawmaterialOpening['opening']=($searcharray['opening']==NULL?0:$searcharray['opening']);;
              $rawmaterialOpening['yearid']=$session['yearid'];
              $rawmaterialOpening['companyid']=$session['company'];
              $rawmaterialOpening["rawmaterialId"]=$raWmaterialId;

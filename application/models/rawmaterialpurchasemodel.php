@@ -10,8 +10,35 @@ class rawmaterialpurchasemodel extends CI_Model {
    public function getProductList(){
        $sql="SELECT 
             `raw_material_master`.`id`,
+            `raw_material_master`.`product_description` 
+             FROM `raw_material_master`  WHERE raw_material_master.type='R' ORDER BY `raw_material_master`.`product_description`";
+        $query = $this->db->query($sql);
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data[] = array(
+                    "productid" => $rows->id,
+                    "productdescript" => $rows->product_description
+                  );
+            }
+
+
+            return $data;
+        } else {
+            return $data;
+        }
+   }
+   /**
+    * @author Abhik<amiabhik@gmail.com>
+    * @method getServiceList
+    * @return type array
+    */
+   public function getServiceList(){
+       $sql="SELECT 
+            `raw_material_master`.`id`,
             `raw_material_master`.`product_description`
-             FROM `raw_material_master` ORDER BY `raw_material_master`.`product_description`";
+             FROM `raw_material_master` 
+             WHERE raw_material_master.type='S'
+             ORDER BY `raw_material_master`.`product_description` ";
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
             foreach ($query->result() as $rows) {
@@ -93,6 +120,46 @@ class rawmaterialpurchasemodel extends CI_Model {
            return $data;
        }
    }
+   
+   /**
+   *GstServicePurchaseList
+   *
+   **/
+   
+    public function GstServicePurchaseList($cmpny,$year){
+       $data=array();
+       $sql="SELECT 
+        `rawmaterial_purchase_master`.`id` AS rawMatPurchMastId,
+        `rawmaterial_purchase_master`.`invoice_no`,
+        DATE_FORMAT(`rawmaterial_purchase_master`.`invoice_date`,'%d-%m-%Y') AS InvoiceDate,
+        `rawmaterial_purchase_master`.`invoice_value`,
+        `vendor`.`vendor_name`
+        FROM `rawmaterial_purchase_master`
+        INNER JOIN `vendor`
+        ON `rawmaterial_purchase_master`.`vendor_id`=`vendor`.`id`
+        WHERE `rawmaterial_purchase_master`.`companyid`=".$cmpny." AND  `rawmaterial_purchase_master`.`yearid`=".$year.
+        " AND  rawmaterial_purchase_master.IsGST='Y' AND rawmaterial_purchase_master.IsService='Y'";
+       $query = $this->db->query($sql);
+       if($query->num_rows()>0){
+           foreach($query->result() as $rows){
+               $data[]=array(
+                   "rawMatPurchMastId"=>$rows->rawMatPurchMastId,
+                   "invoice_no"=>$rows->invoice_no,
+                   "InvoiceDate"=>$rows->InvoiceDate,
+                   "invoice_value"=>$rows->invoice_value,
+                   "vendor_name"=>$rows->vendor_name
+                   
+               );
+           }
+           return $data;
+       }else{
+           return $data;
+       }
+   }
+   
+   
+   
+   
    
    
    public function getRawMatpurchaseMastData($mastId){
@@ -227,7 +294,7 @@ class rawmaterialpurchasemodel extends CI_Model {
             `rawmaterial_purchasedetail`.sgstamt,
              `rawmaterial_purchasedetail`.igstRateId,
              `rawmaterial_purchasedetail`.igstamt,
-              `rawmaterial_purchasedetail`.HSN
+              `rawmaterial_purchasedetail`.HSN,rawmaterial_purchasedetail.serviceaccountId
             FROM `rawmaterial_purchasedetail`
             WHERE `rawmaterial_purchasedetail`.`rawmat_purchase_masterId`=".$mastId."";
        $query = $this->db->query($sql);
@@ -248,7 +315,8 @@ class rawmaterialpurchasemodel extends CI_Model {
                     "sgstamt"=>$rows->sgstamt,
                     "igstRateId"=>$rows->igstRateId,
                     "igstamt"=>$rows->igstamt,
-                    "HSN"=>$rows->HSN
+                    "HSN"=>$rows->HSN,
+                        "serviceaccountId"=>$rows->serviceaccountId
                 );
             }
 
