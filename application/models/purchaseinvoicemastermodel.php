@@ -1828,7 +1828,9 @@ public function updateOtherCharges($pMasterId,$data,$vMastId,$vendorId){
           
             $voucherDetailData = $this->getVoucherDtldataFromPMast($pMasterId);
             $vendorBill = $this->upadateVendorBill($pMasterId, $voucherDetailData['total']); // Mithilesh on 17.10.2016 
-            $vDetailUpd = $this->UpdVochrDtlFromPMast($voucherDetailData,$vMastId,$vendorId);
+            //$vDetailUpd = $this->UpdVochrDtlFromPMast($voucherDetailData,$vMastId,$vendorId);
+            $vDetailUpd = $this->getGSTVchrDataDtl($pMasterId);
+			
           
           if ($this->db->trans_status() === FALSE) {
                 $this->db->trans_rollback();

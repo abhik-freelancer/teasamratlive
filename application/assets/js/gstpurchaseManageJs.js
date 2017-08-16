@@ -315,6 +315,12 @@ $(document).on('change','.igst',function(){
     }
   });
   
+  
+  //IGST
+$(document).on('keyup','#txtRoundOff',function(){
+    getOtherChargesRoundOff();
+});
+
    
 
   
@@ -935,7 +941,15 @@ function updateOtherChargesRoundoff(mstId){
  * 
  */
 function getOtherChargesRoundOff(){
-   
+	
+	var finalCostofAllCost=0;
+	var teaValIncldGST=0;
+	var roundOff = 0;
+	
+	 teaValIncldGST = $("#txtGSTIncludedAmount").val() || 0;
+	 roundOff = $("#txtRoundOff").val() || 0;
+	
+   /*
     var finalCostofAllCost=0;
     var teaValuesTotal = 0;
     var finalBrokerage = 0;
@@ -959,7 +973,15 @@ function getOtherChargesRoundOff(){
     roundOff = parseFloat($("#txtRoundOff").val()==""||$("#txtRoundOff").val()=="-" ||$("#txtRoundOff").val()=="." || $("#txtRoundOff").val()=="-." ?0:$("#txtRoundOff").val());
     
     finalCostofAllCost  = parseFloat((teaValuesTotal+finalBrokerage+finalServiceTax+finalVatAmount+finalCstAmount+finalStamp+finalTbCharg+otherCharges)+parseFloat(roundOff));
-    console.log(finalCostofAllCost);
+	
+	*/
+	
+	finalCostofAllCost  = parseFloat(teaValIncldGST)+parseFloat(roundOff);
+	
+   // console.log("total tea Value "+totalValue);
+   // console.log("round of "+roundOff);
+    
+	
     $("#txtTotalPurchase").val(finalCostofAllCost.toFixed(2));
     
     return false;

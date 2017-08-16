@@ -175,6 +175,7 @@ class leftmenumodel extends CI_Model{
 							"menu_link" => $rows->menu_link,
 							"is_parent" => $rows->is_parent,
 							"parent_id" => $rows->parent_id,
+							"is_new" => $rows->is_new,
 							"secondLevelMenu" => $this->getSecondLevelMenu($rows->id) 
 						 );
 					
@@ -199,6 +200,7 @@ class leftmenumodel extends CI_Model{
 							"second_menu_link" => $rows->menu_link,
 							"second_is_parent" => $rows->is_parent,
 							"second_parent_id" => $rows->parent_id,
+							"is_new" => $rows->is_new,
 							"thirdLevelMenu" => $this->getThirdLevelMenu($rows->id) 
 						 );
 					
@@ -222,6 +224,7 @@ class leftmenumodel extends CI_Model{
 							"third_menu_name" => $rows->menu_name,
 							"third_menu_link" => $rows->menu_link,
 							"third_is_parent" => $rows->is_parent,
+							"is_new" => $rows->is_new,
 							"third_parent_id" => $rows->parent_id,
 							
 						);
@@ -249,6 +252,7 @@ class leftmenumodel extends CI_Model{
 							"menu_link" => $rows->menu_link,
 							"is_parent" => $rows->is_parent,
 							"parent_id" => $rows->parent_id,
+							"is_new" => $rows->is_new,
 							"secondLevelMenu" => $this->getSecondLevelMenu($rows->id) 
 						 );
 					

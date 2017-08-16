@@ -68,14 +68,22 @@
 										}
 										
 										?>
-										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a></li>
+										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a>
+											<?php if($second_lvel['is_new']=="Y"){?>
+											<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+											<?php } ?>
+										</li>
 										
 										<?php if(sizeof($second_lvel['thirdLevelMenu'])>0){ ?>
 											<ul>
 											<?php
 											foreach($second_lvel['thirdLevelMenu'] as $third_level){
 											?>
-												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a></li>
+												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a>
+													<?php if($third_level['is_new']=="Y"){?>
+													<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+													<?php } ?>
+												</li>
 											
 											<?php }?>
 											</ul>
@@ -120,14 +128,23 @@
 										}
 										
 										?>
-										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a></li>
+										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a>
+											<?php if($second_lvel['is_new']=="Y"){?>
+											<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+											<?php } ?>
+										</li>
 										
 										<?php if(sizeof($second_lvel['thirdLevelMenu'])>0){ ?>
 											<ul>
 											<?php
 											foreach($second_lvel['thirdLevelMenu'] as $third_level){
 											?>
-												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a></li>
+												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a> 
+												<?php if($third_level['is_new']=="Y"){?>
+												<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+												<?php } ?>
+												
+												</li>
 											
 											<?php }?>
 											</ul>
@@ -168,14 +185,22 @@
 										}
 										
 										?>
-										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a></li>
+										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a>
+											<?php if($second_lvel['is_new']=="Y"){?>
+											<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+											<?php } ?>
+										</li>
 										
 										<?php if(sizeof($second_lvel['thirdLevelMenu'])>0){ ?>
 											<ul>
 											<?php
 											foreach($second_lvel['thirdLevelMenu'] as $third_level){
 											?>
-												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a></li>
+												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a>
+												<?php if($third_level['is_new']=="Y"){?>
+												<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+												<?php } ?>
+												</li>
 											
 											<?php }?>
 											</ul>
@@ -218,14 +243,22 @@
 										}
 										
 										?>
-										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a></li>
+										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a>
+											<?php if($second_lvel['is_new']=="Y"){?>
+											<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+											<?php } ?>
+										</li>
 										
 										<?php if(sizeof($second_lvel['thirdLevelMenu'])>0){ ?>
 											<ul>
 											<?php
 											foreach($second_lvel['thirdLevelMenu'] as $third_level){
 											?>
-												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a></li>
+												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a>
+													<?php if($third_level['is_new']=="Y"){?>
+													<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+													<?php } ?>
+												</li>
 											
 											<?php }?>
 											</ul>
@@ -274,14 +307,22 @@
 										
 										
 										?>
-										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a></li>
+										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a>
+											<?php if($second_lvel['is_new']=="Y"){?>
+											<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+											<?php } ?>
+										</li>
 										
 										<?php if(sizeof($second_lvel['thirdLevelMenu'])>0){ ?>
 											<ul>
 											<?php
 											foreach($second_lvel['thirdLevelMenu'] as $third_level){
 											?>
-												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a></li>
+												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a>
+													<?php if($third_level['is_new']=="Y"){?>
+													<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+													<?php } ?>
+												</li>
 											
 											<?php }?>
 											</ul>
@@ -322,14 +363,22 @@
 										}
 			
 										?>
-										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a></li>
+										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a>
+											<?php if($second_lvel['is_new']=="Y"){?>
+											<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+											<?php } ?>
+										</li>
 										
 										<?php if(sizeof($second_lvel['thirdLevelMenu'])>0){ ?>
 											<ul>
 											<?php
 											foreach($second_lvel['thirdLevelMenu'] as $third_level){
 											?>
-												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a></li>
+												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a>
+													<?php if($third_level['is_new']=="Y"){?>
+													<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+													<?php } ?>
+												</li>
 											
 											<?php }?>
 											</ul>
@@ -370,14 +419,22 @@
 										}
 										
 										?>
-										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a></li>
+										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a>
+											<?php if($second_lvel['is_new']=="Y"){?>
+											<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+											<?php } ?>
+										</li>
 										
 										<?php if(sizeof($second_lvel['thirdLevelMenu'])>0){ ?>
 											<ul>
 											<?php
 											foreach($second_lvel['thirdLevelMenu'] as $third_level){
 											?>
-												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a></li>
+												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a>
+													<?php if($third_level['is_new']=="Y"){?>
+													<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+													<?php } ?>
+												</li>
 											
 											<?php }?>
 											</ul>
@@ -415,14 +472,22 @@
 											$class = "";
 										}
 										?>
-										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a></li>
+										<li class="<?php echo $class; ?>"><span class="glyphicon glyphicon-chevron-right"></span><a href="<?php if($second_lvel['second_menu_link']=="#"){echo "javascript:void(0)";}else{echo $second_lvel['second_menu_link'];}?>"><?php echo $second_lvel['second_menu_name']; ?></a>
+											<?php if($second_lvel['is_new']=="Y"){?>
+											<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+											<?php } ?>
+										</li>
 										
 										<?php if(sizeof($second_lvel['thirdLevelMenu'])>0){ ?>
 											<ul>
 											<?php
 											foreach($second_lvel['thirdLevelMenu'] as $third_level){
 											?>
-												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a></li>
+												<li><span class="glyphicon glyphicon-star-empty"></span><a href="<?php if($third_level['third_menu_link']=="#"){echo "javascript:void(0)";}else{echo $third_level['third_menu_link'];}?>"><?php echo $third_level['third_menu_name']; ?></a>
+													<?php if($third_level['is_new']=="Y"){?>
+													<img src="<?php echo base_url();?>application/assets/images/new-blink.gif" width="30" />
+													<?php } ?>
+												</li>
 											
 											<?php }?>
 											</ul>
