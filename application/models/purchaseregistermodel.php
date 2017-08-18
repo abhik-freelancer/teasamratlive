@@ -212,6 +212,32 @@ class purchaseregistermodel extends CI_Model {
             return $data;
         }
 	}
+        
+        public function generateGstPurchaseRegister($companyId,$yearId,$fromDate,$toDate){
+            $data=array();
+            $call_procedure = "CALL sp_gstPurchaseRegister(".$companyId.",".$yearId.",'".$fromDate."','".$toDate."')";
+            $query = $this->db->query($call_procedure);
+            if ($query->num_rows() > 0) {
+            foreach ($query->result() as $rows) {
+                $data[] = array(
+                        "vendorname" => $rows->vendorname,
+                        "BillNo" => $rows->BillNo,
+                        "BillDate" => $rows->BillDate,
+                        "taxableamount" => $rows->taxableamount,
+                        "cgstamount" => $rows->cgstamount,
+                        "sgstamount" => $rows->sgstamount,
+                        "igstamount" => $rows->igstamount,
+                        "gstincludedamt" => $rows->gstincludedamt,
+                        "roundoff" => $rows->roundoff,
+                        "billtotal" => $rows->billtotal
+
+						
+                     );
+                }
+            }
+            return $data;
+        }
+        
 	
 	public function getPurchaseRegSumData()
 	{

@@ -63,7 +63,7 @@
                 <th style="font-size:12px;">Bill No</th>
                 <th style="font-size:12px;">Bill Dt</th>
                 <th style="font-size:12px;">Qty</th>
-                <th style="font-size:12px;">Disc.</th>
+                <th style="font-size:12px;">Taxable</th>
 				<th style="font-size:12px;">CGST Amt.</th>
 				<th style="font-size:12px;">SGST Amt.</th>
 				<th style="font-size:12px;">IGST Amt.</th>
@@ -76,6 +76,7 @@
 			$grandTotalAmt = 0;
 			$totalAmountSum = 0;
 			$totalDiscountSum = 0;
+			$totalTaxable = 0;
 			$totalCGSTSum = 0;
 			$totalSGSTSum = 0;
 			$totalIGSTSum = 0;
@@ -91,6 +92,7 @@
 					$totalSGSTSum = $totalSGSTSum+$row['totalSGST'];
 					$totalIGSTSum = $totalIGSTSum+$row['totalIGST'];
 					$totalDiscountSum = $totalDiscountSum+$row['gstDiscountAmt'];
+					$totalTaxable = $totalTaxable+$row['gstTaxableAmt'];
 					$totalAmountSum = $totalAmountSum+$row['totalAmount'];
 					$grandTotalAmt = $grandTotalAmt+$row['grandTotalAmt'];
                     ?>
@@ -99,7 +101,7 @@
                         <td style="font-size:11px;"><?php echo $row['saleBillNo']; ?></td>
                         <td style="font-size:11px;"><?php echo date('d-m-Y',strtotime($row['saleBillDate'])); ?></td>
                         <td align="right"><?php echo $row['totalQty'];?></td>
-						<td align="right"><?php echo $row['gstDiscountAmt'];?></td>
+						<td align="right"><?php echo $row['gstTaxableAmt'];?></td>
 						<td align="right"><?php echo $row['totalCGST'];?></td>
 						<td align="right"><?php echo $row['totalSGST'];?></td>
 						<td align="right"><?php echo $row['totalIGST'];?></td>
@@ -144,7 +146,7 @@
 										<th style="font-size:12px;">Bill No</th>
 										<th style="font-size:12px;">Bill Dt</th>
 										<th style="font-size:12px;">Qty</th>
-										<th style="font-size:12px;">Disc.</th>
+										<th style="font-size:12px;">Taxable</th>
 										<th style="font-size:12px;">CGST Amt.</th>
 										<th style="font-size:12px;">SGST Amt.</th>
 										<th style="font-size:12px;">IGST Amt.</th>
@@ -176,7 +178,7 @@
 			<tr>
 				<td colspan="3" style="font-size:12px;font-weight:bold;">Grand Total </td>
 				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalQtySum ,2); ?></td>
-				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalDiscountSum ,2); ?></td>
+				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalTaxable ,2); ?></td>
 				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalCGSTSum ,2); ?></td>
 				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalSGSTSum ,2); ?></td>
 				<td style="font-size:12px;font-weight:bold;" align="right"><?php echo number_format($totalIGSTSum ,2); ?></td>
