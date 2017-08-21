@@ -102,7 +102,7 @@ class rawmaterialpurchasemodel extends CI_Model {
         INNER JOIN `vendor`
         ON `rawmaterial_purchase_master`.`vendor_id`=`vendor`.`id`
         WHERE `rawmaterial_purchase_master`.`companyid`=".$cmpny." AND  `rawmaterial_purchase_master`.`yearid`=".$year.
-        " AND  rawmaterial_purchase_master.IsGST='Y'";
+        " AND  rawmaterial_purchase_master.IsGST='Y' AND rawmaterial_purchase_master.IsService='N'";
        $query = $this->db->query($sql);
        if($query->num_rows()>0){
            foreach($query->result() as $rows){

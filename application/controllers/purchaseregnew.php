@@ -108,7 +108,7 @@ public function getGSTPurchaseRegister()
 			
 			$result['forperiod'] = $fromDate." To ".$toDate;
                         $result['purchaseRegister']=$this->purchaseregistermodel->generateGstPurchaseRegister($compnyID,$yearID,$fDate,$toDt);
-                       /* echo("<pre>");
+                      /*  echo("<pre>");
                         print_r($result['purchaseRegister']);
 			echo("</pre>");*/
                         

@@ -227,7 +227,7 @@ class purchaseregistermodel extends CI_Model {
                         "cgstamount" => $rows->cgstamount,
                         "sgstamount" => $rows->sgstamount,
                         "igstamount" => $rows->igstamount,
-                        "gstincludedamt" => $rows->gstincludedamt,
+                        "gstincludedamt" =>($rows->cgstamount + $rows->sgstamount+$rows->igstamount) ,        //$rows->gstincludedamt,
                         "roundoff" => $rows->roundoff,
                         "billtotal" => $rows->billtotal
 
